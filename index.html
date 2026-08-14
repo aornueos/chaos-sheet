@@ -429,13 +429,19 @@ body{
 }
 .masthead,.panel{animation:assenta .34s cubic-bezier(.2,.7,.3,1) backwards}
 
-/* carimbo: bate no papel, recua e assenta */
+/* Carimbo: bate no papel, recua e assenta. A escala de entrada é uma
+   variável porque em tela estreita o pico de 1.8 deixa o carimbo mais
+   largo que o espaço disponível, e o corte do cabeçalho o decepa. */
 @keyframes carimba{
-  0%{opacity:0;transform:rotate(var(--rot)) scale(1.8)}
+  0%{opacity:0;transform:rotate(var(--rot)) scale(var(--esc))}
   55%{opacity:1;transform:rotate(var(--rot)) scale(.92)}
   100%{opacity:1;transform:rotate(var(--rot)) scale(1)}
 }
-.stamp{--rot:-4deg;animation:carimba .4s cubic-bezier(.3,1.5,.4,1) .18s backwards}
+/* Os carimbos ficam encostados na borda direita do cabeçalho, então a
+   ampliação precisa crescer para dentro; com origem no centro ela
+   transbordava e era recortada pelo overflow do cabeçalho. */
+.stamp{--rot:-4deg;--esc:1.8;transform-origin:right center;
+  animation:carimba .4s cubic-bezier(.3,1.5,.4,1) .18s backwards}
 .stamp-brass{--rot:3deg;animation-delay:.32s}
 
 /* lâmpada velha sobre o cabeçalho: pisca raro, nunca ritmado */
@@ -609,7 +615,20 @@ body{
   .mast-row{flex-direction:column;gap:14px}
   .mast-id{gap:12px}
   .portrait{width:74px;height:92px}
-  .mast-stamps{flex-direction:row;align-items:center;align-self:flex-start;gap:10px}
+  /* afiliações de nome longo ("Sociedade dos Ceifadores") somam mais que
+     a largura da tela; deixar quebrar é melhor que empurrar para fora */
+  .mast-stamps{flex-direction:row;flex-wrap:wrap;align-items:center;align-self:flex-start;gap:10px;max-width:100%}
+  .stamp{max-width:100%;transform-origin:left center}   /* aqui eles alinham à esquerda */
+  .stamp-brass{white-space:normal}
+
+  /* Em tela estreita o carimbo já ocupa quase toda a largura: qualquer
+     escala de entrada o faz transbordar e ser decepado pelo corte do
+     cabeçalho. Aqui ele cai de cima, que dá o mesmo peso sem crescer. */
+  @keyframes carimba{
+    0%{opacity:0;transform:rotate(var(--rot)) translateY(-7px)}
+    60%{opacity:1;transform:rotate(var(--rot)) translateY(2px)}
+    100%{opacity:1;transform:rotate(var(--rot))}
+  }
   .mast-nome{letter-spacing:.04em}
   .mast-kicker{letter-spacing:.05em}
   .mast-meta{letter-spacing:.04em}
