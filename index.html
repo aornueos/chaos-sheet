@@ -357,6 +357,85 @@ body{
 .print-only{display:none}
 
 /* ============================================================
+   MOVIMENTO
+   Três camadas, nenhuma decorativa:
+   1. chegada — os documentos são postos sobre a mesa
+   2. ambiente — a Corrupção faz a página respirar
+   3. resposta — o que você toca reage como tinta
+   Só transform/opacity, para não custar repintura.
+   ============================================================ */
+
+/* ---- 1. chegada ---- */
+@keyframes assenta{
+  from{opacity:0;transform:translateY(7px)}
+  to{opacity:1;transform:none}
+}
+.masthead,.panel{animation:assenta .34s cubic-bezier(.2,.7,.3,1) backwards}
+
+/* carimbo: bate no papel, recua e assenta */
+@keyframes carimba{
+  0%{opacity:0;transform:rotate(var(--rot)) scale(1.8)}
+  55%{opacity:1;transform:rotate(var(--rot)) scale(.92)}
+  100%{opacity:1;transform:rotate(var(--rot)) scale(1)}
+}
+.stamp{--rot:-4deg;animation:carimba .4s cubic-bezier(.3,1.5,.4,1) .18s backwards}
+.stamp-brass{--rot:3deg;animation-delay:.32s}
+
+/* lâmpada velha sobre o cabeçalho: pisca raro, nunca ritmado */
+@keyframes lampada{
+  0%,93%,100%{opacity:1}
+  94%{opacity:.25}
+  95%{opacity:.85}
+  96%{opacity:.4}
+  97%{opacity:.95}
+}
+.masthead::before{animation:lampada 13s steps(1,end) infinite}
+
+/* ---- 2. ambiente: a maré só existe se houver Corrupção ---- */
+@keyframes mare{
+  0%,100%{opacity:1}
+  50%{opacity:calc(1 - var(--corr) * .38)}
+}
+.tex::after{animation:mare 9s ease-in-out infinite}
+
+/* estado crítico pulsa sem precisar de cor */
+@keyframes alerta{0%,100%{opacity:1}50%{opacity:.42}}
+.lvl.bad.on,.corr-c.on.max{animation:alerta 1.9s ease-in-out infinite}
+
+/* ---- 3. resposta ao toque ---- */
+@keyframes tinta{0%{transform:scale(.65)}60%{transform:scale(1.14)}100%{transform:scale(1)}}
+.pip.on{animation:tinta .2s ease-out}
+.pip:active{transform:scale(.8)}
+
+.lvl,.corr-c{transition:transform .1s ease}
+.lvl:active,.corr-c:active{transform:scale(.93)}
+
+.panel{transition:border-color .18s ease}
+.panel:hover{border-color:#4a4a4a}
+
+.file{transform-origin:left center}
+.file:active{transform:scale(.985)}
+
+/* dado: chacoalha enquanto rola, assenta ao parar */
+@keyframes chacoalha{
+  0%{transform:translate(0,0) rotate(0)}
+  25%{transform:translate(1px,-2px) rotate(-4deg)}
+  50%{transform:translate(-1px,1px) rotate(3deg)}
+  75%{transform:translate(2px,1px) rotate(-2deg)}
+  100%{transform:translate(0,0) rotate(0)}
+}
+.die.rolando{animation:chacoalha .16s linear infinite;color:var(--dust-dim)}
+@keyframes assenta-dado{0%{transform:scale(1.28)}100%{transform:scale(1)}}
+.die.parou{animation:assenta-dado .17s cubic-bezier(.3,1.4,.4,1)}
+
+/* aviso entra deslizando, sem perder a centralização */
+@keyframes sobe-aviso{
+  from{opacity:0;transform:translate(-50%,16px)}
+  to{opacity:1;transform:translate(-50%,0)}
+}
+.toast{animation:sobe-aviso .24s ease-out}
+
+/* ============================================================
    IMPRESSÃO — preto e branco, A4 paisagem, mesma direção de arte
    ============================================================ */
 @media print{
@@ -386,7 +465,9 @@ body{
   .mast-title{font-size:20pt}
   .mast-kicker{color:#000 !important;font-size:7pt}
   .stamp,.stamp-brass{background:#fff !important;border:1.5pt solid #000 !important;color:#000 !important;opacity:1}
-  *{text-shadow:none !important}
+  /* animação com fill 'backwards' congelaria elementos invisíveis no papel */
+  *{text-shadow:none !important;animation:none !important}
+  .masthead,.panel{opacity:1 !important;transform:none !important}
 
   .inp,.sel,.txt{
     background:transparent !important;border:none !important;
@@ -1062,6 +1143,15 @@ function renderSheet(){
   renderList("bencaos");
   renderList("inventario");
   updateDerived();
+  escalona();
+}
+
+/* os documentos não caem todos de uma vez: cada painel entra logo após
+   o anterior, com o atraso limitado para a folha não demorar a existir */
+function escalona(){
+  document.querySelectorAll(".masthead,.panel").forEach((el,i) => {
+    el.style.animationDelay = Math.min(i * 26, 380) + "ms";
+  });
 }
 
 /* ============================================================
@@ -1389,19 +1479,49 @@ document.addEventListener("click", e => {
 });
 
 /* ---------- rolador ---------- */
+let rolando = null;
 document.addEventListener("click", e => {
   if(!e.target.closest("#btnRoll")) return;
+
   const n = Math.max(1, Math.min(20, Number(document.getElementById("rollN").value)||1));
   const rolls = Array.from({length:n},() => 1 + Math.floor(Math.random()*6));
-  const suc = rolls.filter(r => r >= 4).length;
-  const terr = rolls.filter(r => r === 1).length;
+  const box = document.getElementById("dice");
+  const out = document.getElementById("rollOut");
 
-  document.getElementById("dice").innerHTML = rolls
-    .map(r => `<span class="die ${r>=4?"hit":r===1?"terr":""}">${r}</span>`).join("");
+  clearInterval(rolando);   // clique repetido não deixa duas rolagens correndo juntas
 
-  document.getElementById("rollOut").innerHTML =
-    `<b>${suc}</b> sucesso${suc===1?"":"s"} em ${n}D6` +
-    (terr ? ` · <span class="terrible">${terr} Terrível${terr===1?"":"is"}</span>` : "");
+  const parar = () => {
+    box.innerHTML = rolls.map(r =>
+      `<span class="die parou ${r>=4?"hit":r===1?"terr":""}">${r}</span>`).join("");
+    const suc  = rolls.filter(r => r >= 4).length;
+    const terr = rolls.filter(r => r === 1).length;
+    out.innerHTML =
+      `<b>${suc}</b> sucesso${suc===1?"":"s"} em ${n}D6` +
+      (terr ? ` · <span class="terrible">${terr} Terrível${terr===1?"":"is"}</span>` : "");
+  };
+
+  // quem pediu menos movimento recebe o resultado direto
+  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){ parar(); return; }
+
+  box.innerHTML = rolls.map(() => `<span class="die rolando">?</span>`).join("");
+  out.textContent = "rolando…";
+
+  const dados = [...box.children];
+  const fim = dados.map((_,i) => 220 + i * 65);   // assentam um a um, da esquerda
+  let t = 0;
+  rolando = setInterval(() => {
+    t += 55;
+    let girando = 0;
+    dados.forEach((d,i) => {
+      if(t < fim[i]){ d.textContent = 1 + Math.floor(Math.random()*6); girando++; }
+      else if(d.classList.contains("rolando")){
+        d.classList.remove("rolando");
+        d.classList.add("parou", rolls[i] >= 4 ? "hit" : rolls[i] === 1 ? "terr" : "");
+        d.textContent = rolls[i];
+      }
+    });
+    if(!girando){ clearInterval(rolando); rolando = null; parar(); }
+  }, 55);
 });
 
 /* ---------- gaveta: ações ---------- */
