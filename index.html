@@ -57,6 +57,7 @@
 }
 
 *{box-sizing:border-box}
+::selection{background:var(--bone);color:#000;text-shadow:none}
 
 body{
   margin:0;
@@ -121,6 +122,7 @@ body{
 .file.is-active span{color:var(--dust)}
 
 .drawer-foot{padding:10px;border-top:1px solid var(--line);display:grid;gap:6px}
+.drawer-toggle{display:none}
 .save-state{
   font-size:10px;letter-spacing:.09em;text-transform:uppercase;
   color:var(--dust-dim);text-align:center;padding:3px 0 5px;
@@ -170,6 +172,13 @@ body{
   background:linear-gradient(90deg,var(--brass) 0%,var(--brass-lo) 22%,transparent 60%);
 }
 .mast-row{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.mast-id{display:flex;gap:16px;align-items:flex-start;min-width:0;flex:1}
+.mast-id > div:last-child{min-width:0;flex:1}
+.mast-stamps{display:flex;flex-direction:column;gap:14px;align-items:flex-end;flex:none}
+.mast-nome{
+  font-size:var(--fs-2xl);letter-spacing:.07em;text-transform:uppercase;font-weight:700;
+  padding:2px 6px;background:transparent;border:none;border-bottom:1px solid var(--line);
+}
 .mast-title{margin:0;font-size:var(--fs-2xl);letter-spacing:.07em;text-transform:uppercase;font-weight:700;line-height:1}
 .mast-kicker{font-size:var(--fs-xs);letter-spacing:.08em;text-transform:uppercase;color:var(--brass);margin:0 0 8px}
 .mast-meta{font-size:var(--fs-xs);letter-spacing:.08em;text-transform:uppercase;color:var(--dust-dim);margin:8px 0 0}
@@ -215,6 +224,8 @@ body{
 }
 .sel option{background:var(--panel);color:var(--bone)}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* rotulos de alturas diferentes desalinhavam os campos: alinha pela base */
+.grid-2>.field,.grid-3>.field,.grid-4>.field{justify-content:flex-end}
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 
@@ -505,19 +516,92 @@ body{
   .portrait img{filter:grayscale(1) contrast(1.5) brightness(1.05)}
 }
 
-/* ---------- responsivo (só tela: uma folha A4 paisagem tem ~1055px
-   e reativaria estas regras durante a impressão) ---------- */
+/* ============================================================
+   RESPONSIVO — só para tela: uma folha A4 paisagem tem ~1055px
+   e reativaria estas regras durante a impressão.
+   ============================================================ */
+
+/* ---- notebook estreito ---- */
 @media screen and (max-width:1180px){
   .cols{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-  .full{grid-template-columns:minmax(0,1fr)}
 }
-@media screen and (max-width:860px){
+
+/* ---- tablet ---- */
+@media screen and (max-width:900px){
   .wrap{grid-template-columns:1fr}
   .drawer{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}
-  .drawer-list{max-height:210px}
-  .cols{grid-template-columns:minmax(0,1fr)}
-  .sheet{padding:18px 16px 60px}
-  .mast-title{font-size:24px}
+  .full{grid-template-columns:minmax(0,1fr)}
+  .sheet{padding:20px 18px 60px}
+
+  /* aberta, a gaveta empurrava a ficha para fora da tela (493px antes de
+     qualquer conteudo). Recolhida por padrao em tudo que nao e desktop. */
+  .drawer-head{padding:12px 14px 10px}
+  .drawer-toggle{display:block;width:100%;margin-top:9px}
+  .drawer-list,.drawer-foot{display:none}
+  .drawer.is-open .drawer-list{display:block}
+  .drawer.is-open .drawer-foot{display:grid}
+  .drawer-list{padding:8px 14px 0;overflow:visible}
+  #fileList{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px}
+  .file{flex:0 0 190px;margin-bottom:0}
+  .drawer-foot{grid-template-columns:1fr 1fr;padding:8px 14px 12px}
+  .save-state{grid-column:1/-1;padding:0 0 2px}
+}
+
+/* ---- celular ---- */
+@media screen and (max-width:680px){
+  :root{--fs-2xl:22px}
+
+  .sheet{padding:14px 12px 56px}
+  .cols{grid-template-columns:minmax(0,1fr);gap:12px}
+  .full{gap:12px}
+  .stack{gap:12px}
+  .panel{padding:12px 13px 14px}
+
+  /* a gaveta virava um muro de 500px antes da ficha:
+     as fichas passam a rolar na horizontal e as ações ficam em duas colunas */
+  /* cabeçalho: o retrato fixo de 104px espremia todo o resto */
+  .mast-row{flex-direction:column;gap:14px}
+  .mast-id{gap:12px}
+  .portrait{width:74px;height:92px}
+  .mast-stamps{flex-direction:row;align-items:center;align-self:flex-start;gap:10px}
+  .mast-nome{letter-spacing:.04em}
+  .mast-kicker{letter-spacing:.05em}
+  .mast-meta{letter-spacing:.04em}
+
+  /* grelhas densas não cabem em 375px */
+  .grid-4,.grid-3{grid-template-columns:1fr 1fr}
+  .attrs{grid-template-columns:1fr 1fr;gap:7px}
+  .attr-v{font-size:22px}
+}
+
+/* ---- celular estreito ---- */
+@media screen and (max-width:430px){
+  .grid-3{grid-template-columns:1fr}
+  .row-meta{flex-direction:column;align-items:stretch}
+  .row-meta .field{width:100% !important}
+  .eq{align-self:flex-start}
+  .track-state{flex-direction:column;gap:2px}
+  .file{flex:0 0 158px}
+}
+
+/* ============================================================
+   TOQUE — vale por tipo de ponteiro, não por largura, para
+   pegar também tablets e telas sensíveis grandes.
+   ============================================================ */
+@media (pointer:coarse){
+  /* abaixo de 16px o iOS dá zoom sozinho ao focar o campo */
+  .inp,.sel,.txt{font-size:16px;padding:9px 10px}
+  .mast-nome{font-size:var(--fs-2xl)}
+
+  .pip{width:26px;height:26px}
+  .pips{gap:5px}
+  .lvl{padding:12px 2px;font-size:11px}
+  .corr-c{height:34px}
+  .die{width:34px;height:34px}
+  .btn{padding:11px 12px}
+  .row-x{padding:9px 13px;font-size:14px}
+  .eq input{width:18px;height:18px}
+  .toast-x{padding:6px 8px;font-size:16px}
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -534,6 +618,7 @@ body{
     <div class="drawer-head">
       <p class="brand">Caos Eminente</p>
       <p class="brand-sub">Arquivo de Pessoal</p>
+      <button class="btn drawer-toggle" id="drawerToggle" aria-expanded="false">Fichas ▾</button>
     </div>
 
     <div class="drawer-list">
@@ -668,7 +753,7 @@ function blankChar(){
   Object.values(SKILLS).flat().forEach(s => sk[s] = 0);
   return {
     id: uid(),
-    nome:"", jogador:"", conceito:"", portrait:"",
+    nome:"", jogador:"", portrait:"",
     cultura:"", antecedente:"", linhagem:"Angelical (padrão)",
     afiliacao:"O Olho", selo:"", ascensao:"Vislumbre",
     patrimonio:"Comum", estre:4000,
@@ -886,23 +971,21 @@ function renderSheet(){
   <!-- ===== CABEÇALHO ===== -->
   <header class="masthead">
     <div class="mast-row">
-      <div style="display:flex;gap:16px;align-items:flex-start;min-width:0;flex:1">
+      <div class="mast-id">
         <div class="portrait" id="portrait" title="Clique para anexar uma fotografia">
           ${c.portrait ? `<img src="${esc(c.portrait)}" alt="">` : `<span>Anexar<br>Fotografia</span>`}
         </div>
         <div style="min-width:0;flex:1">
           <p class="mast-kicker">Dossiê de Ascendido · Uso Interno</p>
-          <input class="inp" data-path="nome" value="${esc(c.nome)}" placeholder="NOME DO ASCENDIDO"
-            style="font-size:var(--fs-2xl);letter-spacing:.1em;text-transform:uppercase;font-weight:700;padding:2px 6px;background:transparent;border:none;border-bottom:1px solid var(--line)">
-          <div class="grid-3" style="margin-top:12px">
-            ${fieldInput("Operador","jogador",c.jogador)}
-            ${fieldInput("Conceito","conceito",c.conceito)}
+          <input class="inp mast-nome" data-path="nome" value="${esc(c.nome)}" placeholder="NOME DO ASCENDIDO">
+          <div class="grid-2" style="margin-top:12px">
+            ${fieldInput("Afiliado","jogador",c.jogador)}
             ${fieldSelect("Estágio de Ascensão","ascensao",c.ascensao,ASCENSAO)}
           </div>
           <p class="mast-meta">Registro ${esc(c.id.slice(1,7).toUpperCase())} · Classificação restrita ao Olho</p>
         </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:14px;align-items:flex-end">
+      <div class="mast-stamps">
         <div class="stamp">Confidencial</div>
         <div class="stamp stamp-brass">${esc(c.afiliacao || "Sem Afiliação")}</div>
       </div>
@@ -1094,8 +1177,12 @@ function renderSheet(){
     </div>
   </div>
 
-  <!-- ===== FAIXA INFERIOR ===== -->
+  <!-- ===== FAIXA INFERIOR =====
+       Duas pilhas em vez de duas linhas: num grid comum a altura da linha
+       é ditada pelo painel mais alto, e o mais curto deixava um vazio
+       enorme embaixo antes do próximo poder começar. -->
   <div class="full">
+   <div class="stack">
     <section class="panel">
       <h2 class="panel-h">Âncoras <span class="h-note">duas pessoas do mundo ordinário</span></h2>
       ${c.ancoras.map((a,i) => `
@@ -1110,16 +1197,6 @@ function renderSheet(){
     </section>
 
     <section class="panel">
-      <h2 class="panel-h">A Dívida <span class="h-note">o que a Afiliação tem sobre você</span></h2>
-      ${fieldArea("O fato arquivado","divida",c.divida,3)}
-      <div style="margin-top:9px">${fieldArea("Linhas acrescentadas (cada Chamado cumprido)","dividaLinhas",c.dividaLinhas,2)}</div>
-      <p class="hint">Acesso: uma vez por sessão, sem teste. No terceiro Acesso do arco, eles cobram.
-      Cumprir o Chamado sobe 1 NC e faz a Dívida crescer. Recusar desce 1 NC e coloca uma Âncora na mira.</p>
-    </section>
-  </div>
-
-  <div class="full">
-    <section class="panel">
       <h2 class="panel-h">Inventário</h2>
       <div class="vol" id="volRow">
         <span>Volume em uso</span>
@@ -1129,11 +1206,22 @@ function renderSheet(){
       <button class="btn add-row no-print" data-add="inventario">+ Adicionar Item</button>
       <p class="hint">Máximo de quatro itens equipados por vez. Sobrecarga impõe −2D em Atletismo e Movimentação.</p>
     </section>
+   </div>
+
+   <div class="stack">
+    <section class="panel">
+      <h2 class="panel-h">A Dívida <span class="h-note">o que a Afiliação tem sobre você</span></h2>
+      ${fieldArea("O fato arquivado","divida",c.divida,3)}
+      <div style="margin-top:9px">${fieldArea("Linhas acrescentadas (cada Chamado cumprido)","dividaLinhas",c.dividaLinhas,2)}</div>
+      <p class="hint">Acesso: uma vez por sessão, sem teste. No terceiro Acesso do arco, eles cobram.
+      Cumprir o Chamado sobe 1 NC e faz a Dívida crescer. Recusar desce 1 NC e coloca uma Âncora na mira.</p>
+    </section>
 
     <section class="panel">
       <h2 class="panel-h">Anotações</h2>
-      ${fieldArea("","notas",c.notas,12)}
+      ${fieldArea("","notas",c.notas,14)}
     </section>
+   </div>
   </div>
   `;
 
@@ -1561,6 +1649,12 @@ function restoreLast(){
   toast(`"${c.nome || "Sem nome"}" foi restaurada.`, 5000);
 }
 document.getElementById("btnUndo").onclick = restoreLast;
+
+document.getElementById("drawerToggle").onclick = e => {
+  const aberta = document.querySelector(".drawer").classList.toggle("is-open");
+  e.currentTarget.setAttribute("aria-expanded", aberta);
+  e.currentTarget.textContent = aberta ? "Fichas ▴" : "Fichas ▾";
+};
 
 document.getElementById("btnPrint").onclick = () => { flush(); window.print(); };
 
