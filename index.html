@@ -604,9 +604,14 @@ body{
   .toast-x{padding:6px 8px;font-size:16px}
 }
 
+/* ---------- movimento: sistema por padrão, com decisão manual por cima ----------
+   O padrão continua obedecendo o "reduzir movimento" do sistema. Quem quer os
+   efeitos mesmo assim marca 'on' e passa na frente; quem quer silêncio total
+   marca 'off' e desliga até onde o sistema permitiria. */
 @media (prefers-reduced-motion:reduce){
-  *{transition:none !important;animation:none !important}
+  :root:not([data-motion="on"]) *{transition:none !important;animation:none !important}
 }
+:root[data-motion="off"] *{transition:none !important;animation:none !important}
 </style>
 
 <div class="tex" aria-hidden="true"></div>
@@ -628,6 +633,7 @@ body{
 
     <div class="drawer-foot">
       <div class="save-state" id="saveState" data-state="salvo">salvo</div>
+      <button class="btn" id="btnMotion">Efeitos: automático</button>
       <button class="btn btn-brass" id="btnNew">+ Nova Ficha</button>
       <button class="btn" id="btnDup">Duplicar</button>
       <button class="btn" id="btnPrint">Exportar PDF</button>
@@ -1589,22 +1595,28 @@ document.addEventListener("click", e => {
   };
 
   // quem pediu menos movimento recebe o resultado direto
-  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){ parar(); return; }
+  if(!temMovimento()){ parar(); return; }
 
   box.innerHTML = rolls.map(() => `<span class="die rolando">?</span>`).join("");
   out.textContent = "rolando…";
 
   const dados = [...box.children];
   const fim = dados.map((_,i) => 220 + i * 65);   // assentam um a um, da esquerda
-  let t = 0;
+  // tempo de relógio, não contagem de tiques: em aba oculta o navegador
+  // limita o intervalo a 1s, e contar tiques esticaria a rolagem por segundos
+  const inicio = performance.now();
   rolando = setInterval(() => {
-    t += 55;
+    const t = performance.now() - inicio;
     let girando = 0;
     dados.forEach((d,i) => {
       if(t < fim[i]){ d.textContent = 1 + Math.floor(Math.random()*6); girando++; }
       else if(d.classList.contains("rolando")){
+        // classList.add("") lança exceção: um dado 2 ou 3 não tem classe
+        // extra, e o erro dentro do setInterval travava a rolagem inteira
+        const marca = rolls[i] >= 4 ? "hit" : rolls[i] === 1 ? "terr" : null;
         d.classList.remove("rolando");
-        d.classList.add("parou", rolls[i] >= 4 ? "hit" : rolls[i] === 1 ? "terr" : "");
+        d.classList.add("parou");
+        if(marca) d.classList.add(marca);
         d.textContent = rolls[i];
       }
     });
@@ -1649,6 +1661,37 @@ function restoreLast(){
   toast(`"${c.nome || "Sem nome"}" foi restaurada.`, 5000);
 }
 document.getElementById("btnUndo").onclick = restoreLast;
+
+/* ---------- movimento ----------
+   "auto" segue o sistema. "on" e "off" mandam nele. A escolha fica
+   gravada por aparelho, porque é preferência de quem olha a tela. */
+const LS_MOV = "caos-eminente:movimento";
+
+function temMovimento(){
+  const m = document.documentElement.dataset.motion;
+  if(m === "on")  return true;
+  if(m === "off") return false;
+  return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function aplicaMovimento(modo){
+  const raiz = document.documentElement;
+  if(modo === "auto") delete raiz.dataset.motion;
+  else raiz.dataset.motion = modo;
+  const b = document.getElementById("btnMotion");
+  if(b) b.textContent = "Efeitos: " + ({auto:"automático", on:"ligados", off:"desligados"})[modo];
+  try{ localStorage.setItem(LS_MOV, modo); }catch(_){}
+}
+
+document.getElementById("btnMotion").onclick = () => {
+  const atual = document.documentElement.dataset.motion || "auto";
+  const proximo = atual === "auto" ? "on" : atual === "on" ? "off" : "auto";
+  aplicaMovimento(proximo);
+  if(proximo === "on" && window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+    toast("Seu sistema pede movimento reduzido. A ficha vai ignorar isso e animar mesmo assim.", 7000);
+  }
+  renderSheet();   // redesenha para as animações de chegada rodarem na hora
+};
 
 document.getElementById("drawerToggle").onclick = e => {
   const aberta = document.querySelector(".drawer").classList.toggle("is-open");
@@ -1716,6 +1759,7 @@ document.getElementById("fileInput").onchange = e => {
 
 /* ---------- início ---------- */
 load();
+(function(){ let m="auto"; try{ m = localStorage.getItem(LS_MOV) || "auto"; }catch(_){} aplicaMovimento(m); })();
 renderSheet();
 renderFileList();
 </script>
