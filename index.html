@@ -1253,7 +1253,7 @@ function blankChar(){
     ],
     divida:"", dividaLinhas:"",
     concessoes:{},
-    cifras:[], talentos:[], bencaos:[],
+    cifras:[], talentos:[],
     lab:{selo:"",estagio:"—",cargas:0,tracos:""},
     inventario:[],
     notas:""
@@ -1315,9 +1315,9 @@ function normalize(raw){
       ativo: x.ativo === undefined ? true : !!x.ativo
     };
   });
-  c.bencaos = arr("bencaos").map(x => ({
-    nome:str(x.nome), semblante:opt(x.semblante,SELOS), camada:clampNum(x.camada,1,3,1)
-  }));
+  /* Ressonância e Bênçãos saíram da ficha: a mecânica passou a ser expressa
+     por Talentos e Cifras. O que já estava anotado não é apagado — segue no
+     arquivo salvo e nos backups, apenas sem painel que o desenhe. */
   c.inventario = arr("inventario").map(x => ({
     nome:str(x.nome), volume:clampNum(x.volume,0,999,0),
     nc:clampNum(x.nc,0,4,0), equipado: !!x.equipado
@@ -1723,11 +1723,6 @@ function renderSheet(){
         <p class="hint">Custo: 1 Corrupção + 1 carga por cena.</p>
       </section>
 
-      <section class="panel">
-        <h2 class="panel-h">Ressonância e Bênçãos</h2>
-        <div class="rows" id="listBencaos"></div>
-        <button class="btn add-row no-print" data-add="bencaos">+ Adicionar Bênção</button>
-      </section>
     </div>
   </div>
 
@@ -1784,7 +1779,6 @@ function renderSheet(){
 
   renderList("cifras");
   renderList("talentos");
-  renderList("bencaos");
   renderList("inventario");
   renderConcedidas();
   updateDerived();
@@ -1865,24 +1859,6 @@ const LIST_CFG = {
       </div>
       <div style="margin-top:6px">
         <input class="inp" data-path="talentos.${i}.texto" value="${esc(it.texto)}" placeholder="Efeito">
-      </div>`
-  },
-  bencaos:{
-    el:"listBencaos", vazio:"Nenhuma Bênção concedida.",
-    novo:() => ({semblante:"",camada:1,nome:""}),
-    row:(it,i) => `
-      <div class="row-top">
-        <input class="inp" data-path="bencaos.${i}.nome" value="${esc(it.nome)}" placeholder="Nome da Bênção">
-        <button class="row-x no-print" data-del="bencaos" data-i="${i}" aria-label="Remover">✕</button>
-      </div>
-      <div class="row-meta">
-        <select class="sel" data-path="bencaos.${i}.semblante" style="flex:1">
-          <option value="">Semblante —</option>
-          ${SELOS.map(s=>`<option${s===it.semblante?" selected":""}>${s}</option>`).join("")}
-        </select>
-        <select class="sel" data-path="bencaos.${i}.camada" style="flex:none;width:110px">
-          ${[1,2,3].map(n=>`<option value="${n}"${Number(it.camada)===n?" selected":""}>Camada ${n}</option>`).join("")}
-        </select>
       </div>`
   },
   inventario:{
