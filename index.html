@@ -39,6 +39,12 @@
   --blood-hi:#e9dab6;    /* alerta forte = papel */
   --spec:#e9dab6;
 
+  /* a cor que fica LEGÍVEL em cima de um preenchimento de --bone.
+     Cada Afiliação tem o seu, porque o breu de cada uma é diferente. */
+  --on-bone:#000;
+  --focus-bg:#111;       /* campo em foco */
+  --line-hi:#4a4a4a;     /* borda acordada pelo ponteiro */
+
   /* tramas: como o preto e branco diz "pior" sem usar cor */
   --hatch:repeating-linear-gradient(45deg,#e9dab6 0 3px,#000 3px 5px);
   --hatch-dense:repeating-linear-gradient(45deg,#e9dab6 0 2px,#000 2px 4px);
@@ -54,10 +60,21 @@
   --fs-2xl:34px;
 
   --mono:"Courier Prime","Courier New",Courier,"Lucida Sans Typewriter",monospace;
+
+  /* Só a Courier Prime viaja embutida no arquivo. As famílias que os temas
+     pedem são as que já existem na máquina de quem abre — por isso cada
+     pilha termina numa genérica, e o tema degrada para algo próximo em vez
+     de para o nada. */
+  --fonte-titulo:var(--mono);
+  --titulo-caixa:uppercase;
+  --titulo-espaco:.15em;
+  --titulo-peso:700;
+  --titulo-italico:normal;
+  --nome-caixa:uppercase;   /* o nome do Ascendido no cabeçalho */
 }
 
 *{box-sizing:border-box}
-::selection{background:var(--bone);color:#000;text-shadow:none}
+::selection{background:var(--bone);color:var(--on-bone);text-shadow:none}
 
 body{
   margin:0;
@@ -88,6 +105,7 @@ body{
   animation:granulado .7s steps(1,end) infinite;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='180' height='180' filter='url(%23n)' opacity='1'/></svg>");
   opacity:calc(var(--grain) + var(--corr) * .06);
+  /* o grão é a luz que sobra na emulsão, por isso "screen" e não "multiply" */
   mix-blend-mode:screen;
 }
 .tex::after{
@@ -138,22 +156,22 @@ body{
   font-size:10px;letter-spacing:.09em;text-transform:uppercase;
   color:var(--dust-dim);text-align:center;padding:3px 0 5px;
 }
-.save-state[data-state="erro"]{background:var(--bone);color:#000;font-weight:700}
+.save-state[data-state="erro"]{background:var(--bone);color:var(--on-bone);font-weight:700}
 
 /* ---------- aviso persistente ---------- */
 .toast{
   position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:10000;
   max-width:min(680px,92vw);display:flex;align-items:center;gap:12px;
-  background:var(--bone);color:#000;border:2px solid #000;
+  background:var(--bone);color:var(--on-bone);border:2px solid var(--on-bone);
   padding:12px 14px;font-size:var(--fs-sm);line-height:1.45;text-shadow:none;
   box-shadow:0 0 0 1px var(--bone),0 10px 30px rgba(0,0,0,.6);
 }
 .toast[hidden]{display:none}
 .toast span{flex:1}
-.toast .btn{border-color:#000;color:#000;flex:none}
-.toast .btn:hover{background:rgba(0,0,0,.12);border-color:#000;color:#000}
+.toast .btn{border-color:var(--on-bone);color:var(--on-bone);flex:none}
+.toast .btn:hover{background:rgba(0,0,0,.12);border-color:var(--on-bone);color:var(--on-bone)}
 .toast-x{
-  background:transparent;border:none;color:#000;cursor:pointer;flex:none;
+  background:transparent;border:none;color:var(--on-bone);cursor:pointer;flex:none;
   font-family:var(--mono);font-size:14px;line-height:1;padding:0 2px;
 }
 
@@ -189,7 +207,7 @@ body{
 .mast-id > div:last-child{min-width:0;flex:1}
 .mast-stamps{display:flex;flex-direction:column;gap:14px;align-items:flex-end;flex:none}
 .mast-nome{
-  font-size:var(--fs-2xl);letter-spacing:.07em;text-transform:uppercase;font-weight:700;
+  font-family:var(--fonte-titulo);font-size:var(--fs-2xl);letter-spacing:.07em;text-transform:var(--nome-caixa);font-weight:var(--titulo-peso);font-style:var(--titulo-italico);
   padding:2px 6px;background:transparent;border:none;border-bottom:1px solid var(--line);
 }
 .mast-title{margin:0;font-size:var(--fs-2xl);letter-spacing:.07em;text-transform:uppercase;font-weight:700;line-height:1}
@@ -198,11 +216,11 @@ body{
 
 /* carimbo principal: bloco invertido, como tinta chapada de fotocópia */
 .stamp{
-  border:2px solid var(--bone);background:var(--bone);color:#000;
+  border:2px solid var(--bone);background:var(--bone);color:var(--on-bone);
   font-size:var(--fs-xs);letter-spacing:.11em;text-transform:uppercase;font-weight:700;
   padding:7px 12px;transform:rotate(-4deg);white-space:nowrap;
 }
-.stamp-brass{background:var(--bone);border-color:var(--bone);color:#000;transform:rotate(3deg)}
+.stamp-brass{background:var(--bone);border-color:var(--bone);color:var(--on-bone);transform:rotate(3deg)}
 
 /* --- grelha de painéis --- */
 /* Três colunas, mas não uma grade: numa grade cada pilha é uma coluna fixa,
@@ -218,7 +236,7 @@ body{
 .panel{border:1px solid var(--line);background:var(--panel);padding:14px 16px 16px}
 .panel-h{
   display:flex;align-items:center;gap:10px;margin:0 0 12px;
-  font-size:var(--fs-xs);letter-spacing:.13em;text-transform:uppercase;color:var(--bone);font-weight:700;
+  font-family:var(--fonte-titulo);font-size:var(--fs-xs);letter-spacing:var(--titulo-espaco);text-transform:var(--titulo-caixa);color:var(--bone);font-weight:var(--titulo-peso);font-style:var(--titulo-italico);
 }
 .panel-h::before{content:"";width:7px;height:7px;background:var(--brass);flex:none}
 .panel-h::after{content:"";flex:1;height:1px;background:var(--line)}
@@ -234,7 +252,7 @@ body{
   background:var(--ink-2);border:1px solid var(--line-soft);border-bottom-color:var(--line);
   padding:6px 8px;width:100%;min-width:0;
 }
-.inp:focus,.sel:focus,.txt:focus{outline:none;border-color:var(--brass-lo);background:#111}
+.inp:focus,.sel:focus,.txt:focus{outline:none;border-color:var(--brass-lo);background:var(--focus-bg)}
 .txt{resize:vertical;line-height:1.5}
 .sel{appearance:none;cursor:pointer;padding-right:22px;
   background-image:linear-gradient(45deg,transparent 50%,var(--dust) 50%),linear-gradient(135deg,var(--dust) 50%,transparent 50%);
@@ -298,10 +316,10 @@ body{
 }
 .lvl:hover{border-color:var(--brass-lo)}
 /* estados sem cor: sólido = ok · hachurado = penalidade · invertido = crítico */
-.lvl.on{background:var(--bone);border-color:var(--bone);color:#000;font-weight:700}
+.lvl.on{background:var(--bone);border-color:var(--bone);color:var(--on-bone);font-weight:700}
 .lvl.on.vit{background:var(--bone);border-color:var(--bone)}
-.lvl.warn.on{background:var(--hatch);border-color:var(--bone);color:#000;text-shadow:0 0 3px #e9dab6,0 0 2px #e9dab6}
-.lvl.bad.on{background:#000;border-color:var(--bone);border-width:2px;color:var(--bone);text-shadow:none}
+.lvl.warn.on{background:var(--hatch);border-color:var(--bone);color:var(--on-bone);text-shadow:0 0 3px var(--bone),0 0 2px var(--bone)}
+.lvl.bad.on{background:var(--ink);border-color:var(--bone);border-width:2px;color:var(--bone);text-shadow:none}
 .track-state{
   display:flex;justify-content:space-between;gap:10px;
   font-size:var(--fs-xs);letter-spacing:.1em;color:var(--dust);
@@ -324,7 +342,7 @@ body{
 .corr-c.on{background:var(--bone);border-color:var(--bone)}
 .corr-c.on.mid{background:var(--hatch);border-color:var(--bone)}
 .corr-c.on.hi{background:var(--hatch-dense);border-color:var(--bone)}
-.corr-c.on.max{background:#000;border-color:var(--bone);border-width:2px}
+.corr-c.on.max{background:var(--ink);border-color:var(--bone);border-width:2px}
 .corr-state{font-size:var(--fs-xs);letter-spacing:.08em;text-transform:uppercase;display:flex;justify-content:space-between}
 .corr-state b{color:var(--blood-hi)}
 
@@ -418,7 +436,7 @@ body{
   background:transparent;border:1px solid var(--line);color:var(--dust);padding:7px 11px;cursor:pointer;
 }
 .comp-aba:hover{border-color:var(--brass-lo);color:var(--bone)}
-.comp-aba.on{background:var(--bone);border-color:var(--bone);color:#000;font-weight:700}
+.comp-aba.on{background:var(--bone);border-color:var(--bone);color:var(--on-bone);font-weight:700}
 .comp-lista{overflow-y:auto;display:grid;gap:7px;padding-right:4px}
 .comp-grupo{
   font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--brass);
@@ -536,10 +554,209 @@ body{
 .lvl:active,.corr-c:active{transform:scale(.93)}
 
 .panel{transition:border-color .18s ease}
-.panel:hover{border-color:#4a4a4a}
+.panel:hover{border-color:var(--line-hi)}
 
 .file{transform-origin:left center}
 .file:active{transform:scale(.985)}
+
+/* ============================================================
+   PAPEL TIMBRADO — a ficha veste a Afiliação
+
+   Cada Afiliação emite os próprios documentos, e um documento diz de
+   onde veio antes de dizer qualquer outra coisa. Só mudam cor, tipo e
+   textura: a disposição dos painéis é a mesma em todas, porque é a
+   mesma ficha sendo preenchida por gente diferente.
+
+   Tudo aqui é redefinição de variável. Onde um tema precisa de mais que
+   cor — uma borda dupla, um filete de manchete — a regra vem logo
+   abaixo do bloco de variáveis daquele tema.
+   ============================================================ */
+
+/* ---- O Olho · dossiê interno, papel velho sob lâmpada fraca ----
+   É o padrão do arquivo, e está aqui escrito para que voltar a ele
+   seja igual a escolher qualquer outro. */
+[data-afiliacao="O Olho"]{
+  --ink:#000000; --ink-2:#070707; --panel:#0b0b0b; --panel-2:#131313;
+  --line:#3a3a3a; --line-soft:#242424; --line-hi:#4a4a4a;
+  --bone:#e9dab6; --dust:#ada38c; --dust-dim:#847c6d;
+  --brass:#e9dab6; --brass-lo:#8a8272;
+  --blood:#8a8272; --blood-hi:#e9dab6; --spec:#e9dab6;
+  --on-bone:#000; --focus-bg:#111;
+  --hatch:repeating-linear-gradient(45deg,#e9dab6 0 3px,#000 3px 5px);
+  --hatch-dense:repeating-linear-gradient(45deg,#e9dab6 0 2px,#000 2px 4px);
+  --grain:.055;
+}
+
+/* ---- A Penumbra · o que opera sem luz ----
+   Nada de âmbar: aqui a folha é lida no escuro, e a cor que sobra é a
+   temperatura fria do pouco que reflete. Título condensado, como
+   carimbo apertado para caber onde não devia ser visto. */
+[data-afiliacao="A Penumbra"]{
+  --ink:#030405; --ink-2:#060809; --panel:#090c0e; --panel-2:#101417;
+  --line:#242b31; --line-soft:#171c20; --line-hi:#38424a;
+  --bone:#a8bac6; --dust:#71828e; --dust-dim:#7d8f9a;
+  --brass:#8fa6b3; --brass-lo:#5a6a75;
+  --blood:#5a6a75; --blood-hi:#c3d5e0; --spec:#8fa6b3;
+  --on-bone:#04070a; --focus-bg:#0c1013;
+  --hatch:repeating-linear-gradient(45deg,#a8bac6 0 3px,#030405 3px 5px);
+  --hatch-dense:repeating-linear-gradient(45deg,#a8bac6 0 2px,#030405 2px 4px);
+  --grain:.085;
+  --fonte-titulo:"Haettenschweiler","Arial Narrow","Segoe UI",sans-serif;
+  --titulo-espaco:.24em;
+}
+[data-afiliacao="A Penumbra"] .panel{border-color:var(--line-soft)}
+[data-afiliacao="A Penumbra"] .masthead::before{opacity:.45}
+
+/* ---- Os Acorrentados · ordem devocional ----
+   Luz de vela e ouro sobre madeira escura. A borda dupla dos painéis é
+   moldura de relicário, e o título abre mão da caixa alta pelas
+   versaletes, que é como se escreve em pedra. */
+[data-afiliacao="Os Acorrentados"]{
+  --ink:#0a0704; --ink-2:#0f0b07; --panel:#140e08; --panel-2:#1c1409;
+  --line:#4a3820; --line-soft:#2b2013; --line-hi:#6b5230;
+  --bone:#f0dcac; --dust:#b9a077; --dust-dim:#9c855f;
+  --brass:#d4a537; --brass-lo:#8f6f24;
+  --blood:#8f6f24; --blood-hi:#f5c451; --spec:#d4a537;
+  --on-bone:#140e08; --focus-bg:#1a1209;
+  --hatch:repeating-linear-gradient(45deg,#d4a537 0 3px,#0a0704 3px 5px);
+  --hatch-dense:repeating-linear-gradient(45deg,#d4a537 0 2px,#0a0704 2px 4px);
+  --grain:.05;
+  --fonte-titulo:"Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
+  --titulo-caixa:none;
+  --titulo-espaco:.1em;
+  --nome-caixa:none;
+}
+[data-afiliacao="Os Acorrentados"] .panel-h,
+[data-afiliacao="Os Acorrentados"] .mast-nome{font-variant:small-caps}
+[data-afiliacao="Os Acorrentados"] .panel{border-style:double;border-width:3px}
+[data-afiliacao="Os Acorrentados"] .panel-h::before{transform:rotate(45deg)}
+
+/* ---- Mysteria · gabinete de estudo ----
+   Tinta violeta em caderno de pesquisa. O itálico do título é o do
+   punho de quem anota antes de publicar. */
+[data-afiliacao="Mysteria"]{
+  --ink:#07060c; --ink-2:#0b0912; --panel:#100d1b; --panel-2:#171326;
+  --line:#332b4d; --line-soft:#1f1a2f; --line-hi:#4a3f6b;
+  --bone:#ddd3f0; --dust:#9d92b8; --dust-dim:#8b81a6;
+  --brass:#b294e0; --brass-lo:#6f5a94;
+  --blood:#6f5a94; --blood-hi:#cbb0ff; --spec:#b294e0;
+  --on-bone:#0d0a16; --focus-bg:#141020;
+  --hatch:repeating-linear-gradient(45deg,#b294e0 0 3px,#07060c 3px 5px);
+  --hatch-dense:repeating-linear-gradient(45deg,#b294e0 0 2px,#07060c 2px 4px);
+  --grain:.06;
+  --fonte-titulo:Georgia,"Times New Roman",Times,serif;
+  --titulo-italico:italic;
+  --titulo-espaco:.08em;
+  --titulo-caixa:none;
+  --nome-caixa:none;
+}
+[data-afiliacao="Mysteria"] .panel-h::before{border-radius:50%}
+
+/* ---- Guardiões da Árvore · registro de campo ----
+   Musgo, casca e papel de herbário. Nada aqui foi impresso numa
+   gráfica: foi anotado embaixo de uma árvore. */
+[data-afiliacao="Guardiões da Árvore"]{
+  --ink:#050704; --ink-2:#080b07; --panel:#0c110b; --panel-2:#131a10;
+  --line:#2f4029; --line-soft:#1d2818; --line-hi:#46603c;
+  --bone:#dfe6c9; --dust:#9aab84; --dust-dim:#84936f;
+  --brass:#9dc45f; --brass-lo:#5f7a37;
+  --blood:#5f7a37; --blood-hi:#bbe27a; --spec:#9dc45f;
+  --on-bone:#0c110b; --focus-bg:#0f150d;
+  --hatch:repeating-linear-gradient(45deg,#9dc45f 0 3px,#050704 3px 5px);
+  --hatch-dense:repeating-linear-gradient(45deg,#9dc45f 0 2px,#050704 2px 4px);
+  --grain:.07;
+  --fonte-titulo:"Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
+  --titulo-espaco:.11em;
+}
+[data-afiliacao="Guardiões da Árvore"] .panel-h::before{border-radius:50% 0 50% 0}
+
+/* ---- Sociedade dos Ceifadores · laudo ----
+   Aço, azulejo e luz de necrotério. Datilografia mantida de propósito:
+   é o único tema onde a fonte NÃO muda, porque um laudo não tem estilo.
+   O que muda é o espaçamento, que abre até ficar frio. */
+[data-afiliacao="Sociedade dos Ceifadores"]{
+  --ink:#030505; --ink-2:#060a0a; --panel:#0a1011; --panel-2:#101819;
+  --line:#26383a; --line-soft:#182426; --line-hi:#3a5457;
+  --bone:#d3e6e4; --dust:#8ba5a3; --dust-dim:#758f8d;
+  --brass:#63b3ab; --brass-lo:#3a6d68;
+  --blood:#3a6d68; --blood-hi:#8ce0d6; --spec:#63b3ab;
+  --on-bone:#030505; --focus-bg:#0b1314;
+  --hatch:repeating-linear-gradient(45deg,#63b3ab 0 3px,#030505 3px 5px);
+  --hatch-dense:repeating-linear-gradient(45deg,#63b3ab 0 2px,#030505 2px 4px);
+  --grain:.03;
+  --titulo-espaco:.32em;
+}
+[data-afiliacao="Sociedade dos Ceifadores"] .panel{border-width:1px}
+[data-afiliacao="Sociedade dos Ceifadores"] .panel-h::after{opacity:.5}
+
+/* ---- O Coletivo · a edição da madrugada ----
+   Jornal, mas visto na sala de impressão e não na banca: chumbo, tinta
+   fresca e o papel ainda escuro do rolo. A serifa de manchete e o filete
+   vermelho do cabeçalho fazem o trabalho que a folha branca faria, sem
+   acender a tela na cara de quem joga de noite. */
+[data-afiliacao="O Coletivo"]{
+  --ink:#090807; --ink-2:#0d0c0a; --panel:#121110; --panel-2:#1a1714;
+  --line:#3f392f; --line-soft:#26221c; --line-hi:#5d5445;
+  --bone:#ece5d4; --dust:#a99d87; --dust-dim:#8b8071;
+  --brass:#e05a44; --brass-lo:#96301f;
+  --blood:#96301f; --blood-hi:#f57a62; --spec:#e05a44;
+  --on-bone:#121110; --focus-bg:#171512;
+  --hatch:repeating-linear-gradient(45deg,#ece5d4 0 3px,#090807 3px 5px);
+  --hatch-dense:repeating-linear-gradient(45deg,#ece5d4 0 2px,#090807 2px 4px);
+  --grain:.045;
+  --fonte-titulo:"Times New Roman",Times,Georgia,serif;
+  --titulo-espaco:.06em;
+}
+[data-afiliacao="O Coletivo"] .masthead::before{height:4px;background:var(--brass)}
+[data-afiliacao="O Coletivo"] .panel-h{border-bottom:2px solid var(--line);padding-bottom:5px}
+[data-afiliacao="O Coletivo"] .panel-h::after{display:none}
+
+/* ---- A Frente · cartaz ----
+   Impresso rápido, colado num muro, para ser lido de longe e por cima
+   do ombro de alguém. Título pesado, apertado, sem elegância nenhuma. */
+[data-afiliacao="A Frente"]{
+  --ink:#0a0504; --ink-2:#0f0807; --panel:#150a08; --panel-2:#1e0f0b;
+  --line:#4d211a; --line-soft:#2c1310; --line-hi:#78352a;
+  --bone:#f2e6d8; --dust:#b09184; --dust-dim:#987c6e;
+  --brass:#e8583d; --brass-lo:#a02c1a;
+  --blood:#8e2415; --blood-hi:#ff5c3d; --spec:#d43a22;
+  --on-bone:#150a08; --focus-bg:#1a0c09;
+  --hatch:repeating-linear-gradient(45deg,#d43a22 0 3px,#0a0504 3px 5px);
+  --hatch-dense:repeating-linear-gradient(45deg,#d43a22 0 2px,#0a0504 2px 4px);
+  --grain:.1;
+  --fonte-titulo:Impact,Haettenschweiler,"Arial Black","Arial Narrow",sans-serif;
+  --titulo-espaco:.04em;
+  --titulo-peso:400;   /* Impact já vem pesada; negrito a borraria */
+}
+[data-afiliacao="A Frente"] .panel-h::before{width:12px;height:9px}
+[data-afiliacao="A Frente"] .stamp{border-width:3px}
+
+/* ---- Avulso · sem papel timbrado ----
+   Quem não responde a ninguém não recebe formulário de ninguém. Cinza
+   de fotocópia, sem acento, sem calor. A ausência de identidade é a
+   identidade. */
+[data-afiliacao="Avulso"]{
+  --ink:#050505; --ink-2:#090909; --panel:#0e0e0e; --panel-2:#151515;
+  --line:#333; --line-soft:#202020; --line-hi:#454545;
+  --bone:#cfcfcf; --dust:#8f8f8f; --dust-dim:#7d7d7d;
+  --brass:#9a9a9a; --brass-lo:#5e5e5e;
+  --blood:#5e5e5e; --blood-hi:#cfcfcf; --spec:#9a9a9a;
+  --on-bone:#050505; --focus-bg:#101010;
+  --hatch:repeating-linear-gradient(45deg,#cfcfcf 0 3px,#050505 3px 5px);
+  --hatch-dense:repeating-linear-gradient(45deg,#cfcfcf 0 2px,#050505 2px 4px);
+  --grain:.09;
+  --titulo-espaco:.1em;
+}
+[data-afiliacao="Avulso"] .masthead::before{background:var(--line-hi)}
+[data-afiliacao="Avulso"] .panel-h::before{background:var(--dust-dim)}
+
+/* A troca não é um corte seco: o papel é substituído, não repintado. */
+body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn{
+  transition:background-color .45s ease,border-color .45s ease,color .45s ease;
+}
+@media (prefers-reduced-motion:reduce){
+  body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn{transition:none}
+}
 
 /* aviso entra deslizando, sem perder a centralização */
 @keyframes sobe-aviso{
@@ -555,6 +772,13 @@ body{
   @page{size:A4 landscape;margin:9mm}
 
   html,body{background:#fff !important;color:#000 !important}
+
+  /* No papel a ficha volta a ser datilografada, qualquer que seja a
+     Afiliação. Só a Courier Prime viaja embutida no arquivo; as famílias
+     dos temas dependem da máquina, e um PDF que sai diferente em cada
+     computador não serve como documento. A cor do tema já não chega
+     aqui — a folha é preta e branca desde sempre. */
+  *{font-family:var(--mono) !important}
   .tex,.drawer,.no-print,.toast{display:none !important}
   .print-only{display:block}
   .wrap{display:block}
@@ -1782,7 +2006,16 @@ function renderSheet(){
   renderList("inventario");
   renderConcedidas();
   updateDerived();
+  aplicaTema();
   escalona();
+}
+
+/* A Afiliação escolhida no cabeçalho vira o papel timbrado da ficha
+   inteira. O atributo fica na raiz do documento, e não na folha, porque
+   a gaveta e o compêndio também são papel emitido pela mesma casa. */
+function aplicaTema(){
+  const c = cur();
+  document.documentElement.dataset.afiliacao = (c && c.afiliacao) || "Avulso";
 }
 
 /* os documentos não caem todos de uma vez: cada painel entra logo após
