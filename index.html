@@ -355,6 +355,33 @@ body{
   border-color:var(--brass-lo);
   background:repeating-linear-gradient(-45deg,var(--brass) 0 2px,transparent 2px 5px);
 }
+
+/* --- ajuda: o "?" do título e o balão que ele abre --- */
+.panel-h::after{order:1}      /* o filete corre antes do botão */
+.ajuda{
+  order:2;flex:none;font-family:var(--mono);font-size:11px;line-height:1;
+  width:17px;height:17px;padding:0;border:1px solid var(--line);border-radius:50%;
+  background:transparent;color:var(--dust-dim);cursor:pointer;
+  transition:color .12s,border-color .12s;
+}
+.ajuda:hover,.ajuda[aria-expanded="true"]{color:var(--brass);border-color:var(--brass-lo)}
+.balao{
+  position:fixed;z-index:9998;max-width:330px;
+  border:1px solid var(--line);background:var(--panel-2);
+  padding:11px 13px;font-size:var(--fs-sm);line-height:1.55;color:var(--dust);
+  box-shadow:0 10px 30px rgba(0,0,0,.6);
+}
+@media screen and (max-width:680px){
+  .balao{max-width:calc(100vw - 20px)}
+  .ajuda{width:24px;height:24px;font-size:13px}
+}
+.conc-nome .ajuda{margin-left:7px;vertical-align:middle}
+/* legenda derivada do Vínculo, repetida em toda linha de Cifra: terse,
+   porque quem lê já sabe o que significa depois da segunda vez. */
+.legenda{
+  margin:6px 0 0;font-size:10px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--dust-dim);
+}
 .corr-state{font-size:var(--fs-xs);letter-spacing:.08em;text-transform:uppercase;display:flex;justify-content:space-between}
 .corr-state b{color:var(--blood-hi)}
 
@@ -2139,6 +2166,7 @@ function renderSheet(){
   renderConcedidas();
   updateDerived();
   aplicaTema();
+  recolheAjuda();
   ajustaCaixas();
   escalona();
 }
@@ -2196,7 +2224,7 @@ const LIST_CFG = {
         <textarea class="txt cresce" rows="1" data-path="cifras.${i}.efeito" placeholder="Efeito da Cifra">${esc(it.efeito)}</textarea>
       </div>
       ${(() => { const v = VINCULOS[it.vinculo] || VINCULOS["Baixo"];
-        return `<p class="hint">Entra +${v.corr} Corrupção · Domínio ND ${v.nd} · retém ${v.falha} falhando, ${v.passa} passando</p>`; })()}`
+        return `<p class="legenda">+${v.corr} Corr · ND ${v.nd} · retém ${v.falha}/${v.passa}</p>`; })()}`
   },
   talentos:{
     el:"listTalentos", vazio:"Nenhum talento adquirido.",
@@ -2248,6 +2276,131 @@ const LIST_CFG = {
       </div>`
   }
 };
+/* ============================================================
+   AJUDA — a regra sai da folha e fica a um clique
+
+   O texto explicativo é lido uma vez, quando a pessoa aprende o painel,
+   e depois vira ruído permanente em volta do que ela veio preencher.
+   Então ele sai do corpo da ficha e passa a viver atrás de um "?" no
+   título do painel.
+
+   O recolhimento é feito depois do desenho, varrendo o que existe, em
+   vez de marcado painel a painel no template: assim toda dica nova
+   nasce recolhida sem ninguém precisar lembrar.
+
+   Dica com id fica onde está. Ela não é explicação, é leitura de estado
+   — o efeito da Corrupção atual muda conforme a barra e precisa estar
+   visível junto dela.
+   ============================================================ */
+
+const AJUDAS = [];
+
+function recolheAjuda(){
+  AJUDAS.length = 0;
+  document.querySelectorAll(".sheet .panel").forEach(painel => {
+    const titulo = painel.querySelector(".panel-h");
+    if(!titulo) return;
+    /* ":scope >" é essencial: sem ele a varredura desce nas linhas de
+       Cifra e Talento e engole a legenda de cada uma, que é por linha e
+       não por painel. */
+    const dicas = [...painel.querySelectorAll(":scope > .hint:not([id])")];
+    if(!dicas.length) return;
+
+    const i = AJUDAS.push(dicas.map(d => d.innerHTML.trim()).join("<br><br>")) - 1;
+    dicas.forEach(d => d.remove());
+
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "ajuda no-print";
+    b.textContent = "?";
+    b.dataset.ajuda = i;
+    b.setAttribute("aria-expanded", "false");
+    b.setAttribute("aria-label", "Como funciona: " + titulo.textContent.trim());
+    titulo.appendChild(b);
+  });
+
+  /* Habilidades de Origem: o nome do traço é o que se consulta de relance,
+     o parágrafo é o que se lê uma vez. O "?" vai no nome. */
+  document.querySelectorAll(".sheet .conc-ajuda").forEach(el => {
+    const nome = el.previousElementSibling;
+    if(!nome || !nome.classList.contains("conc-nome")) return;
+    const i = AJUDAS.push(el.innerHTML.trim()) - 1;
+    el.remove();
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "ajuda no-print";
+    b.textContent = "?";
+    b.dataset.ajuda = i;
+    b.setAttribute("aria-expanded", "false");
+    b.setAttribute("aria-label", "O que faz: " + nome.textContent.trim());
+    nome.appendChild(b);
+  });
+}
+
+/* O balão é um só, reaproveitado. Ancorado no botão, preso dentro da
+   janela, e fechado por Esc, por clique fora ou por rolagem — porque um
+   balão que fica para trás quando a página anda é pior que nenhum. */
+let balaoAberto = null;
+
+function fechaBalao(){
+  const b = document.getElementById("balao");
+  if(b) b.hidden = true;
+  if(balaoAberto) balaoAberto.setAttribute("aria-expanded", "false");
+  balaoAberto = null;
+}
+
+function abreBalao(botao){
+  const i = Number(botao.dataset.ajuda);
+  const texto = AJUDAS[i];
+  if(texto == null) return;
+
+  let balao = document.getElementById("balao");
+  if(!balao){
+    balao = document.createElement("div");
+    balao.id = "balao";
+    balao.className = "balao no-print";
+    balao.setAttribute("role", "dialog");
+    document.body.appendChild(balao);
+  }
+  balao.innerHTML = texto;
+  balao.hidden = false;
+
+  // medir depois de visível, senão a largura é zero e o encaixe erra
+  const r = botao.getBoundingClientRect();
+  const largura = balao.offsetWidth, altura = balao.offsetHeight;
+  const margem = 10;
+  let x = r.left + r.width / 2 - largura / 2;
+  let y = r.bottom + 8;
+  x = Math.max(margem, Math.min(x, window.innerWidth - largura - margem));
+  if(y + altura > window.innerHeight - margem) y = r.top - altura - 8;
+  balao.style.left = Math.round(x) + "px";
+  balao.style.top = Math.round(Math.max(margem, y)) + "px";
+
+  botao.setAttribute("aria-expanded", "true");
+  balaoAberto = botao;
+}
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-ajuda]");
+  if(b){
+    if(balaoAberto === b) fechaBalao(); else abreBalao(b);
+    return;
+  }
+  if(balaoAberto && !e.target.closest("#balao")) fechaBalao();
+});
+document.addEventListener("keydown", e => { if(e.key === "Escape") fechaBalao(); });
+/* Rolar não fecha: reancora. Clicar num botão já dá foco nele, e o foco
+   por si só rola a página o suficiente para um "fecha ao rolar" matar o
+   balão no mesmo gesto que o abriu. Só fecha quando o botão sai de vista,
+   porque aí não há mais a que se ancorar. */
+function reancoraBalao(){
+  if(!balaoAberto) return;
+  const r = balaoAberto.getBoundingClientRect();
+  if(r.bottom < 0 || r.top > window.innerHeight){ fechaBalao(); return; }
+  abreBalao(balaoAberto);
+}
+window.addEventListener("scroll", reancoraBalao, true);
+window.addEventListener("resize", reancoraBalao);
 /* A altura do campo passa a ser a do texto que ele guarda. Roda depois de
    cada desenho e a cada tecla, porque uma frase a mais precisa aparecer na
    hora, e não quando a ficha for redesenhada. */
@@ -2312,7 +2465,7 @@ function renderConcedidas(){
       <div class="conc">
         <div class="conc-de">${tipo === "cultura" ? "Cultura" : "Antecedente"} · ${esc(f.nome)}</div>
         <div class="conc-nome">${esc(f.traco)}</div>
-        <div class="conc-txt">${esc(f.tracoTexto)}</div>
+        <div class="conc-ajuda">${esc(f.tracoTexto)}</div>
         <div class="conc-per">
           <span class="conc-de">Perícia concedida</span>
           ${ops.length
@@ -2329,7 +2482,7 @@ function renderConcedidas(){
   if(lin) partes.push(`
     <div class="conc">
       <div class="conc-de">Linhagem · ${esc(c.linhagem)} <span class="tag">Vitalidade ${vitMaxDe(c)}</span> <span class="tag">Limiar ${limiarDe(c)}</span></div>
-      ${lin.map(([n,t]) => `<div class="conc-nome" style="margin-top:5px">${esc(n)}</div><div class="conc-txt">${esc(t)}</div>`).join("")}
+      ${lin.map(([n,t]) => `<div class="conc-nome" style="margin-top:5px">${esc(n)}</div><div class="conc-ajuda">${esc(t)}</div>`).join("")}
     </div>`);
 
   const arq = ARQUETIPOS.find(a => a.nome === c.arquetipo);
@@ -2337,9 +2490,9 @@ function renderConcedidas(){
     <div class="conc">
       <div class="conc-de">Arquétipo · ${esc(arq.nome)} <span class="tag">não ocupa Capacidade</span></div>
       <div class="conc-nome" style="margin-top:5px">Forma de operar</div>
-      <div class="conc-txt">${esc(arq.forma)}</div>
+      <div class="conc-ajuda">${esc(arq.forma)}</div>
       <div class="conc-nome" style="margin-top:5px">O que ele não faz</div>
-      <div class="conc-txt">${esc(arq.naoFaz)}</div>
+      <div class="conc-ajuda">${esc(arq.naoFaz)}</div>
     </div>`);
 
   box.innerHTML = partes.length ? partes.join("")
