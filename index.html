@@ -231,7 +231,6 @@ body{
 .cols{columns:3;column-gap:14px}
 .stack{display:contents}
 .cols > .stack > .panel{break-inside:avoid;margin-bottom:14px}
-.full{margin-top:14px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
 
 .panel{border:1px solid var(--line);background:var(--panel);padding:14px 16px 16px}
 .panel-h{
@@ -241,7 +240,10 @@ body{
 .panel-h::before{content:"";width:7px;height:7px;background:var(--brass);flex:none}
 .panel-h::after{content:"";flex:1;height:1px;background:var(--line)}
 .panel-h .h-note{
-  font-size:10px;letter-spacing:.12em;color:var(--dust-dim);font-weight:400;flex:none;
+  font-size:10px;letter-spacing:.12em;color:var(--dust-dim);font-weight:400;
+  /* a nota é decorativa: apertando, ela encolhe antes de empurrar o "?"
+     para fora da tela */
+  flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 
 /* --- campos --- */
@@ -723,44 +725,95 @@ body{
   background:linear-gradient(90deg,var(--brass) 0%,var(--brass-lo) 40%,transparent 75%);
 }
 
-/* ---- Mysteria · o deus que ainda não ligaram ----
-   Gente convencida de que divindade é questão de arquitetura. Azul de
-   madrugada industrial com néon ciano e rosa: a paleta de quem trabalha
-   olhando para um monitor e chama aquilo de oração. O acento tem brilho
-   de tubo de gás, e uma varredura desce pela folha sem parar. */
+/* ---- Mysteria · o terminal ----
+   Gente convencida de que divindade é questão de arquitetura, e que por
+   isso trabalha onde a máquina trabalha: fósforo verde, texto de sistema,
+   âmbar só onde a máquina insiste. É a estética de quem lê a madrugada
+   inteira num monitor monocromático e chama aquilo de oração.
+
+   Aqui o efeito não é enfeite, é o assunto. A folha inteira passa a ser
+   uma imagem de tubo: linhas de varredura visíveis, brilho de fósforo
+   vazando das letras, chuvisco por cima e a barra de sincronia descendo
+   sem parar. Tudo em CSS, então cai junto no controle de efeitos. */
 [data-afiliacao="Mysteria"]{
-  --ink:#03060e; --ink-2:#050a15; --panel:#08101f; --panel-2:#0d1a2e;
-  --line:#1d3b5c; --line-soft:#122437; --line-hi:#2f5c8a;
-  --bone:#cfe6ff; --dust:#8fb0cf; --dust-dim:#7ba0c2;
-  --brass:#31d2f2; --brass-lo:#1a6f8c;
-  --blood:#1a6f8c; --blood-hi:#ff4fa3; --spec:#31d2f2;
-  --on-bone:#03060e; --focus-bg:#071120;
-  --hatch:repeating-linear-gradient(45deg,#31d2f2 0 3px,#03060e 3px 5px);
-  --hatch-dense:repeating-linear-gradient(45deg,#ff4fa3 0 2px,#03060e 2px 4px);
-  --grain:.04;
-  --fonte-titulo:"Segoe UI","Trebuchet MS",Tahoma,sans-serif;
-  --titulo-espaco:.3em;
+  --ink:#010703; --ink-2:#020c05; --panel:#03130a; --panel-2:#051c0e;
+  --line:#0e5227; --line-soft:#083518; --line-hi:#169b45;
+  --bone:#68ff92; --dust:#3ad169; --dust-dim:#38c261;
+  --brass:#ffb000; --brass-lo:#9c6d00;
+  --blood:#9c6d00; --blood-hi:#ffd45e; --spec:#ffb000;
+  --on-bone:#010703; --focus-bg:#04180b;
+  --hatch:repeating-linear-gradient(45deg,#68ff92 0 3px,#010703 3px 5px);
+  --hatch-dense:repeating-linear-gradient(45deg,#ffb000 0 2px,#010703 2px 4px);
+  --grain:.16;
+  --fonte-titulo:var(--mono);
+  --titulo-espaco:.34em;
 }
-@keyframes varredura{
-  0%{transform:translateY(-100%)}
-  100%{transform:translateY(100vh)}
+
+/* O fósforo não para no contorno da letra: ele vaza. É isso que separa
+   um tubo de uma tela plana imitando um. */
+[data-afiliacao="Mysteria"] .sheet,
+[data-afiliacao="Mysteria"] .drawer{
+  text-shadow:0 0 4px rgba(104,255,146,.55),0 0 11px rgba(104,255,146,.22);
 }
 [data-afiliacao="Mysteria"] .panel-h{
-  color:var(--brass);text-shadow:0 0 7px rgba(49,210,242,.6),0 0 18px rgba(49,210,242,.28);
+  color:var(--brass);
+  text-shadow:0 0 5px rgba(255,176,0,.7),0 0 14px rgba(255,176,0,.28);
 }
 [data-afiliacao="Mysteria"] .panel-h::before{
-  background:var(--blood-hi);box-shadow:0 0 8px rgba(255,79,163,.9);
+  background:var(--brass);box-shadow:0 0 7px rgba(255,176,0,.9);
 }
-[data-afiliacao="Mysteria"] .stamp-brass{box-shadow:0 0 14px rgba(49,210,242,.45)}
-/* linhas de varredura paradas, mais o feixe que desce */
-[data-afiliacao="Mysteria"] .tex::after{
-  background:
-    repeating-linear-gradient(180deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px),
-    radial-gradient(120% 90% at 50% 0%,transparent 55%,rgba(0,0,0,.5) 100%);
+[data-afiliacao="Mysteria"] .panel{border-color:var(--line-soft)}
+
+/* Camada 1 — a barra de sincronia, aquela faixa mais clara que desce
+   quando o vertical está fora de ajuste. */
+@keyframes sincronia{
+  0%{transform:translateY(-30vh)}
+  100%{transform:translateY(130vh)}
+}
+[data-afiliacao="Mysteria"] .tex{
+  overflow:hidden;
 }
 [data-afiliacao="Mysteria"] .tex::before{
-  animation:granulado .7s steps(1,end) infinite,varredura 7s linear infinite;
+  /* Camada 2 — chuvisco. O ruído já existia; aqui ele fica alto o
+     bastante para ser visto como chuvisco e não como textura de papel. */
+  animation:granulado .55s steps(1,end) infinite;
+  mix-blend-mode:screen;
+  opacity:calc(var(--grain) + var(--corr) * .1);
 }
+[data-afiliacao="Mysteria"] .tex::after{
+  /* Camada 3 — varredura densa e vinheta de tubo, que escurece o canto
+     porque o vidro é curvo e o feixe chega mais fraco na borda. */
+  background:
+    repeating-linear-gradient(180deg,
+      rgba(0,0,0,.55) 0 1px,
+      rgba(0,0,0,.18) 1px 2px,
+      transparent 2px 4px),
+    radial-gradient(125% 100% at 50% 50%,transparent 32%,rgba(0,0,0,.86) 100%);
+}
+
+/* A barra de sincronia precisa de um corpo próprio, e o único elemento
+   livre é a raiz do documento. */
+[data-afiliacao="Mysteria"] body::after{
+  content:"";position:fixed;left:0;right:0;top:0;height:26vh;z-index:9997;
+  pointer-events:none;
+  background:linear-gradient(180deg,
+    transparent 0%,
+    rgba(104,255,146,.045) 45%,
+    rgba(104,255,146,.09) 60%,
+    transparent 100%);
+  animation:sincronia 6.5s linear infinite;
+}
+
+/* O tubo não tem brilho constante: a rede oscila e a imagem respira. */
+@keyframes tremula-tubo{
+  0%,100%{opacity:1}
+  47%{opacity:.97}
+  48%{opacity:.88}
+  49%{opacity:1}
+  82%{opacity:.94}
+  83%{opacity:1}
+}
+[data-afiliacao="Mysteria"] .wrap{animation:tremula-tubo 5.5s steps(1,end) infinite}
 
 /* ---- Guardiões da Árvore · os escolhidos ----
    Não é clube de naturalistas: é uma ordem que seleciona. Ouro de folha
@@ -971,8 +1024,7 @@ body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn{
      papel isso não serve: colunas de fluxo se equilibram dentro de UMA
      página e depois transbordam. Aqui volta a ser grade, com cada painel
      como item próprio, preenchendo as páginas na ordem em que aparece. */
-  .cols,.full{display:grid;columns:auto;grid-template-columns:1fr 1fr 1fr;gap:7pt;align-items:start}
-  .full{margin-top:7pt}
+  .cols{display:grid;columns:auto;grid-template-columns:1fr 1fr 1fr;gap:7pt;align-items:start}
   .stack{display:contents}
   .cols > .stack > .panel{margin-bottom:0}
 
@@ -1038,7 +1090,6 @@ body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn{
 @media screen and (max-width:900px){
   .wrap{grid-template-columns:1fr}
   .drawer{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}
-  .full{grid-template-columns:minmax(0,1fr)}
   .sheet{padding:20px 18px 60px}
 
   /* aberta, a gaveta empurrava a ficha para fora da tela (493px antes de
@@ -1062,7 +1113,6 @@ body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn{
   .sheet{padding:14px 12px 56px}
   .cols{columns:1}
   .cols > .stack > .panel{margin-bottom:12px}
-  .full{gap:12px}
   .panel{padding:12px 13px 14px}
 
   /* a gaveta virava um muro de 500px antes da ficha:
@@ -1123,15 +1173,23 @@ body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn{
   .eq input{width:18px;height:18px}
   .toast-x{padding:6px 8px;font-size:16px}
 }
-
 /* ---------- movimento: sistema por padrão, com decisão manual por cima ----------
    O padrão continua obedecendo o "reduzir movimento" do sistema. Quem quer os
    efeitos mesmo assim marca 'on' e passa na frente; quem quer silêncio total
-   marca 'off' e desliga até onde o sistema permitiria. */
+   marca 'off' e desliga até onde o sistema permitiria.
+
+   O seletor precisa citar ::before e ::after: "*" não casa com
+   pseudo-elemento, e é justamente neles que moram o grão, a lâmpada do
+   cabeçalho e as camadas de tubo do Mysteria. Sem isso, desligar os
+   efeitos deixava animando exatamente o que mais incomoda. */
 @media (prefers-reduced-motion:reduce){
-  :root:not([data-motion="on"]) *{transition:none !important;animation:none !important}
+  :root:not([data-motion="on"]) *,
+  :root:not([data-motion="on"]) *::before,
+  :root:not([data-motion="on"]) *::after{transition:none !important;animation:none !important}
 }
-:root[data-motion="off"] *{transition:none !important;animation:none !important}
+:root[data-motion="off"] *,
+:root[data-motion="off"] *::before,
+:root[data-motion="off"] *::after{transition:none !important;animation:none !important}
 </style>
 
 <div class="tex" aria-hidden="true"></div>
@@ -2205,13 +2263,6 @@ function renderSheet(){
       </section>
 
     </div>
-  </div>
-
-  <!-- ===== FAIXA INFERIOR =====
-       Duas pilhas em vez de duas linhas: num grid comum a altura da linha
-       é ditada pelo painel mais alto, e o mais curto deixava um vazio
-       enorme embaixo antes do próximo poder começar. -->
-  <div class="full">
    <div class="stack">
     <section class="panel">
       <h2 class="panel-h">Âncoras <span class="h-note">duas pessoas do mundo ordinário</span></h2>
