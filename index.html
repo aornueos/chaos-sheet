@@ -1988,6 +1988,12 @@ function renderSheet(){
             <span class="pool-lbl">/ <span id="vitMax2">${vitMax}</span></span>
           </div>
         </div>
+        <p class="hint">A Vitalidade mede o estado físico e vem da Linhagem, não de atributo:
+        o corpo aguenta o que o sangue permite. São cinco níveis, e os Pontos são a reserva
+        dentro do nível em que você está.</p>
+        <p class="hint">Quando os Pontos chegam a zero, você perde um nível e os Pontos voltam
+        ao máximo. Do nível 3 em diante a queda cobra dados em todos os testes. No nível 1 o
+        personagem não age, e no 0 sai da mesa em definitivo.</p>
 
       </section>
 
@@ -2078,6 +2084,11 @@ function renderSheet(){
       <section class="panel">
         <h2 class="panel-h">Habilidades de Origem <span class="h-note">automático</span></h2>
         <div id="listConcedidas"></div>
+        <p class="hint">Nada aqui se preenche à mão: tudo vem da Cultura, do Antecedente, da
+        Linhagem e do Arquétipo escolhidos no cabeçalho. Como é derivado e não copiado, trocar
+        qualquer uma dessas escolhas troca o que aparece aqui, sem sobrar nada da anterior.</p>
+        <p class="hint">O "?" ao lado de cada traço abre o que ele faz. A perícia concedida pela
+        Cultura e pelo Antecedente você escolhe, e o grau entra sozinho na lista de Perícias.</p>
       </section>
 
       <section class="panel">
@@ -2372,7 +2383,10 @@ function abreBalao(botao){
   let x = r.left + r.width / 2 - largura / 2;
   let y = r.bottom + 8;
   x = Math.max(margem, Math.min(x, window.innerWidth - largura - margem));
+  // não cabendo embaixo, vira para cima; não cabendo em lugar nenhum,
+  // encosta na borda — fora da tela o balão não serve para nada
   if(y + altura > window.innerHeight - margem) y = r.top - altura - 8;
+  y = Math.max(margem, Math.min(y, window.innerHeight - altura - margem));
   balao.style.left = Math.round(x) + "px";
   balao.style.top = Math.round(Math.max(margem, y)) + "px";
 
