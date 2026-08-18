@@ -340,13 +340,21 @@ body{
    casas muda quando o jogador troca de sangue. */
 .corr-bar{display:flex;gap:2px;margin:8px 0 7px}
 .corr-c{
-  flex:1;min-width:0;height:22px;border:1px solid var(--line);background:var(--ink-2);padding:0;
-  transition:background .12s,border-color .12s;
+  flex:1;min-width:0;height:22px;border:1px solid var(--line);background:var(--ink-2);
+  padding:0;cursor:pointer;transition:background .12s,border-color .12s;
 }
-.corr-c.on{background:var(--bone);border-color:var(--bone)}
-.corr-c.on.mid{background:var(--hatch);border-color:var(--bone)}
-.corr-c.on.hi{background:var(--hatch-dense);border-color:var(--bone)}
-.corr-c.on.max{background:var(--ink);border-color:var(--bone);border-width:2px}
+.corr-c:hover{border-color:var(--brass-lo)}
+.corr-c.assentada{background:var(--bone);border-color:var(--bone)}
+.corr-c.assentada.mid{background:var(--hatch);border-color:var(--bone)}
+.corr-c.assentada.hi{background:var(--hatch-dense);border-color:var(--bone)}
+.corr-c.assentada.max{background:var(--ink);border-color:var(--bone);border-width:2px}
+/* A Ativada ocupa o Limiar sem ser tinta que assentou: trama na diagonal
+   contrária e na cor de acento, para não se confundir com as tramas de
+   intensidade da Assentada. */
+.corr-c.ativada{
+  border-color:var(--brass-lo);
+  background:repeating-linear-gradient(-45deg,var(--brass) 0 2px,transparent 2px 5px);
+}
 .corr-state{font-size:var(--fs-xs);letter-spacing:.08em;text-transform:uppercase;display:flex;justify-content:space-between}
 .corr-state b{color:var(--blood-hi)}
 
@@ -547,7 +555,7 @@ body{
 
 /* estado crítico pulsa sem precisar de cor */
 @keyframes alerta{0%,100%{opacity:1}50%{opacity:.42}}
-.lvl.bad.on,.corr-c.on.max{animation:alerta 1.9s ease-in-out infinite}
+.lvl.bad.on,.corr-c.assentada.max{animation:alerta 1.9s ease-in-out infinite}
 
 /* ---- 3. resposta ao toque ---- */
 @keyframes tinta{0%{transform:scale(.65)}60%{transform:scale(1.14)}100%{transform:scale(1)}}
@@ -964,7 +972,8 @@ body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn{
   .lvl.on *{color:#fff !important}
 
   .corr-c{border:.75pt solid #000 !important;background:#fff !important;height:12pt}
-  .corr-c.on{background:#000 !important}
+  .corr-c.assentada{background:#000 !important}
+  .corr-c.ativada{background:repeating-linear-gradient(-45deg,#000 0 2px,#fff 2px 5px) !important}
 
   /* Quais Talentos estão acesos é estado da ficha, não controle de tela:
      a folha impressa precisa dizer isso. O botão vira um selo de tinta. */
@@ -1408,6 +1417,32 @@ const LAB_ESTAGIOS = ["—","Instável (Despertar)","Consolidado (Aclarado)","Ab
 /* A Corrupção não tem tabela de estados própria. A escada é a proporção
    entre ela e o Limiar, e o Limiar vem da Linhagem — por isso o mesmo
    número de Corrupção significa coisas diferentes em corpos diferentes. */
+/* As casas da barra de Corrupção.
+
+   A Assentada é a única coisa que o jogador marca, e ele marca clicando —
+   um campo numérico ao lado da barra pedia que a mesma informação fosse
+   lida em dois lugares e digitada num terceiro.
+
+   A Ativada não se clica: ela vem dos Talentos acesos e muda quando o
+   jogador acende ou apaga um. Por isso ocupa as casas seguintes com trama
+   em vez de tinta cheia — está lá, conta contra o Limiar, mas quem manda
+   nela é o painel de Talentos. */
+function celulasCorrupcao(c){
+  const limiar = limiarDe(c);
+  const assentada = Number(c.corrAssentada) || 0;
+  const ativada = ativadaDe(c);
+  return Array.from({length:limiar},(_,i) => {
+    const v = i + 1;
+    const faixa = v >= limiar ? "max" : v > 2*limiar/3 ? "hi" : v > limiar/3 ? "mid" : "";
+    const estado = v <= assentada ? "assentada"
+                 : v <= assentada + ativada ? "ativada" : "";
+    const rotulo = estado === "ativada"
+      ? "Ativada " + v + " — vem de Talento aceso; clicar marca Assentada até aqui"
+      : "Assentada " + v + (v === assentada ? " — clique para baixar" : "");
+    return `<button class="corr-c ${estado} ${faixa}" data-corr="${v}"
+      title="${esc(rotulo)}" aria-label="${esc(rotulo)}"></button>`;
+  }).join("");
+}
 function corrState(v, limiar){
   const L = limiar || 10;
   if(v<=0)      return {t:"Limpo",      d:"Nenhum efeito."};
@@ -1980,28 +2015,14 @@ function renderSheet(){
 
       <section class="panel">
         <h2 class="panel-h">Corrupção <span class="h-note">Limiar ${limiar} · ${esc(linChave(c))}</span></h2>
-        <div class="corr-bar" id="corrBar">
-          ${Array.from({length:limiar},(_,i) => {
-            const v=i+1, on=corr>=v;
-            const cls = v>2*limiar/3 ? (v>=limiar?"max":"hi") : (v>limiar/3?"mid":"");
-            return `<span class="corr-c${on?" on ":" "}${cls}" aria-hidden="true"></span>`;
-          }).join("")}
-        </div>
+        <div class="corr-bar" id="corrBar">${celulasCorrupcao(c)}</div>
         <div class="corr-state">
           <span><b id="corrT">${corrState(corr,limiar).t}</b> · <span id="corrV">${corr}</span>/${limiar}</span>
         </div>
         <p class="hint" id="corrD">${corrState(corr,limiar).d}</p>
-
-        <div class="grid-2" style="margin-top:9px">
-          ${fieldInput("Assentada","corrAssentada",c.corrAssentada,"number")}
-          <div class="field">
-            <label>Ativada</label>
-            <input class="inp" id="corrAtivada" value="${ativadaDe(c)}" disabled title="Soma da Ativada dos Talentos acesos">
-          </div>
-        </div>
-        <p class="hint">Assentada é o que ficou: sai em Local Seguro ou no contato com uma Âncora.
-        Ativada é o que você carrega por escolha, e sai quando você apaga o Talento que a
-        sustenta — o que só dá para fazer em Local Seguro.</p>
+        <p class="hint">Clique para marcar a Assentada, que é o que ficou: sai em Local Seguro
+        ou no contato com uma Âncora. As casas em trama são a Ativada, que você não marca —
+        ela vem dos Talentos acesos e some quando você apaga o Talento que a sustenta.</p>
 
         <div class="divider"></div>
         <div class="grid-2">
@@ -2356,21 +2377,12 @@ function updateDerived(){
   const limiar = limiarDe(c), corr = corrTotal(c);
   const cs = corrState(corr, limiar);
   set("corrT",cs.t); set("corrV",corr); set("corrD",cs.d);
-  const ativada = document.getElementById("corrAtivada");
-  if(ativada) ativada.value = ativadaDe(c);
 
+  /* a barra é pequena e depende de três grandezas (Assentada, Ativada e
+     Limiar): redesenhá-la inteira custa menos que sincronizar classe a
+     classe, e nunca sai do passo. */
   const bar = document.getElementById("corrBar");
-  if(bar){
-    if(bar.children.length !== limiar){
-      bar.innerHTML = Array.from({length:limiar},() => `<span class="corr-c" aria-hidden="true"></span>`).join("");
-    }
-    Array.from(bar.children).forEach((cel,i) => {
-      const v = i+1;
-      cel.className = "corr-c"
-        + (corr>=v ? " on" : "")
-        + (v>=limiar ? " max" : v>2*limiar/3 ? " hi" : v>limiar/3 ? " mid" : "");
-    });
-  }
+  if(bar) bar.innerHTML = celulasCorrupcao(c);
   document.documentElement.style.setProperty("--corr", Math.min(1, corr/limiar).toFixed(2));
 
   updateCapacidade();
@@ -2712,6 +2724,14 @@ document.addEventListener("click", e => {
     updateDerived(); save(); return;
   }
 
+
+  /* marcar Corrupção Assentada. Clicar de novo na casa mais alta baixa
+     uma, que é como se apaga sem precisar de um segundo controle. */
+  if(t.dataset.corr !== undefined){
+    const v = Number(t.dataset.corr);
+    c.corrAssentada = (c.corrAssentada === v) ? v - 1 : v;
+    updateDerived(); save(); return;
+  }
   // níveis de vitalidade
   if(t.dataset.vit !== undefined){
     c.vitLvl = Number(t.dataset.vit);
