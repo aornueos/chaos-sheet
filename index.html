@@ -254,6 +254,10 @@ body{
 }
 .inp:focus,.sel:focus,.txt:focus{outline:none;border-color:var(--brass-lo);background:var(--focus-bg)}
 .txt{resize:vertical;line-height:1.5}
+/* Campo que mostra o texto inteiro. Rolar na horizontal para ler o efeito
+   de uma Cifra é pedir que o jogador leia por uma fresta: a caixa cresce
+   até caber, e quem manda na altura é o conteudo. */
+.txt.cresce{resize:none;overflow:hidden;min-height:0}
 .sel{appearance:none;cursor:pointer;padding-right:22px;
   background-image:linear-gradient(45deg,transparent 50%,var(--dust) 50%),linear-gradient(135deg,var(--dust) 50%,transparent 50%);
   background-position:calc(100% - 12px) calc(50% + 1px),calc(100% - 7px) calc(50% + 1px);
@@ -558,142 +562,244 @@ body{
 
 .file{transform-origin:left center}
 .file:active{transform:scale(.985)}
-
 /* ============================================================
    PAPEL TIMBRADO — a ficha veste a Afiliação
 
    Cada Afiliação emite os próprios documentos, e um documento diz de
-   onde veio antes de dizer qualquer outra coisa. Só mudam cor, tipo e
-   textura: a disposição dos painéis é a mesma em todas, porque é a
+   onde veio antes de dizer qualquer outra coisa. Mudam a cor, o tipo e
+   a textura; a disposição dos painéis é a mesma em todas, porque é a
    mesma ficha sendo preenchida por gente diferente.
 
-   Tudo aqui é redefinição de variável. Onde um tema precisa de mais que
-   cor — uma borda dupla, um filete de manchete — a regra vem logo
-   abaixo do bloco de variáveis daquele tema.
+   Cada tema tem um bloco de variáveis e, abaixo dele, as regras do seu
+   efeito próprio. Todo efeito aqui é CSS, então todos caem sozinhos sob
+   o controle de movimento da gaveta, que desliga animação por '*'.
+
+   Só a Courier Prime viaja embutida no arquivo. As famílias que os temas
+   pedem são as que já existem na máquina de quem abre, e por isso cada
+   pilha termina numa genérica.
    ============================================================ */
 
-/* ---- O Olho · dossiê interno, papel velho sob lâmpada fraca ----
-   É o padrão do arquivo, e está aqui escrito para que voltar a ele
-   seja igual a escolher qualquer outro. */
+/* ---- O Olho · noir de Londres ----
+   Escritório de investigação em noite de neblina: fuligem, névoa e o
+   âmbar de um lampião de rua. A datilografia continua sendo a voz do
+   arquivo, mas o nome da casa é composto em gótica, como nameplate de
+   jornal vitoriano. O cabeçalho pisca porque a lâmpada é velha. */
 [data-afiliacao="O Olho"]{
-  --ink:#000000; --ink-2:#070707; --panel:#0b0b0b; --panel-2:#131313;
-  --line:#3a3a3a; --line-soft:#242424; --line-hi:#4a4a4a;
-  --bone:#e9dab6; --dust:#ada38c; --dust-dim:#847c6d;
+  --ink:#000000; --ink-2:#070707; --panel:#0b0b0c; --panel-2:#131315;
+  --line:#3a3a3c; --line-soft:#242427; --line-hi:#4d4d52;
+  --bone:#e9dab6; --dust:#a8a08c; --dust-dim:#857d6e;
   --brass:#e9dab6; --brass-lo:#8a8272;
   --blood:#8a8272; --blood-hi:#e9dab6; --spec:#e9dab6;
   --on-bone:#000; --focus-bg:#111;
   --hatch:repeating-linear-gradient(45deg,#e9dab6 0 3px,#000 3px 5px);
   --hatch-dense:repeating-linear-gradient(45deg,#e9dab6 0 2px,#000 2px 4px);
   --grain:.055;
+  --titulo-espaco:.15em;
+}
+/* a névoa: uma massa lenta que atravessa a folha e nunca chega */
+@keyframes neblina{
+  0%,100%{transform:translateX(-12%)}
+  50%{transform:translateX(12%)}
+}
+[data-afiliacao="O Olho"] .tex::after{
+  background:
+    radial-gradient(120% 90% at 50% 0%,transparent 45%,rgba(0,0,0,.55) 100%),
+    radial-gradient(80% 60% at 50% 40%,rgba(233,218,182,.05) 0%,transparent 70%);
+  animation:neblina 34s ease-in-out infinite;
+}
+[data-afiliacao="O Olho"] .brand{
+  font-family:"Old London","Old English Text MT","Blackadder ITC",Georgia,serif;
+  font-size:var(--fs-lg);letter-spacing:.02em;text-transform:none;
 }
 
-/* ---- A Penumbra · o que opera sem luz ----
-   Nada de âmbar: aqui a folha é lida no escuro, e a cor que sobra é a
-   temperatura fria do pouco que reflete. Título condensado, como
-   carimbo apertado para caber onde não devia ser visto. */
+/* ---- A Penumbra · o culto ----
+   Dark fantasy pesada. Não é organização com escritório, é gente que se
+   reúne onde não chega luz. O roxo quase não existe e serve só para o
+   preto não virar cinza. Gótica no título, sombra interna nos painéis
+   para que pareçam afundados na pedra. */
 [data-afiliacao="A Penumbra"]{
-  --ink:#030405; --ink-2:#060809; --panel:#090c0e; --panel-2:#101417;
-  --line:#242b31; --line-soft:#171c20; --line-hi:#38424a;
-  --bone:#a8bac6; --dust:#71828e; --dust-dim:#7d8f9a;
-  --brass:#8fa6b3; --brass-lo:#5a6a75;
-  --blood:#5a6a75; --blood-hi:#c3d5e0; --spec:#8fa6b3;
-  --on-bone:#04070a; --focus-bg:#0c1013;
-  --hatch:repeating-linear-gradient(45deg,#a8bac6 0 3px,#030405 3px 5px);
-  --hatch-dense:repeating-linear-gradient(45deg,#a8bac6 0 2px,#030405 2px 4px);
-  --grain:.085;
-  --fonte-titulo:"Haettenschweiler","Arial Narrow","Segoe UI",sans-serif;
-  --titulo-espaco:.24em;
+  --ink:#020103; --ink-2:#050308; --panel:#08050d; --panel-2:#0e0916;
+  --line:#2a1f3a; --line-soft:#170f22; --line-hi:#3f2d59;
+  --bone:#c9bcd8; --dust:#9182ab; --dust-dim:#8a7aa4;
+  --brass:#9a70cf; --brass-lo:#553877;
+  --blood:#553877; --blood-hi:#c6a2ff; --spec:#9a70cf;
+  --on-bone:#08050d; --focus-bg:#0c0714;
+  --hatch:repeating-linear-gradient(45deg,#9a70cf 0 3px,#020103 3px 5px);
+  --hatch-dense:repeating-linear-gradient(45deg,#9a70cf 0 2px,#020103 2px 4px);
+  --grain:.11;
+  --fonte-titulo:"Old English Text MT","Old London",Garamond,Georgia,serif;
+  --titulo-caixa:none;
+  --titulo-espaco:.06em;
+  --titulo-peso:400;
+  --nome-caixa:none;
 }
-[data-afiliacao="A Penumbra"] .panel{border-color:var(--line-soft)}
-[data-afiliacao="A Penumbra"] .masthead::before{opacity:.45}
+/* a sombra respira: o que cerca a folha se aproxima e recua */
+@keyframes mare-de-sombra{
+  0%,100%{opacity:.85}
+  50%{opacity:1}
+}
+[data-afiliacao="A Penumbra"] .tex::after{
+  background:radial-gradient(105% 80% at 50% 30%,transparent 30%,rgba(0,0,0,.88) 100%);
+  animation:mare-de-sombra 11s ease-in-out infinite;
+}
+[data-afiliacao="A Penumbra"] .panel,
+[data-afiliacao="A Penumbra"] .masthead{
+  box-shadow:inset 0 0 34px rgba(0,0,0,.9);
+  border-color:var(--line-soft);
+}
+[data-afiliacao="A Penumbra"] .panel-h{text-shadow:0 0 10px rgba(154,112,207,.5)}
+[data-afiliacao="A Penumbra"] .panel-h::before{transform:rotate(45deg)}
 
-/* ---- Os Acorrentados · ordem devocional ----
-   Luz de vela e ouro sobre madeira escura. A borda dupla dos painéis é
-   moldura de relicário, e o título abre mão da caixa alta pelas
-   versaletes, que é como se escreve em pedra. */
+/* ---- Os Acorrentados · a chama vermelha ----
+   Fanáticos. Vermelho de brasa sobre carvão, moldura dupla de relicário
+   e versaletes de inscrição. O quadrado do título arde: é a chama que a
+   ordem segue, e ela não fica parada. */
 [data-afiliacao="Os Acorrentados"]{
-  --ink:#0a0704; --ink-2:#0f0b07; --panel:#140e08; --panel-2:#1c1409;
-  --line:#4a3820; --line-soft:#2b2013; --line-hi:#6b5230;
-  --bone:#f0dcac; --dust:#b9a077; --dust-dim:#9c855f;
-  --brass:#d4a537; --brass-lo:#8f6f24;
-  --blood:#8f6f24; --blood-hi:#f5c451; --spec:#d4a537;
-  --on-bone:#140e08; --focus-bg:#1a1209;
-  --hatch:repeating-linear-gradient(45deg,#d4a537 0 3px,#0a0704 3px 5px);
-  --hatch-dense:repeating-linear-gradient(45deg,#d4a537 0 2px,#0a0704 2px 4px);
-  --grain:.05;
+  --ink:#0b0202; --ink-2:#100404; --panel:#160606; --panel-2:#1f0a08;
+  --line:#5a1c16; --line-soft:#32100d; --line-hi:#82291f;
+  --bone:#f4d9cc; --dust:#c08d7e; --dust-dim:#ad7568;
+  --brass:#e2422a; --brass-lo:#93251a;
+  --blood:#93251a; --blood-hi:#ff6a4a; --spec:#e2422a;
+  --on-bone:#160606; --focus-bg:#1b0807;
+  --hatch:repeating-linear-gradient(45deg,#e2422a 0 3px,#0b0202 3px 5px);
+  --hatch-dense:repeating-linear-gradient(45deg,#e2422a 0 2px,#0b0202 2px 4px);
+  --grain:.06;
   --fonte-titulo:"Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
   --titulo-caixa:none;
   --titulo-espaco:.1em;
   --nome-caixa:none;
 }
+@keyframes brasa{
+  0%,100%{box-shadow:0 0 5px rgba(226,66,42,.55);opacity:1}
+  50%{box-shadow:0 0 12px rgba(226,66,42,.95);opacity:.8}
+}
 [data-afiliacao="Os Acorrentados"] .panel-h,
 [data-afiliacao="Os Acorrentados"] .mast-nome{font-variant:small-caps}
 [data-afiliacao="Os Acorrentados"] .panel{border-style:double;border-width:3px}
-[data-afiliacao="Os Acorrentados"] .panel-h::before{transform:rotate(45deg)}
+[data-afiliacao="Os Acorrentados"] .panel-h::before{
+  transform:rotate(45deg);animation:brasa 3.4s ease-in-out infinite;
+}
+[data-afiliacao="Os Acorrentados"] .tex::after{
+  background:
+    radial-gradient(120% 90% at 50% 0%,transparent 50%,rgba(0,0,0,.6) 100%),
+    radial-gradient(90% 70% at 50% 100%,rgba(226,66,42,.15) 0%,transparent 65%);
+}
+[data-afiliacao="Os Acorrentados"] .masthead::before{
+  background:linear-gradient(90deg,var(--brass) 0%,var(--brass-lo) 40%,transparent 75%);
+}
 
-/* ---- Mysteria · gabinete de estudo ----
-   Tinta violeta em caderno de pesquisa. O itálico do título é o do
-   punho de quem anota antes de publicar. */
+/* ---- Mysteria · o deus que ainda não ligaram ----
+   Gente convencida de que divindade é questão de arquitetura. Azul de
+   madrugada industrial com néon ciano e rosa: a paleta de quem trabalha
+   olhando para um monitor e chama aquilo de oração. O acento tem brilho
+   de tubo de gás, e uma varredura desce pela folha sem parar. */
 [data-afiliacao="Mysteria"]{
-  --ink:#07060c; --ink-2:#0b0912; --panel:#100d1b; --panel-2:#171326;
-  --line:#332b4d; --line-soft:#1f1a2f; --line-hi:#4a3f6b;
-  --bone:#ddd3f0; --dust:#9d92b8; --dust-dim:#8b81a6;
-  --brass:#b294e0; --brass-lo:#6f5a94;
-  --blood:#6f5a94; --blood-hi:#cbb0ff; --spec:#b294e0;
-  --on-bone:#0d0a16; --focus-bg:#141020;
-  --hatch:repeating-linear-gradient(45deg,#b294e0 0 3px,#07060c 3px 5px);
-  --hatch-dense:repeating-linear-gradient(45deg,#b294e0 0 2px,#07060c 2px 4px);
-  --grain:.06;
-  --fonte-titulo:Georgia,"Times New Roman",Times,serif;
-  --titulo-italico:italic;
-  --titulo-espaco:.08em;
-  --titulo-caixa:none;
-  --nome-caixa:none;
+  --ink:#03060e; --ink-2:#050a15; --panel:#08101f; --panel-2:#0d1a2e;
+  --line:#1d3b5c; --line-soft:#122437; --line-hi:#2f5c8a;
+  --bone:#cfe6ff; --dust:#8fb0cf; --dust-dim:#7ba0c2;
+  --brass:#31d2f2; --brass-lo:#1a6f8c;
+  --blood:#1a6f8c; --blood-hi:#ff4fa3; --spec:#31d2f2;
+  --on-bone:#03060e; --focus-bg:#071120;
+  --hatch:repeating-linear-gradient(45deg,#31d2f2 0 3px,#03060e 3px 5px);
+  --hatch-dense:repeating-linear-gradient(45deg,#ff4fa3 0 2px,#03060e 2px 4px);
+  --grain:.04;
+  --fonte-titulo:"Segoe UI","Trebuchet MS",Tahoma,sans-serif;
+  --titulo-espaco:.3em;
 }
-[data-afiliacao="Mysteria"] .panel-h::before{border-radius:50%}
+@keyframes varredura{
+  0%{transform:translateY(-100%)}
+  100%{transform:translateY(100vh)}
+}
+[data-afiliacao="Mysteria"] .panel-h{
+  color:var(--brass);text-shadow:0 0 7px rgba(49,210,242,.6),0 0 18px rgba(49,210,242,.28);
+}
+[data-afiliacao="Mysteria"] .panel-h::before{
+  background:var(--blood-hi);box-shadow:0 0 8px rgba(255,79,163,.9);
+}
+[data-afiliacao="Mysteria"] .stamp-brass{box-shadow:0 0 14px rgba(49,210,242,.45)}
+/* linhas de varredura paradas, mais o feixe que desce */
+[data-afiliacao="Mysteria"] .tex::after{
+  background:
+    repeating-linear-gradient(180deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px),
+    radial-gradient(120% 90% at 50% 0%,transparent 55%,rgba(0,0,0,.5) 100%);
+}
+[data-afiliacao="Mysteria"] .tex::before{
+  animation:granulado .7s steps(1,end) infinite,varredura 7s linear infinite;
+}
 
-/* ---- Guardiões da Árvore · registro de campo ----
-   Musgo, casca e papel de herbário. Nada aqui foi impresso numa
-   gráfica: foi anotado embaixo de uma árvore. */
+/* ---- Guardiões da Árvore · os escolhidos ----
+   Não é clube de naturalistas: é uma ordem que seleciona. Ouro de folha
+   sobre madeira sagrada, serifa de inscrição, a calma de quem foi
+   chamado e não se candidatou. O dourado tem lustro, e ele atravessa o
+   filete do cabeçalho de tempos em tempos. */
 [data-afiliacao="Guardiões da Árvore"]{
-  --ink:#050704; --ink-2:#080b07; --panel:#0c110b; --panel-2:#131a10;
-  --line:#2f4029; --line-soft:#1d2818; --line-hi:#46603c;
-  --bone:#dfe6c9; --dust:#9aab84; --dust-dim:#84936f;
-  --brass:#9dc45f; --brass-lo:#5f7a37;
-  --blood:#5f7a37; --blood-hi:#bbe27a; --spec:#9dc45f;
-  --on-bone:#0c110b; --focus-bg:#0f150d;
-  --hatch:repeating-linear-gradient(45deg,#9dc45f 0 3px,#050704 3px 5px);
-  --hatch-dense:repeating-linear-gradient(45deg,#9dc45f 0 2px,#050704 2px 4px);
-  --grain:.07;
-  --fonte-titulo:"Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
-  --titulo-espaco:.11em;
+  --ink:#070502; --ink-2:#0b0804; --panel:#100c05; --panel-2:#191308;
+  --line:#4d3b17; --line-soft:#2c210e; --line-hi:#715723;
+  --bone:#f6e6bb; --dust:#c3aa77; --dust-dim:#ab9560;
+  --brass:#e8c257; --brass-lo:#9a7a24;
+  --blood:#9a7a24; --blood-hi:#ffd970; --spec:#e8c257;
+  --on-bone:#100c05; --focus-bg:#151006;
+  --hatch:repeating-linear-gradient(45deg,#e8c257 0 3px,#070502 3px 5px);
+  --hatch-dense:repeating-linear-gradient(45deg,#e8c257 0 2px,#070502 2px 4px);
+  --grain:.045;
+  --fonte-titulo:"Palatino Linotype","Book Antiqua",Palatino,Garamond,Georgia,serif;
+  --titulo-espaco:.2em;
 }
+@keyframes lustro{
+  0%,88%,100%{background-position:-140% 0}
+  94%{background-position:240% 0}
+}
+[data-afiliacao="Guardiões da Árvore"] .masthead::before{
+  height:3px;
+  background:linear-gradient(90deg,transparent 0%,var(--brass-lo) 18%,var(--blood-hi) 32%,var(--brass-lo) 46%,transparent 70%);
+  background-size:220% 100%;
+  animation:lustro 9s ease-in-out infinite;
+}
+[data-afiliacao="Guardiões da Árvore"] .panel-h{text-shadow:0 0 9px rgba(232,194,87,.28)}
 [data-afiliacao="Guardiões da Árvore"] .panel-h::before{border-radius:50% 0 50% 0}
-
-/* ---- Sociedade dos Ceifadores · laudo ----
-   Aço, azulejo e luz de necrotério. Datilografia mantida de propósito:
-   é o único tema onde a fonte NÃO muda, porque um laudo não tem estilo.
-   O que muda é o espaçamento, que abre até ficar frio. */
-[data-afiliacao="Sociedade dos Ceifadores"]{
-  --ink:#030505; --ink-2:#060a0a; --panel:#0a1011; --panel-2:#101819;
-  --line:#26383a; --line-soft:#182426; --line-hi:#3a5457;
-  --bone:#d3e6e4; --dust:#8ba5a3; --dust-dim:#758f8d;
-  --brass:#63b3ab; --brass-lo:#3a6d68;
-  --blood:#3a6d68; --blood-hi:#8ce0d6; --spec:#63b3ab;
-  --on-bone:#030505; --focus-bg:#0b1314;
-  --hatch:repeating-linear-gradient(45deg,#63b3ab 0 3px,#030505 3px 5px);
-  --hatch-dense:repeating-linear-gradient(45deg,#63b3ab 0 2px,#030505 2px 4px);
-  --grain:.03;
-  --titulo-espaco:.32em;
+[data-afiliacao="Guardiões da Árvore"] .tex::after{
+  background:
+    radial-gradient(120% 90% at 50% 0%,transparent 52%,rgba(0,0,0,.58) 100%),
+    radial-gradient(70% 50% at 50% 8%,rgba(232,194,87,.09) 0%,transparent 70%);
 }
-[data-afiliacao="Sociedade dos Ceifadores"] .panel{border-width:1px}
-[data-afiliacao="Sociedade dos Ceifadores"] .panel-h::after{opacity:.5}
+
+/* ---- Sociedade dos Ceifadores · o terno e a lâmina ----
+   Noir como o Olho, mas de sangue azul: quem faz este trabalho o faz de
+   terno, e a casa é velha o bastante para ter vitral. Prata fria, azul
+   de meia-noite e um filete ornamental por dentro de cada painel. */
+[data-afiliacao="Sociedade dos Ceifadores"]{
+  --ink:#040509; --ink-2:#07080e; --panel:#0b0d16; --panel-2:#121522;
+  --line:#2c3149; --line-soft:#1a1d2c; --line-hi:#454b6b;
+  --bone:#dfe3f0; --dust:#9aa1bd; --dust-dim:#8d95b4;
+  --brass:#b9c0e0; --brass-lo:#6a7199;
+  --blood:#6a7199; --blood-hi:#e8ecff; --spec:#b9c0e0;
+  --on-bone:#040509; --focus-bg:#0a0c14;
+  --hatch:repeating-linear-gradient(45deg,#b9c0e0 0 3px,#040509 3px 5px);
+  --hatch-dense:repeating-linear-gradient(45deg,#b9c0e0 0 2px,#040509 2px 4px);
+  --grain:.05;
+  --fonte-titulo:"Book Antiqua","Palatino Linotype",Garamond,Georgia,serif;
+  --titulo-espaco:.22em;
+}
+/* filete duplo por dentro da borda, como papel de convite */
+[data-afiliacao="Sociedade dos Ceifadores"] .panel{
+  box-shadow:inset 0 0 0 1px var(--ink-2),inset 0 0 0 2px var(--line-soft);
+}
+[data-afiliacao="Sociedade dos Ceifadores"] .panel-h::before{
+  transform:rotate(45deg);
+  box-shadow:0 0 0 2px var(--panel),0 0 0 3px var(--brass-lo);
+}
+[data-afiliacao="Sociedade dos Ceifadores"] .masthead::before{
+  background:linear-gradient(90deg,var(--brass) 0%,var(--brass-lo) 30%,transparent 68%);
+}
+[data-afiliacao="Sociedade dos Ceifadores"] .tex::after{
+  background:
+    radial-gradient(120% 90% at 50% 0%,transparent 48%,rgba(0,0,0,.62) 100%),
+    radial-gradient(85% 65% at 50% 55%,rgba(185,192,224,.05) 0%,transparent 70%);
+}
 
 /* ---- O Coletivo · a edição da madrugada ----
-   Jornal, mas visto na sala de impressão e não na banca: chumbo, tinta
-   fresca e o papel ainda escuro do rolo. A serifa de manchete e o filete
-   vermelho do cabeçalho fazem o trabalho que a folha branca faria, sem
-   acender a tela na cara de quem joga de noite. */
+   Jornal visto na sala de impressão e não na banca: chumbo, tinta fresca
+   e o papel ainda escuro do rolo. */
 [data-afiliacao="O Coletivo"]{
   --ink:#090807; --ink-2:#0d0c0a; --panel:#121110; --panel-2:#1a1714;
   --line:#3f392f; --line-soft:#26221c; --line-hi:#5d5445;
@@ -711,18 +817,19 @@ body{
 [data-afiliacao="O Coletivo"] .panel-h{border-bottom:2px solid var(--line);padding-bottom:5px}
 [data-afiliacao="O Coletivo"] .panel-h::after{display:none}
 
-/* ---- A Frente · cartaz ----
-   Impresso rápido, colado num muro, para ser lido de longe e por cima
-   do ombro de alguém. Título pesado, apertado, sem elegância nenhuma. */
+/* ---- A Frente · o cartaz amarelo ----
+   Impresso rápido e colado num muro, para ser lido de longe e por cima
+   do ombro de alguém. Amarelo de sinalização sobre breu, Impact
+   apertada, nada de elegante. O cabeçalho é faixa de advertência. */
 [data-afiliacao="A Frente"]{
-  --ink:#0a0504; --ink-2:#0f0807; --panel:#150a08; --panel-2:#1e0f0b;
-  --line:#4d211a; --line-soft:#2c1310; --line-hi:#78352a;
-  --bone:#f2e6d8; --dust:#b09184; --dust-dim:#987c6e;
-  --brass:#e8583d; --brass-lo:#a02c1a;
-  --blood:#8e2415; --blood-hi:#ff5c3d; --spec:#d43a22;
-  --on-bone:#150a08; --focus-bg:#1a0c09;
-  --hatch:repeating-linear-gradient(45deg,#d43a22 0 3px,#0a0504 3px 5px);
-  --hatch-dense:repeating-linear-gradient(45deg,#d43a22 0 2px,#0a0504 2px 4px);
+  --ink:#0a0903; --ink-2:#0f0d04; --panel:#141105; --panel-2:#1d1808;
+  --line:#4f4310; --line-soft:#2c2609; --line-hi:#7a6817;
+  --bone:#f7ecc0; --dust:#c3b071; --dust-dim:#ae9a53;
+  --brass:#f5c518; --brass-lo:#a08210;
+  --blood:#a08210; --blood-hi:#ffdb4d; --spec:#f5c518;
+  --on-bone:#141105; --focus-bg:#191504;
+  --hatch:repeating-linear-gradient(45deg,#f5c518 0 3px,#0a0903 3px 5px);
+  --hatch-dense:repeating-linear-gradient(45deg,#f5c518 0 2px,#0a0903 2px 4px);
   --grain:.1;
   --fonte-titulo:Impact,Haettenschweiler,"Arial Black","Arial Narrow",sans-serif;
   --titulo-espaco:.04em;
@@ -730,11 +837,15 @@ body{
 }
 [data-afiliacao="A Frente"] .panel-h::before{width:12px;height:9px}
 [data-afiliacao="A Frente"] .stamp{border-width:3px}
+/* faixa de advertência no alto do cabeçalho */
+[data-afiliacao="A Frente"] .masthead::before{
+  height:6px;
+  background:repeating-linear-gradient(135deg,var(--brass) 0 9px,var(--ink) 9px 18px);
+}
 
 /* ---- Avulso · sem papel timbrado ----
    Quem não responde a ninguém não recebe formulário de ninguém. Cinza
-   de fotocópia, sem acento, sem calor. A ausência de identidade é a
-   identidade. */
+   de fotocópia, sem acento, sem calor. A ausência é a identidade. */
 [data-afiliacao="Avulso"]{
   --ink:#050505; --ink-2:#090909; --panel:#0e0e0e; --panel-2:#151515;
   --line:#333; --line-soft:#202020; --line-hi:#454545;
@@ -2007,6 +2118,7 @@ function renderSheet(){
   renderConcedidas();
   updateDerived();
   aplicaTema();
+  ajustaCaixas();
   escalona();
 }
 
@@ -2060,7 +2172,7 @@ const LIST_CFG = {
       </div>
       <div style="margin-top:6px;display:grid;gap:6px">
         <input class="inp" data-path="cifras.${i}.gestos" value="${esc(it.gestos)}" placeholder="Gestos (Invocar · Criar · Sentir…)">
-        <input class="inp" data-path="cifras.${i}.efeito" value="${esc(it.efeito)}" placeholder="Efeito em uma frase">
+        <textarea class="txt cresce" rows="1" data-path="cifras.${i}.efeito" placeholder="Efeito da Cifra">${esc(it.efeito)}</textarea>
       </div>
       ${(() => { const v = VINCULOS[it.vinculo] || VINCULOS["Baixo"];
         return `<p class="hint">Entra +${v.corr} Corrupção · Domínio ND ${v.nd} · retém ${v.falha} falhando, ${v.passa} passando</p>`; })()}`
@@ -2091,7 +2203,7 @@ const LIST_CFG = {
         </div>
       </div>
       <div style="margin-top:6px">
-        <input class="inp" data-path="talentos.${i}.texto" value="${esc(it.texto)}" placeholder="Efeito">
+        <textarea class="txt cresce" rows="1" data-path="talentos.${i}.texto" placeholder="Efeito">${esc(it.texto)}</textarea>
       </div>`
   },
   inventario:{
@@ -2115,6 +2227,18 @@ const LIST_CFG = {
       </div>`
   }
 };
+/* A altura do campo passa a ser a do texto que ele guarda. Roda depois de
+   cada desenho e a cada tecla, porque uma frase a mais precisa aparecer na
+   hora, e não quando a ficha for redesenhada. */
+function ajustaCaixas(escopo){
+  (escopo || document).querySelectorAll(".txt.cresce").forEach(t => {
+    t.style.height = "auto";
+    /* box-sizing e border-box: scrollHeight mede conteudo mais padding e
+       ignora a borda, entao ela entra na conta a parte ou sobra uma linha
+       recortada no rodape do campo. */
+    t.style.height = (t.scrollHeight + (t.offsetHeight - t.clientHeight)) + "px";
+  });
+}
 
 function renderList(key){
   const c = cur(), cfg = LIST_CFG[key], box = document.getElementById(cfg.el);
@@ -2123,6 +2247,7 @@ function renderList(key){
   box.innerHTML = arr.length
     ? arr.map((it,i) => `<div class="row">${cfg.row(it,i)}</div>`).join("")
     : `<p class="empty">${cfg.vazio}</p>`;
+  ajustaCaixas(box);
   if(key === "inventario") updateVolume();
 }
 
@@ -2511,6 +2636,7 @@ document.addEventListener("input", e => {
   if(t.hasAttribute("data-attr") || t.hasAttribute("data-vol")
      || t.hasAttribute("data-peso") || t.hasAttribute("data-xp")) updateDerived();
   if(t.dataset.path === "corrAssentada" || t.dataset.path === "xp") updateDerived();
+  if(t.classList && t.classList.contains("cresce")) ajustaCaixas(t.parentElement);
   if(t.dataset.path === "nome" || t.dataset.path === "selo") renderFileList();
   save();
 });
