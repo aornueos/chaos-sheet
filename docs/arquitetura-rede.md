@@ -190,9 +190,9 @@ dizendo que quem edita é o Narrador.
 Cada estágio entrega algo e deixa a versão local funcionando.
 
 **Estágio 0 — sem servidor nenhum.**
-Ids estáveis nos itens de lista. Extrair um `Armazem` com `carregar`, `salvar`
-e `assinar`, e a implementação `localStorage` por trás. Nada muda para quem
-usa. Sem isso, nenhum dos outros estágios é seguro.
+Ids estáveis nos itens de lista, caminhos que resolvem por id, e um `Cache`
+que concentra o acesso ao `localStorage`. Nada muda para quem usa. Sem isso,
+nenhum dos outros estágios é seguro.
 
 **Estágio 1 — conta e nuvem.**
 Auth, `mesa`, `ficha`, RLS. Sincronização de blob inteiro, último a gravar
@@ -206,13 +206,73 @@ Caminhos por `data-path`, assinatura por canal, Narrador editando ao vivo.
 A tabela de patches vira registro de auditoria: quem mudou o quê e quando,
 com desfazer para o Narrador. Marcador de quem está com a ficha aberta.
 
-## O que falta decidir
+## Decisões tomadas
 
-1. **Plataforma.** Supabase entrega auth, Postgres, RLS e tempo real prontos, e
-   a RLS acima é literalmente o arquivo de política. Node com Postgres próprio
-   dá controle total e custa umas duas semanas a mais. Firebase resolve tempo
-   real bem, mas as regras de segurança são menos expressivas que SQL.
-2. **Modo local sem conta continua existindo?** A recomendação é sim.
-3. **Como o jogador entra.** Link mágico por e-mail, conta Google, ou código de
-   convite com apelido e sem e-mail — o último é o mais leve para uma mesa de
-   amigos, e o mais frágil se alguém perder o dispositivo.
+**Entrada por link com código de convite.** O Narrador gera um link
+`.../#/entrar/K7M2P9`. Quem abre é criado como usuário anônimo no banco —
+sem e-mail, sem senha — e o código é resgatado na hora, inserindo a linha em
+`membro`. É a solução mais simples possível para uma mesa privada e fechada, e
+mesmo assim existe um `auth.uid()` de verdade por trás, que é o que a RLS
+precisa para funcionar.
+
+O código é um dado, não uma credencial: quem tem o link entra na mesa, mas
+entrar na mesa não dá acesso a ficha nenhuma além da própria. A separação
+continua sendo feita pela política do banco.
+
+**O modo local continua existindo.** Abrir o arquivo sem conta nenhuma segue
+funcionando como hoje, com as fichas no navegador. A conta é o que permite o
+Narrador enxergar, não o que permite jogar.
+
+**Plataforma: Supabase.** Entrega auth anônima, Postgres, RLS e tempo real sem
+servidor para manter, e a política escrita acima é literalmente o arquivo de
+migração. Trocar depois por Postgres próprio custa reescrever a camada de
+acesso, e nada do modelo de dados.
+
+### O risco do login anônimo, escrito antes de doer
+
+A sessão anônima vive no navegador. Limpar dados do site, trocar de aparelho ou
+usar aba anônima significa perder o vínculo com o personagem — o banco continua
+com a ficha, mas ninguém consegue provar que ela é sua.
+
+Três defesas, e vale ter as três:
+
+1. **O Narrador consegue reatribuir uma ficha a outro usuário.** É a rede de
+   segurança que resolve o caso real: o jogador entra de novo pelo link, e o
+   Narrador aponta a ficha antiga para o novo `uid`.
+2. **A exportação `.json` que já existe vira backup de verdade.** Um arquivo na
+   máquina do jogador não depende de sessão nenhuma.
+3. **Oferecer vínculo por e-mail depois.** Supabase permite promover uma conta
+   anônima para uma com e-mail sem trocar o `uid`. Quem quiser garantia, liga;
+   quem não quiser, segue sem.
+
+## Estágio 0 — feito
+
+Concluído sem servidor e sem mudança visível:
+
+- **Id estável em cada item de lista.** Cifras, Talentos e Inventário passam a
+  ter `id` gerado no `normalize()`. Fichas antigas ganham id ao abrir, e ids já
+  existentes não são regerados.
+- **Caminhos por id.** `setPath` e `getPath` aceitam `cifras.#c1a2.efeito` além
+  de `cifras.2.efeito`, e `caminhoCanonico()` traduz um no outro na fronteira
+  com a rede. A interface segue emitindo índice, que é o que ela tem à mão ao
+  desenhar a lista; nenhum template precisou mudar.
+- **`Cache`**, o único ponto do arquivo que fala com `localStorage` para dado de
+  ficha. A preferência de efeitos continua indo direto, porque é preferência de
+  aparelho e não acompanha o jogador.
+
+O `setPath` passou a devolver `false` quando o caminho não existe mais, em vez
+de estourar: patch que chega para uma Cifra que a outra ponta apagou precisa
+cair fora sem derrubar a folha.
+
+### Por que isso não é burocracia
+
+Com três Cifras na ficha, apagar a primeira faz `cifras.1.efeito` passar a
+apontar para outra Cifra. Dois editores e um índice significam texto escrito na
+linha errada, em silêncio. Com id, o caminho continua apontando para a mesma
+Cifra ou para nada.
+
+## Próximo passo — Estágio 1
+
+Auth anônima, `mesa`, `membro`, `ficha` e a RLS. Sincronização de ficha inteira,
+último a gravar vence, sobre o debounce que já existe. Painel do Narrador
+somente leitura. O modo local segue intocado o tempo todo.

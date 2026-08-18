@@ -1688,6 +1688,7 @@ function normalize(raw){
   c.cifras = arr("cifras").map(x => {
     const vinculo = VINCULOS[x.vinculo] ? x.vinculo : "Baixo";
     return {
+      id: str(x.id) || uid(),
       nome:str(x.nome), selo:opt(x.selo,SELOS), vinculo,
       gatilho:opt(x.gatilho,GATILHOS), gestos:str(x.gestos), efeito:str(x.efeito),
       // Cifra gravada antes do cálculo de XP herda o custo do próprio Vínculo
@@ -1702,6 +1703,7 @@ function normalize(raw){
   c.talentos = arr("talentos").map(x => {
     const doLivro = achaTalento(str(x.nome), str(x.chave));
     return {
+      id:    str(x.id) || uid(),
       nome:  str(x.nome),
       chave: str(x.chave) || (doLivro ? doLivro.chave : ""),
       xp:    clampNum(x.xp, 0, 99, doLivro ? doLivro.xp : 2),
@@ -1716,6 +1718,7 @@ function normalize(raw){
      por Talentos e Cifras. O que já estava anotado não é apagado — segue no
      arquivo salvo e nos backups, apenas sem painel que o desenhe. */
   c.inventario = arr("inventario").map(x => ({
+    id:str(x.id) || uid(),
     nome:str(x.nome), volume:clampNum(x.volume,0,999,0),
     nc:clampNum(x.nc,0,4,0), equipado: !!x.equipado
   }));
@@ -1754,19 +1757,58 @@ function normalize(raw){
   return c;
 }
 
+/* ============================================================
+   CACHE LOCAL — o único lugar do arquivo que fala com localStorage
+
+   A arquitetura de rede (docs/arquitetura-rede.md) coloca o navegador
+   como verdade imediata e a nuvem como cópia compartilhada. Então isto
+   aqui não é uma etapa que a nuvem substitui: é a camada que continua
+   embaixo dela, e que faz a ficha funcionar sem rede nenhuma.
+
+   O que a nuvem acrescenta depois é outro destino para o mesmo estado,
+   assíncrono e por ficha. Por isso este objeto continua síncrono: quem
+   grava antes de a aba fechar não tem como esperar promessa, e o cache
+   é justamente quem precisa gravar nessa hora.
+   ============================================================ */
+
+const Cache = {
+  nome: "local",
+
+  ler(){
+    try{ return localStorage.getItem(LS_KEY); }
+    catch(e){ setStatus("erro"); return null; }
+  },
+
+  gravar(json){
+    localStorage.setItem(LS_KEY, json);   // deixa estourar: quem chama trata
+  },
+
+  lerCopia(){
+    try{ return localStorage.getItem(LS_BAK); }catch(e){ return null; }
+  },
+
+  gravarCopia(json){
+    try{ localStorage.setItem(LS_BAK, json); return true; }catch(e){ return false; }
+  },
+
+  /* Texto ilegível nunca é descartado em silêncio: fica guardado sob outra
+     chave para recuperação manual, porque uma ficha perdida é pior que
+     qualquer erro de leitura. */
+  guardarIlegivel(raw){
+    try{ localStorage.setItem(LS_KEY + ":corrompido:" + Date.now(), raw); }catch(_){}
+  }
+};
 function load(){
-  let raw = null;
-  try{ raw = localStorage.getItem(LS_KEY); }
-  catch(e){ setStatus("erro"); }
+  const raw = Cache.ler();
 
   let parsed = null;
   if(raw){
     try{ parsed = JSON.parse(raw); }
     catch(e){
       // nunca descarta em silêncio: preserva o texto ilegível para recuperação manual
-      try{ localStorage.setItem(LS_KEY + ":corrompido:" + Date.now(), raw); }catch(_){}
+      Cache.guardarIlegivel(raw);
       try{
-        const bak = localStorage.getItem(LS_BAK);
+        const bak = Cache.lerCopia();
         if(bak) parsed = JSON.parse(bak);
       }catch(_){}
       toast(parsed
@@ -1810,12 +1852,12 @@ function flush(){
   catch(e){ setStatus("erro"); return; }
 
   try{
-    localStorage.setItem(LS_KEY, json);
+    Cache.gravar(json);
     pending = false;
     setStatus("salvo");
     // cópia de segurança espaçada, só depois que a principal deu certo
     if(Date.now() - lastBak > 30000){
-      try{ localStorage.setItem(LS_BAK, json); lastBak = Date.now(); }catch(_){}
+      if(Cache.gravarCopia(json)) lastBak = Date.now();
     }
   }catch(e){
     setStatus("erro");
@@ -1844,15 +1886,60 @@ function cur(){
   return c;
 }
 
-/* --- caminho aninhado: "attrs.corpo" --- */
+/* --- caminho aninhado: "attrs.corpo", "cifras.2.efeito", "cifras.#c1a2.efeito"
+
+   Um segmento que começa por "#" endereça o item de lista pelo id, e não
+   pela posição. A diferença só importa quando duas pessoas mexem na mesma
+   ficha: "cifras.2.efeito" deixa de significar a mesma coisa se alguém
+   apagar a Cifra 0 enquanto a outra digita, e o texto vai parar na Cifra
+   errada. Índice não é identidade.
+
+   A interface continua emitindo índice, que é o que ela tem à mão ao
+   desenhar a lista. A tradução para id acontece em caminhoCanonico, na
+   fronteira com a rede — assim nenhum template precisa saber disso. */
+
+function resolveSegmento(o, chave){
+  if(o == null) return undefined;
+  if(chave[0] === "#" && Array.isArray(o)){
+    const id = chave.slice(1);
+    return o.find(x => x && x.id === id);
+  }
+  return o[chave];
+}
+
 function setPath(obj, path, val){
   const parts = path.split(".");
   let o = obj;
-  for(let i=0;i<parts.length-1;i++) o = o[parts[i]];
-  o[parts[parts.length-1]] = val;
+  for(let i=0;i<parts.length-1;i++){
+    o = resolveSegmento(o, parts[i]);
+    if(o == null) return false;   // item apagado por outra mão: o patch cai fora
+  }
+  const ultima = parts[parts.length-1];
+  if(ultima[0] === "#") return false;   // id é endereço, não campo
+  o[ultima] = val;
+  return true;
 }
+
 function getPath(obj, path){
-  return path.split(".").reduce((o,k) => (o == null ? o : o[k]), obj);
+  return path.split(".").reduce(resolveSegmento, obj);
+}
+
+/* Troca o índice pelo id do item, para que o caminho continue apontando
+   para a mesma Cifra depois que a lista mudar de tamanho. Caminho que não
+   atravessa lista volta igual. */
+function caminhoCanonico(obj, path){
+  const parts = path.split(".");
+  let o = obj;
+  for(let i=0;i<parts.length;i++){
+    const chave = parts[i];
+    if(Array.isArray(o) && /^\d+$/.test(chave)){
+      const item = o[Number(chave)];
+      if(item && item.id) parts[i] = "#" + item.id;
+    }
+    o = resolveSegmento(o, chave);
+    if(o == null) break;
+  }
+  return parts.join(".");
 }
 
 /* ============================================================
@@ -2205,7 +2292,7 @@ function escalona(){
 const LIST_CFG = {
   cifras:{
     el:"listCifras", vazio:"Nenhuma Cifra registrada.",
-    novo:() => ({nome:"",selo:"",vinculo:"Baixo",gatilho:"",gestos:"",efeito:"",xp:VINCULOS["Baixo"].xp,corrente:false}),
+    novo:() => ({id:uid(),nome:"",selo:"",vinculo:"Baixo",gatilho:"",gestos:"",efeito:"",xp:VINCULOS["Baixo"].xp,corrente:false}),
     row:(it,i) => `
       <div class="row-top">
         <input class="inp" data-path="cifras.${i}.nome" value="${esc(it.nome)}" placeholder="Nome da Cifra">
@@ -2239,7 +2326,7 @@ const LIST_CFG = {
   },
   talentos:{
     el:"listTalentos", vazio:"Nenhum talento adquirido.",
-    novo:() => ({nome:"",chave:"",xp:2,ativada:0,texto:"",ativo:true}),
+    novo:() => ({id:uid(),nome:"",chave:"",xp:2,ativada:0,texto:"",ativo:true}),
     row:(it,i) => `
       <div class="row-top">
         <button class="acende${it.ativo?" on":""}" data-acende="${i}"
@@ -2268,7 +2355,7 @@ const LIST_CFG = {
   },
   inventario:{
     el:"listInventario", vazio:"Mãos vazias.",
-    novo:() => ({nome:"",volume:1,nc:0,equipado:false}),
+    novo:() => ({id:uid(),nome:"",volume:1,nc:0,equipado:false}),
     row:(it,i) => `
       <div class="row-top">
         <input class="inp" data-path="inventario.${i}.nome" value="${esc(it.nome)}" placeholder="Item">
@@ -2717,7 +2804,7 @@ function adicionaDoLivro(tipo, nome, chave){
     /* Entra aceso se ainda couber na Capacidade. Passar do teto não é a ficha
        que decide, mas ela também não empurra ninguém para lá sem avisar. */
     const cabe = pesoUsado(c) + t.xp <= capacidadeDe(c);
-    c.talentos.push({ nome:t.nome, chave:t.chave, xp:t.xp, ativada:t.ativada, texto:t.texto, ativo:cabe });
+    c.talentos.push({ id:uid(), nome:t.nome, chave:t.chave, xp:t.xp, ativada:t.ativada, texto:t.texto, ativo:cabe });
     renderList("talentos");
     updateDerived();
     if(!cabe) toast(`"${nome}" entrou dormente: não cabe na Capacidade.`, 4500);
@@ -2725,7 +2812,7 @@ function adicionaDoLivro(tipo, nome, chave){
   if(tipo === "cifra"){
     const f = DADOS.cifras.find(x => x.nome === nome); if(!f) return;
     c.cifras.push({
-      nome:f.nome, selo: f.selo === "Universal" ? "" : f.selo, vinculo:f.vinculo,
+      id:uid(), nome:f.nome, selo: f.selo === "Universal" ? "" : f.selo, vinculo:f.vinculo,
       gatilho:f.gatilho, gestos:f.gestos, efeito:f.efeito,
       xp:(VINCULOS[f.vinculo] || VINCULOS["Baixo"]).xp, corrente:false
     });
