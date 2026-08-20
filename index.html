@@ -350,10 +350,10 @@ body{
 .corr-c.assentada.mid{background:var(--hatch);border-color:var(--bone)}
 .corr-c.assentada.hi{background:var(--hatch-dense);border-color:var(--bone)}
 .corr-c.assentada.max{background:var(--ink);border-color:var(--bone);border-width:2px}
-/* A Ativada ocupa o Limiar sem ser tinta que assentou: trama na diagonal
+/* A Carga ocupa o Limiar sem ser tinta que assentou: trama na diagonal
    contrária e na cor de acento, para não se confundir com as tramas de
    intensidade da Assentada. */
-.corr-c.ativada{
+.corr-c.carga{
   border-color:var(--brass-lo);
   background:repeating-linear-gradient(-45deg,var(--brass) 0 2px,transparent 2px 5px);
 }
@@ -1052,7 +1052,7 @@ body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn{
 
   .corr-c{border:.75pt solid #000 !important;background:#fff !important;height:12pt}
   .corr-c.assentada{background:#000 !important}
-  .corr-c.ativada{background:repeating-linear-gradient(-45deg,#000 0 2px,#fff 2px 5px) !important}
+  .corr-c.carga{background:repeating-linear-gradient(-45deg,#000 0 2px,#fff 2px 5px) !important}
 
   /* Quais Talentos estão acesos é estado da ficha, não controle de tela:
      a folha impressa precisa dizer isso. O botão vira um selo de tinta. */
@@ -1253,9 +1253,9 @@ body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn{
 /* ============================================================
    CATÁLOGO DO LIVRO (Caos Eminente 0.5)
    Extraído do PDF oficial: talentos com custo em XP, Cifras por
-   Selo, e o que Cultura, Antecedente e Especialização concedem.
+   Pilar, e o que Cultura, Antecedente e Arquétipo concedem.
    ============================================================ */
-const DADOS = {"cifras":[{"nome":"Canalização Positiva","selo":"Universal","vinculo":"Baixo","gestos":"Criar + Proclamar","gatilho":"Tato","efeito":"Você canaliza energia positiva em um alvo através do toque, curando 1 Vitalidade."},{"nome":"Canalização Negativa","selo":"Universal","vinculo":"Baixo","gestos":"Invocar + Bloquear","gatilho":"Visão","efeito":"Você canaliza energia negativa em um alvo à distância visual, causando 1 de dano."},{"nome":"Selo Menor","selo":"Universal","vinculo":"Baixo","gestos":"Sentir","gatilho":"Terceiro Olho","efeito":"Você percebe toda fonte de Distorção, Cifra ativa e aberração num raio de 10 metros e identifica o Selo e o Vínculo aproximado de cada uma."},{"nome":"Estancar","selo":"Universal","vinculo":"Baixo","gestos":"Criar + Bloquear","gatilho":"Tato","efeito":"Toque um alvo a 0 Vitalidade: ele estabiliza, para de piorar e não perde nível de Vitalidade por aquele colapso. Não restaura Vitalidade."},{"nome":"Pulso","selo":"Origem","vinculo":"Baixo","gestos":"Sentir","gatilho":"Terceiro Olho","efeito":"Você estende sua percepção e sente a vitalidade de todos os seres vivos a até 5 metros. O Narrador informa o estado geral de cada um, não o número exato de Vitalidade, mas se estão saudáveis, feridos, agonizando."},{"nome":"Florescimento","selo":"Origem","vinculo":"Médio","gestos":"Criar + Proclamar + Criar","gatilho":"Visão","efeito":"Escolha um alvo. Até o fim da cena, toda cura que esse alvo receber tem o valor aumentado em 1."},{"nome":"Amigo Místico","selo":"Origem","vinculo":"Médio","gestos":"Criar + Invocar + Proclamar","gatilho":"Terceiro Olho","efeito":"Você invoca uma criatura de Origem, uma entidade orgânica, instável, que pode ou não seguir suas ordens. A criatura possui Vitalidade iguais à metade dos seus, age no seu turno e causa 1 de dano por ataque. Detalhes sobre progressão da criatura estão no capítulo de talentos."},{"nome":"Renascença","selo":"Origem","vinculo":"Alto","gestos":"Criar + Criar + Proclamar","gatilho":"Tato","efeito":"Você toca um alvo que acabou de cair a 0 Vitalidade, nessa"},{"nome":"Raiz Profunda","selo":"Origem","vinculo":"Baixo","gestos":"Criar + Bloquear","gatilho":"Tato","efeito":"Um alvo que você toca cria raízes etéreas: até o início do seu próximo Foco, recebe Vantagem para resistir a ser movido, agarrado ou derrubado."},{"nome":"Enxame Vital","selo":"Origem","vinculo":"Médio","gestos":"Criar + Invocar","gatilho":"Terceiro Olho","efeito":"Por uma cena, sempre que você restaurar Vitalidade de um aliado, um segundo aliado a até 5 metros recupera metade desse valor, arredondando para cima."},{"nome":"Fio","selo":"Extinção","vinculo":"Baixo","gestos":"Sentir + Proclamar","gatilho":"Visão","efeito":"Você vê o fio que conecta um ser à sua morte. O Narrador informa o estado real de saúde do alvo, nível de Vitalidade, e se ele carrega alguma condição oculta."},{"nome":"Marca da Extinção","selo":"Extinção","vinculo":"Médio","gestos":"Proclamar + Invocar","gatilho":"Visão","efeito":"O alvo recebe a Marca. Por 2 rodadas, ele não pode recuperar Vitalidade por nenhum meio. A Marca é visível para qualquer Ascendido com o terceiro olho ativo."},{"nome":"Ceifa","selo":"Extinção","vinculo":"Médio","gestos":"Invocar + Bloquear + Proclamar","gatilho":"Visão","efeito":"Um ataque de Cifra que causa danos igual à diferença entre os Vitalidade máximos e os Vitalidade atuais do alvo, dividida por 2 (arredonde para baixo). Quanto mais ferido o alvo, mais dano."},{"nome":"Círculo do Fim","selo":"Extinção","vinculo":"Alto","gestos":"Bloquear + Invocar + Bloquear","gatilho":"Terceiro Olho","efeito":"Cria um círculo etéreo ao seu redor com raio de 3 metros. Inimigos dentro do círculo ficam presos, para sair, devem gastar uma Ação Completa e passar em um teste de Resistência ND 3. Enquanto o círculo estiver ativo, você recebe −1 em qualquer dano sofrido e causa +1 em qualquer dano causado. O círculo persiste até o fim da cena ou até você se mover mais de 1 metro."},{"nome":"Sentença","selo":"Extinção","vinculo":"Médio","gestos":"Proclamar + Bloquear","gatilho":"Visão","efeito":"Marque um alvo visível. Na próxima vez que ele sofrer dano até o fim da cena, sofre 1d6 adicional e a marca se apaga."},{"nome":"Último Suspiro","selo":"Extinção","vinculo":"Alto","gestos":"Invocar + Proclamar + Bloquear","gatilho":"Visão","efeito":"Escolha um corpo a 0 Vitalidade ou recém eliminado nesta rodada. A morte dele se expande: todos os inimigos a até 3 metros sofrem 1d8 de dano espiritual."},{"nome":"Sussurro da Sabedoria","selo":"Controle","vinculo":"Baixo","gestos":"Sentir + Proclamar","gatilho":"Audição","efeito":"Uma vez por cena, receba uma dica ou informação do Narrador sobre a situação atual. A informação é sempre verdadeira, mas nem sempre completa."},{"nome":"Tradução","selo":"Controle","vinculo":"Baixo","gestos":"Sentir + Criar","gatilho":"Audição","efeito":"Você compreende e fala qualquer idioma enquanto a Cifra estiver ativa. Dura uma cena."},{"nome":"Quebra de Defesa","selo":"Controle","vinculo":"Médio","gestos":"Transmutar + Bloquear","gatilho":"Visão","efeito":"Todas as reações do alvo sofrem −2 de penalidade até o fim da rodada."},{"nome":"Arquitetura","selo":"Controle","vinculo":"Médio","gestos":"Criar + Transmutar + Proclamar","gatilho":"Visão","efeito":"Você manipula o ambiente físico imediato dentro do campo visual. Pode fechar uma porta sem tocá-la, mover um objeto de até 10kg, criar uma barreira improvisada de materiais presentes no local, ou travar uma saída. Não pode ser usado para atacar diretamente."},{"nome":"Suspensão","selo":"Controle","vinculo":"Alto","gestos":"Bloquear + Transmutar + Bloquear","gatilho":"Terceiro Olho","efeito":"Você anula uma ação que acabou de acontecer nessa rodada, a sua ou a de outro personagem. O agente e o alvo rerrolam todos os dados e mantêm os novos resultados. Não pode suspender a mesma ação duas vezes."},{"nome":"Cárcere Lógico","selo":"Controle","vinculo":"Alto","gestos":"Bloquear + Transmutar + Proclamar","gatilho":"Terceiro Olho","efeito":"Escolha um inimigo visível. Por 2 rodadas, ele só pode realizar uma categoria de ação que você definir na conjuração: apenas mover, apenas atacar ou apenas falar. Qualquer outra coisa não acontece."},{"nome":"Véu","selo":"Pesadelo","vinculo":"Baixo","gestos":"Criar + Transmutar","gatilho":"Visão","efeito":"Você cria uma ilusão que afeta um alvo. A ilusão é real para ele até que ele sofra dano físico ou passe em um teste de Propósito ND 2."},{"nome":"Eco","selo":"Pesadelo","vinculo":"Baixo","gestos":"Proclamar + Transmutar","gatilho":"Audição","efeito":"Quando um alvo falha em qualquer teste como resultado de uma penalidade que você causou, ele sofre −1D adicional no próximo teste que realizar."},{"nome":"Recriação Mental","selo":"Pesadelo","vinculo":"Médio","gestos":"Sentir + Sentir","gatilho":"Tato","efeito":"Tocando uma superfície, objeto ou pessoa, você revive uma cena do passado relacionada a esse ponto de contato. O Narrador descreve os eventos como uma memória, detalhada, mas não necessariamente completa."},{"nome":"Manifestação","selo":"Pesadelo","vinculo":"Médio","gestos":"Invocar + Criar + Proclamar","gatilho":"Terceiro Olho","efeito":"Você pergunta ao Narrador qual é o maior medo de um alvo específico dentro do campo visual. A resposta é obrigatória e honesta. Em seguida, essa coisa aparece, com 4 Vitalidade, causando 2 de dano por rodada a qualquer inimigo que consiga vê-la. Não afeta aliados."},{"nome":"Sussurro Falso","selo":"Pesadelo","vinculo":"Baixo","gestos":"Proclamar + Transmutar","gatilho":"Audição","efeito":"Um alvo ouve com perfeita clareza uma frase curta que você define, como se viesse da fonte em que ele mais confia. Dura um instante, o suficiente para plantar a dúvida."},{"nome":"Terror Profundo","selo":"Pesadelo","vinculo":"Médio","gestos":"Invocar + Sentir + Proclamar","gatilho":"Visão","efeito":"Um alvo encara o próprio medo: deve passar em Propósito ND 2 ou ficar Atordoado por uma rodada."},{"nome":"Abençoar Arma","selo":"Tormento","vinculo":"Baixo","gestos":"Proclamar + Transmutar","gatilho":"Tato","efeito":"Você encanta sua arma através do toque. A arma causa +1 de dano, recebe um efeito adicional definido pelo Narrador conforme o contexto, e você pode usar a perícia Domínio no lugar de Briga ou Pontaria em ataques com ela. Dura uma cena."},{"nome":"Combustão","selo":"Tormento","vinculo":"Baixo","gestos":"Invocar + Proclamar","gatilho":"Visão","efeito":"Causa 2 de dano em todos os alvos inimigos dentro de uma área de 2 metros ao redor de um ponto que você pode ver. O dano é emocional tanto quanto físico, o Narrador pode descrever efeitos visíveis."},{"nome":"Motivação do Combate","selo":"Tormento","vinculo":"Médio","gestos":"Invocar + Proclamar + Criar","gatilho":"Terceiro Olho","efeito":"Até o fim da cena, sempre que você acertar um ataque corpo a corpo, remove 1 de Corrupção Assentada imediatamente."},{"nome":"Círculo de Absorção","selo":"Tormento","vinculo":"Médio","gestos":"Invocar + Sentir + Bloquear","gatilho":"Terceiro Olho","efeito":"Forma um círculo espiritual ao seu redor com raio de 3 metros. No início de cada rodada enquanto o círculo estiver ativo, todos os inimigos dentro sofrem 1 de dano e você cura 1 Vitalidade por inimigo afetado. Dura até o fim da cena."},{"nome":"Impacto Reduzido","selo":"Tormento","vinculo":"Médio","gestos":"Bloquear + Transmutar","gatilho":"Tato","efeito":"Reação. Quando você sofre dano, pode conjurar imediatamente como reação, reduz o dano à metade."},{"nome":"Apoteose","selo":"Tormento","vinculo":"Alto","gestos":"Proclamar + Invocar + Proclamar + Proclamar","gatilho":"Terceiro Olho","efeito":"Por uma rodada, todo dano que você causa é dobrado. Todo dano que você recebe também é dobrado. Você não pode recuar, negociar ou usar Cifras não-ofensivas durante esse estado. Ao fim da rodada, você sofre metade do dano total que causou, arredondado para cima."},{"nome":"Brasa Viva","selo":"Tormento","vinculo":"Baixo","gestos":"Invocar + Transmutar","gatilho":"Tato","efeito":"Sua próxima arma ou golpe nesta cena queima: além do dano normal, o alvo sofre 1d4 por uma rodada adicional."},{"nome":"Catarse Coletiva","selo":"Tormento","vinculo":"Alto","gestos":"Proclamar + Invocar + Criar","gatilho":"Terceiro Olho","efeito":"Toda a dor acumulada explode para fora. Cause a todos os inimigos a até 4 metros um dano igual a 1d6 mais 1d6 para cada nível de Vitalidade que você já perdeu nesta cena."},{"nome":"Interferência","selo":"Causalidade","vinculo":"Baixo","gestos":"Transmutar + Bloquear","gatilho":"Visão","efeito":"Force um inimigo a rolar novamente um teste que acabou de passar nessa rodada. Ele deve ficar com o segundo resultado, seja melhor ou pior."},{"nome":"Cifra Oculta","selo":"Causalidade","vinculo":"Baixo","gestos":"","gatilho":"","efeito":"O gesto e o gatilho não são documentados. O Narrador revela ambos no primeiro momento em que o personagem tenta usar sua Cifra de Causalidade, e o que"},{"nome":"Convergência","selo":"Causalidade","vinculo":"Médio","gestos":"Criar + Invocar + Transmutar","gatilho":"Terceiro Olho","efeito":"Dois eventos que já estão acontecendo na cena colidem de uma forma que beneficia seu grupo. O Narrador s define o que colide e como, mas o resultado deve ser favorável. Você não controla o quê. Apenas o quando."},{"nome":"Improbabilidade","selo":"Causalidade","vinculo":"Médio","gestos":"Proclamar + Criar + Proclamar","gatilho":"Terceiro Olho","efeito":"Você declara uma ação fisicamente improvável, mas não sobrenatural. O Narrador valida se é possível, e se for, ela acontece. Não pode prejudicar aliados diretamente. O Narrador pode adicionar uma complicação como contrapartida."},{"nome":"Dado Final","selo":"Causalidade","vinculo":"Alto","gestos":"Proclamar + Invocar + Criar + Transmutar","gatilho":"Audição","efeito":"Um evento improvável e favorável acontece. O Narrador define o quê, mas deve ser significativo, inesperado, e favorável ao grupo. Não pode matar personagens nem resolver arcos principais automaticamente. O dado cai. O resultado é real."},{"nome":"Empurrão do Acaso","selo":"Causalidade","vinculo":"Baixo","gestos":"Transmutar","gatilho":"Terceiro Olho","efeito":"Depois que um aliado vê o resultado de um teste, ele relança um único dado daquele teste e fica com o novo valor."},{"nome":"Coincidência Fatal","selo":"Causalidade","vinculo":"Médio","gestos":"Criar + Invocar","gatilho":"Audição","efeito":"O ambiente conspira contra um inimigo: o Narrador descreve um acidente plausível que causa 1d8 de dano ou impõe a condição Caído ao alvo, à sua escolha."}],"culturas":[{"nome":"Teala","pericia":"Performance ou Conhecimento","traco":"Herança Filosófica","tracoTexto":"Uma vez por cena, quando realizar um teste de Conhecimento ou Lógica, você pode declarar que está recorrendo a algo que estudou. Se o fizer, adicione +1D ao teste. Se falhar mesmo assim, o Narrador deve oferecer uma pista incompleta, você sabe o suficiente para saber que está errado."},{"nome":"Hon-Ye","pericia":"Resistência ou Briga","traco":"Controle sob Pressão","tracoTexto":"Quando seu personagem estiver no estado Machucado ou Ferido, uma vez por cena você pode ignorar a penalidade de dados em um único teste de ataque ou reação. O corpo de Hon-Ye foi treinado para funcionar quando a mente já desistiu."},{"nome":"Mendro","pericia":"Destreza ou Conhecimento","traco":"Mãos e Mente","tracoTexto":"Você pode realizar testes de Conhecimento para identificar, modificar ou improvisar soluções técnicas mesmo sem equipamento adequado, com penalidade de −1D. Além disso, quando encontrar um equipamento desconhecido ou uma tecnologia não documentada, você pode perguntar ao Narrador uma pergunta sobre como funciona, a resposta deve ser honesta."},{"nome":"Orian","pericia":"Percepção ou Manipulação","traco":"Filho das Sombras","tracoTexto":"Em ambientes urbanos, uma vez por cena você pode tentar se esconder sem cobertura estrutural, bastam sombras, multidões ou ruído visual suficiente. Além disso, você nunca é surpreendido em locais urbanos: mesmo que o Narrador declare que o grupo foi pego desprevenido, você não sofre essa condição."},{"nome":"Calem","pericia":"Lógica ou Conhecimento","traco":"Mente Analítica","tracoTexto":"Quando falhar em um teste de Lógica, uma vez por cena você pode reformular imediatamente: relance todos os dados que não atingiram sucesso. O segundo resultado é definitivo. Além disso, quando analisar um local de alta Distorção, você automaticamente identifica a assinatura do Selo presente sem precisar de um teste."},{"nome":"Louina","pericia":"Intuição ou Consciência","traco":"Eco da Telura","tracoTexto":"Você percebe instintivamente a presença de Distorção elevada, corrupção ou anomalias etéreas num raio de alguns metros, mesmo sem realizar um teste, o Narrador deve te indicar quando algo não está certo. Além disso, quando estiver dentro do Labirinto, você começa com +1D nos testes de Espírito durante os desafios."},{"nome":"Fainn","pericia":"Atletismo ou Conhecimento, Sobrevivência","traco":"Instinto de Fronteira","tracoTexto":"Você pode rastrear qualquer entidade, humana, aberração ou etérea, através de rastros físicos ou de Espírito, sem necessidade de perícia especializada. Testes de rastrei recebem +1D. Além disso, você nunca sofre penalidades de terreno em ambientes naturais ao se movimentar."},{"nome":"Alta Velana","pericia":"Carisma ou Lábia","traco":"Língua de Prata","tracoTexto":"Quando usar Carisma ou Lábia em contextos de negociação, política ou comércio, trate um resultado de Falha como Sucesso Parcial, você não consegue tudo que queria, mas consegue algo. O Narrador define o que."},{"nome":"Kalak","pericia":"Consciência ou Conhecimento, especialidade ligada aos Deuses Primordiais ou às tradições antigas","traco":"Sangue Antigo","tracoTexto":"Você tem acesso intuitivo a conhecimentos sobre os Deuses Primordiais que outros Ascendidos precisam buscar e ativamente. Uma vez por sessão, pode perguntar ao Narrador uma verdade sobre um Deus Primordial, um Selo ou a cosmologia do mundo, a resposta deve ser honesta, mas não necessariamente completa. Além disso, efeitos de Manipulação e Intimidação de fontes externas a Kalak sofrem −1D contra você."},{"nome":"Veina","pericia":"Domínio ou Conhecimento, Cifras e Sigilos","traco":"Fluência Natural","tracoTexto":"Em Veina, Catalogada é uma palavra que os outros usam. Cifras de Vínculo Baixo que você conhece podem ser conjuradas sem satisfazer o gatilho sensorial, você as internalizou ao ponto em que o gesto basta. Além disso, você sempre encontra fonte: qualquer Cifra de Vínculo Baixo ou Médio que exista em Veina está disponível para você aprender, sem teste e sem favor, restando apenas o custo em XP e Corrupção."},{"nome":"Sienna","pericia":"Resistência ou Atletismo","traco":"Fronteira Viva","tracoTexto":"Você não sofre penalidades por condições ambientais extremas, frio, calor, altitude, privação de sono por até 48 horas. Além disso, uma vez por cena, quando seria reduzido a 0 Vitalidade por dano de qualquer fonte ambiental, queda, exposição, colapso estrutural, você permanece em 1 Vitalidade. Sobreviver é o que Sienna ensina antes de qualquer outra coisa. ê"},{"nome":"Narsim","pericia":"Lógica ou qualquer perícia de Espírito","traco":"Adaptação","tracoTexto":"Uma vez por sessão, você pode substituir a perícia o exigida por um teste por qualquer outra perícia que você tenha ao menos Grau 1, declarando como a abordagem diferente faz sentido na situação. O Narrador deve validar a narrativa, mas tem dificuldade em negar se a justificativa for razoável. Narsim ensina que não existe uma única forma de fazer qualquer coisa."},{"nome":"Terras Perdidas de Mireia","pericia":"Intuição ou Estabilidade","traco":"Toque de Mireia","tracoTexto":"As marés celestiais que Mireia comanda deixaram uma marca em você. Uma vez por sessão, você pode declarar que a lua está em posição favorável, o Narrador não pode negar isso narrativamente. Durante essa cena, todos os seus testes de Espírito recebem +1D e qualquer Cifra que você conjure não gera Corrupção, independente do Vínculo."}],"antecedentes":[{"nome":"Artista","pericia":"Performance","traco":"Presença de Palco","tracoTexto":"Quando você tem a atenção de um ou mais personagens, aliados ou não, e realiza qualquer ação que envolva expressão direta (falar, performar, demonstrar), pode realizar um teste de Carisma ND 2. Se passar, todos que estavam atentos recebem −1D em testes de resistência contra suas próximas tentativas de Influência até o fim da cena. Você não precisa estar em um palco. Precisa estar sendo observado."},{"nome":"Acadêmico","pericia":"Conhecimento, Atualidades","traco":"Fundamentado","tracoTexto":"Uma vez por cena, quando realizar um teste de Lógica ou Conhecimento em situação em que sua formação acadêmica é claramente relevante, você pode declarar a fonte, um texto, uma pesquisa, uma metodologia. Se fizer isso, adicione +1D ao teste. Se falhar mesmo assim, o Narrador deve oferecer ao menos uma informação parcialmente correta sobre o tema, você sabe o suficiente para saber que está incompleto."},{"nome":"Amnésico","pericia":"Uma à sua escolha, e o jogador deve justificar brevemente com o Narrador porque faz sentido dado o mistério do personagem","traco":"Quem Sou Eu?","tracoTexto":"Uma vez por cena, você pode focar em um objeto, i local, pessoa ou situação e realizar um teste de Consciência ND 2. Se passar, você vislumbra um fragmento do seu passado relacionado ao foco, uma memória que o Narrador define com base no que faria sentido para a história. Os detalhes são reais, mas não necessariamente completos. Se falhar, o fragmento surge de qualquer forma, mas distorcido. Verdade e ficção misturadas."},{"nome":"Atleta","pericia":"Atletismo","traco":"Corpo Primeiro","tracoTexto":"Uma vez por cena, pode receber +1D em qualquer teste de Movimentação nessa rodada. Além disso, você nunca sofre penalidades de terreno por condições físicas que seria razoável supor que um atleta de alto nível treinou, superfícies irregulares, obstáculos urbanos, corrida prolongada."},{"nome":"Barra Pesada","pericia":"Briga","traco":"Socar Nunca é Demais","tracoTexto":"Você recebe +1 de dano em todos os ataques desarmados. Além disso, quando imobilizar um alvo, pode usar uma Ação Livre para realizar um ataque desarmado contra ele imediatamente, sem custo adicional."},{"nome":"Cientista","pericia":"Conhecimento, Ciências (defina a área com o Narrador)","traco":"Método Científico","tracoTexto":"Sempre que realizar um teste de Lógica em situação em que uma abordagem metodológica e analítica é aplicável, investigação de cena, análise de fenômeno, identificação de padrão, você pode substituir Lógica por Conhecimento (Ciências). Além disso, quando analisar uma aberração ou fenômeno etéreo, pode perguntar ao Narrador uma pergunta de natureza funcional, o que isso faz, como funciona, o que o ativa. A resposta é sempre parcialmente verdadeira."},{"nome":"Especialista de Saúde","pericia":"Conhecimento, Medicina","traco":"Método Avançado","tracoTexto":"Quando usar um Kit de Medicina ou habilidade de cura e falhar, pode tentar novamente imediatamente com os mesmos dados, sem penalidades. Além disso, uma vez por cena, pode estabilizar um personagem que acabou de perder um nível de Vitalidade como Ação Livre se estiver adjacente a ele, sem necessidade de teste."},{"nome":"Investigador","pericia":"Lógica","traco":"Olhos de Águia","tracoTexto":"Quando falhar em um teste de Lógica ou Percepção, pode tentar novamente imediatamente. O segundo resultado é definitivo. Além disso, você nunca deixa de notar contradições, sempre que um personagem (NPC ou jogador) mentir para você em uma interação direta, o Narrador deve te dar um sinal não verbal de que algo não está certo, mesmo que você não saiba o quê."},{"nome":"Militar","pericia":"Pontaria","traco":"Distintivo","tracoTexto":"Você possui identificação funcional de autoridade, ou algo suficientemente convincente para funcionar como tal. Em interações onde sua autoridade é relevante e reconhecida, recebe +1D em testes de Carisma e Conhecimento. Além disso, uma vez por sessão, pode invocar seu histórico institucional para obter cooperação de um NPC que normalmente não cooperaria, o Narrador define o limite do que esse acesso permite."},{"nome":"Rústico","pericia":"Conhecimento, Sobrevivência","traco":"Gambiarra","tracoTexto":"Pode substituir qualquer perícia por Conhecimento em situações em que uma solução improvisada e prática seria plausível. O Narrador valida, mas tem dificuldade em negar se a justificativa for razoável. Além disso, você pode criar utensílios básicos e improvisados a partir de materiais do ambiente, uma faca de um pedaço de metal, uma armadilha de galhos, uma cobertura de emergência. O Narrador define o tempo necessário."},{"nome":"Técnico","pericia":"Conhecimento, Tecnologia","traco":"Especialista Técnico","tracoTexto":"Uma vez por rodada, pode substituir qualquer perícia do atributo Raciocínio por Conhecimento (Tecnologia) em situações em que uma abordagem técnica é aplicável. Além disso, você pode interagir com sistemas eletrônicos, de comunicação ou de segurança de formas que outros personagens não conseguem sem equipamento especializado, o Narrador define o que é possível com o que está disponível."}]
+const DADOS = {"cifras":[{"nome":"Canalização Positiva","selo":"Corrente","vinculo":"Baixo","gestos":"Criar + Proclamar","gatilho":"Tato","efeito":"Você canaliza energia positiva através do toque, curando 1 de Vitalidade.","corrente":true},{"nome":"Canalização Negativa","selo":"Corrente","vinculo":"Baixo","gestos":"Invocar + Bloquear","gatilho":"Visão","efeito":"Você canaliza energia negativa em um alvo à distância visual, causando 1 de dano.","corrente":true},{"nome":"Selo Menor","selo":"Corrente","vinculo":"Baixo","gestos":"Sentir","gatilho":"Terceiro Olho","efeito":"Você percebe toda fonte de Distorção, Cifra ativa e aberração em 10 metros, e identifica o Pilar e o Vínculo aproximado de cada uma.","corrente":true},{"nome":"Estancar","selo":"Corrente","vinculo":"Baixo","gestos":"Criar + Bloquear","gatilho":"Tato","efeito":"Toque um alvo a 0 de Vitalidade: ele estabiliza, para de piorar e não perde nível por aquele colapso. Não restaura Vitalidade.","corrente":true},{"nome":"Pulso","selo":"Origem","vinculo":"Baixo","gestos":"Sentir","gatilho":"Terceiro Olho","efeito":"Você sente a vitalidade de todos os seres vivos a até 5 metros. O Narrador informa o estado geral de cada um, não o número exato."},{"nome":"Raiz Profunda","selo":"Origem","vinculo":"Baixo","gestos":"Criar + Bloquear","gatilho":"Tato","efeito":"Um alvo que você toca cria raízes etéreas: até o início do seu próximo Foco, recebe Vantagem para resistir a ser movido, agarrado ou derrubado."},{"nome":"Florescimento","selo":"Origem","vinculo":"Médio","gestos":"Criar + Proclamar + Criar","gatilho":"Visão","efeito":"Escolha um alvo. Até o fim da cena, toda cura que ele receber tem o valor aumentado em 1."},{"nome":"Amigo Místico","selo":"Origem","vinculo":"Médio","gestos":"Criar + Invocar + Proclamar","gatilho":"Terceiro Olho","efeito":"Você invoca uma criatura de Origem, orgânica e instável, que pode ou não seguir suas ordens. Possui Vitalidade igual à metade da sua, age no seu Foco e causa 1 de dano por ataque."},{"nome":"Enxame Vital","selo":"Origem","vinculo":"Médio","gestos":"Criar + Invocar","gatilho":"Terceiro Olho","efeito":"Por uma cena, sempre que você restaurar Vitalidade de um aliado, um segundo aliado a até 5 metros recupera metade desse valor, arredondando para cima."},{"nome":"Renascença","selo":"Origem","vinculo":"Alto","gestos":"Criar + Criar + Proclamar","gatilho":"Tato","efeito":"Toque um alvo que caiu a 0 de Vitalidade nesta rodada ou na anterior. Ele é estabilizado e retorna com metade da Vitalidade máxima. Não funciona em quem já perdeu um nível por esse colapso."},{"nome":"Fio","selo":"Extinção","vinculo":"Baixo","gestos":"Sentir + Proclamar","gatilho":"Visão","efeito":"Você vê o fio que conecta um ser à sua morte. O Narrador informa o estado real de saúde do alvo e se ele carrega alguma condição oculta."},{"nome":"Marca da Extinção","selo":"Extinção","vinculo":"Médio","gestos":"Proclamar + Invocar","gatilho":"Visão","efeito":"O alvo recebe a Marca. Por 2 rodadas, não pode recuperar Vitalidade por nenhum meio. A Marca é visível para qualquer Ascendido com terceiro olho ativo."},{"nome":"Ceifa","selo":"Extinção","vinculo":"Médio","gestos":"Invocar + Bloquear + Proclamar","gatilho":"Visão","efeito":"Ataque de Cifra que causa dano igual à diferença entre a Vitalidade máxima e a atual do alvo, dividida por 2, arredondando para baixo."},{"nome":"Sentença","selo":"Extinção","vinculo":"Médio","gestos":"Proclamar + Bloquear","gatilho":"Visão","efeito":"Marque um alvo visível. Na próxima vez que ele sofrer dano até o fim da cena, sofre 1d6 adicional e a marca se apaga."},{"nome":"Círculo do Fim","selo":"Extinção","vinculo":"Alto","gestos":"Bloquear + Invocar + Bloquear","gatilho":"Terceiro Olho","efeito":"Cria um círculo etéreo de 3 metros de raio ao seu redor. Inimigos dentro ficam presos e precisam de uma Ação Completa mais um teste de Resistência ND 3 para sair. Enquanto ativo, você recebe 1 a menos em dano sofrido e +1 em dano causado. Dura até o fim da cena ou até você se mover mais de 1 metro."},{"nome":"Último Suspiro","selo":"Extinção","vinculo":"Alto","gestos":"Invocar + Proclamar + Bloquear","gatilho":"Visão","efeito":"Escolha um corpo a 0 de Vitalidade ou eliminado nesta rodada. A morte dele se expande: todos os inimigos a até 3 metros sofrem 1d8 de dano espiritual."},{"nome":"Sussurro da Sabedoria","selo":"Controle","vinculo":"Baixo","gestos":"Sentir + Proclamar","gatilho":"Audição","efeito":"Uma vez por cena, receba uma informação do Narrador sobre a situação atual. Sempre verdadeira, nem sempre completa."},{"nome":"Tradução","selo":"Controle","vinculo":"Baixo","gestos":"Sentir + Criar","gatilho":"Audição","efeito":"Você compreende e fala qualquer idioma enquanto a Cifra estiver ativa. Dura uma cena."},{"nome":"Decreto","selo":"Controle","vinculo":"Baixo","gestos":"Proclamar","gatilho":"Audição","efeito":"Diga uma ordem de uma palavra a um alvo que ouça e entenda você. Falhando em Propósito, a próxima ação dele cumpre a ordem da forma mais literal e segura possível."},{"nome":"Quebra de Defesa","selo":"Controle","vinculo":"Médio","gestos":"Transmutar + Bloquear","gatilho":"Visão","efeito":"Todas as reações do alvo sofrem 2 de penalidade até o fim da rodada."},{"nome":"Arquitetura","selo":"Controle","vinculo":"Médio","gestos":"Criar + Transmutar + Proclamar","gatilho":"Visão","efeito":"Você manipula o ambiente físico dentro do campo visual: fechar uma porta sem tocá-la, mover um objeto de até 10 quilos, criar uma barreira improvisada, travar uma saída. Não ataca diretamente."},{"nome":"Suspensão","selo":"Controle","vinculo":"Alto","gestos":"Bloquear + Transmutar + Bloquear","gatilho":"Terceiro Olho","efeito":"Anule uma ação que acabou de acontecer nesta rodada. O agente e o alvo rerrolam todos os dados e mantêm os novos resultados. Não pode suspender a mesma ação duas vezes."},{"nome":"Cárcere Lógico","selo":"Controle","vinculo":"Alto","gestos":"Bloquear + Transmutar + Proclamar","gatilho":"Terceiro Olho","efeito":"Escolha um inimigo visível. Por 2 rodadas, ele só pode realizar uma categoria de ação que você definir: apenas mover, apenas atacar ou apenas falar."},{"nome":"Véu","selo":"Pesadelo","vinculo":"Baixo","gestos":"Criar + Transmutar","gatilho":"Visão","efeito":"Você cria uma ilusão que afeta um alvo. Ela é real para ele até que sofra dano físico ou passe em Propósito ND 2."},{"nome":"Eco","selo":"Pesadelo","vinculo":"Baixo","gestos":"Proclamar + Transmutar","gatilho":"Audição","efeito":"Quando um alvo falha em um teste por causa de uma penalidade que você causou, ele sofre 1D a menos no próximo teste."},{"nome":"Sussurro Falso","selo":"Pesadelo","vinculo":"Baixo","gestos":"Proclamar + Transmutar","gatilho":"Audição","efeito":"Um alvo ouve com perfeita clareza uma frase curta que você define, como se viesse da fonte em que ele mais confia. Dura um instante, o suficiente para plantar a dúvida."},{"nome":"Recriação Mental","selo":"Pesadelo","vinculo":"Médio","gestos":"Sentir + Sentir","gatilho":"Tato","efeito":"Tocando uma superfície, objeto ou pessoa, você revive uma cena do passado ligada àquele ponto de contato. Detalhada, não necessariamente completa."},{"nome":"Manifestação","selo":"Pesadelo","vinculo":"Médio","gestos":"Invocar + Criar + Proclamar","gatilho":"Terceiro Olho","efeito":"Pergunte ao Narrador qual é o maior medo de um alvo visível. A resposta é obrigatória e honesta. Em seguida, aquilo aparece, com 4 de Vitalidade, causando 2 de dano por rodada a qualquer inimigo que consiga vê-lo. Não afeta aliados."},{"nome":"Terror Profundo","selo":"Pesadelo","vinculo":"Médio","gestos":"Invocar + Sentir + Proclamar","gatilho":"Visão","efeito":"Um alvo encara o próprio medo: passa em Propósito ND 2 ou fica Atordoado por uma rodada."},{"nome":"Sonhar","selo":"Pesadelo","vinculo":"Alto","gestos":"Criar + Sentir + Proclamar + Transmutar","gatilho":"Visão","efeito":"O alvo entra em estado onírico por até uma cena. Ele experiencia o que você narrar como completamente real. Não sofre dano físico, mas condições psicológicas acumuladas são definidas pelo Narrador e podem ter efeito mecânico na cena seguinte."},{"nome":"Abençoar Arma","selo":"Tormento","vinculo":"Baixo","gestos":"Proclamar + Transmutar","gatilho":"Tato","efeito":"Sua arma causa +1 de dano, recebe um efeito adicional definido pelo Narrador conforme o contexto, e você pode usar Domínio no lugar de Briga ou Pontaria com ela. Dura uma cena."},{"nome":"Combustão","selo":"Tormento","vinculo":"Baixo","gestos":"Invocar + Proclamar","gatilho":"Visão","efeito":"Causa 2 de dano em todos os inimigos numa área de 2 metros ao redor de um ponto visível. O dano é emocional tanto quanto físico."},{"nome":"Brasa Viva","selo":"Tormento","vinculo":"Baixo","gestos":"Invocar + Transmutar","gatilho":"Tato","efeito":"Seu próximo golpe nesta cena queima: além do dano normal, o alvo sofre 1d4 por uma rodada adicional."},{"nome":"Motivação do Combate","selo":"Tormento","vinculo":"Médio","gestos":"Invocar + Proclamar + Criar","gatilho":"Terceiro Olho","efeito":"Até o fim da cena, sempre que você acertar um ataque corpo a corpo, remove 1 de Corrupção Recente."},{"nome":"Círculo de Absorção","selo":"Tormento","vinculo":"Médio","gestos":"Invocar + Sentir + Bloquear","gatilho":"Terceiro Olho","efeito":"Forma um círculo espiritual de 3 metros de raio ao seu redor. No início de cada rodada, todos os inimigos dentro sofrem 1 de dano e você cura 1 de Vitalidade por inimigo afetado. Dura até o fim da cena."},{"nome":"Impacto Reduzido","selo":"Tormento","vinculo":"Médio","gestos":"Bloquear + Transmutar","gatilho":"Tato","efeito":"Reação. Ao sofrer dano, conjure imediatamente para reduzi-lo à metade."},{"nome":"Apoteose","selo":"Tormento","vinculo":"Alto","gestos":"Proclamar + Invocar + Proclamar + Proclamar","gatilho":"Terceiro Olho","efeito":"Por uma rodada, todo dano que você causa é dobrado, e todo dano que você recebe também. Você não pode recuar, negociar ou usar Cifras não ofensivas. Ao fim, sofre metade do dano total que causou, arredondando para cima."},{"nome":"Catarse Coletiva","selo":"Tormento","vinculo":"Alto","gestos":"Proclamar + Invocar + Criar","gatilho":"Terceiro Olho","efeito":"Toda a dor acumulada explode. Cause a todos os inimigos a até 4 metros 1d6, mais 1d6 para cada nível de Vitalidade que você já perdeu nesta cena."},{"nome":"Interferência","selo":"Causalidade","vinculo":"Baixo","gestos":"Transmutar + Bloquear","gatilho":"Visão","efeito":"Force um inimigo a rolar novamente um teste que acabou de passar nesta rodada. Ele fica com o segundo resultado, melhor ou pior."},{"nome":"Cifra Oculta","selo":"Causalidade","vinculo":"Baixo","gestos":"não documentados","gatilho":"","efeito":"O gesto e o gatilho não são documentados. O Narrador revela ambos no primeiro momento em que o personagem tenta usá-la, e o que emerge é sempre uma surpresa. Inclusive para o Narrador, se ele quiser jogar honestamente."},{"nome":"Empurrão do Acaso","selo":"Causalidade","vinculo":"Baixo","gestos":"Transmutar","gatilho":"Terceiro Olho","efeito":"Depois que um aliado vê o resultado de um teste, ele relança um único dado daquele teste e fica com o novo valor."},{"nome":"Convergência","selo":"Causalidade","vinculo":"Médio","gestos":"Criar + Invocar + Transmutar","gatilho":"Terceiro Olho","efeito":"Dois eventos que já estão acontecendo na cena colidem de uma forma que beneficia seu grupo. O Narrador define o que colide e como, mas o resultado precisa ser favorável. Você não controla o quê. Apenas o quando."},{"nome":"Improbabilidade","selo":"Causalidade","vinculo":"Médio","gestos":"Proclamar + Criar + Proclamar","gatilho":"Terceiro Olho","efeito":"Declare uma ação fisicamente improvável, mas não sobrenatural. O Narrador valida, e se for possível, ela acontece. Não pode prejudicar aliados diretamente. O Narrador pode adicionar uma complicação."},{"nome":"Coincidência Fatal","selo":"Causalidade","vinculo":"Médio","gestos":"Criar + Invocar","gatilho":"Audição","efeito":"O ambiente conspira contra um inimigo: o Narrador descreve um acidente plausível que causa 1d8 de dano ou impõe a condição Caído, à sua escolha."},{"nome":"Dado Final","selo":"Causalidade","vinculo":"Alto","gestos":"Proclamar + Invocar + Criar + Transmutar","gatilho":"Audição","efeito":"Um evento improvável e favorável acontece. O Narrador define o quê, mas precisa ser significativo, inesperado e favorável ao grupo. Não pode matar personagens nem resolver arcos principais automaticamente. O dado cai. O resultado é real."}],"culturas":[{"nome":"Teala","pericia":"Performance ou Conhecimento","traco":"Herança Filosófica","tracoTexto":"Uma vez por cena, ao fazer um teste de Conhecimento ou Lógica, declare que está recorrendo a algo que estudou e receba +1D. Falhando mesmo assim, o Narrador precisa oferecer uma pista incompleta: você sabe o suficiente para saber que está errado."},{"nome":"Hon-Ye","pericia":"Resistência ou Briga","traco":"Controle sob Pressão","tracoTexto":"Nos estados Machucado ou Ferido, uma vez por cena você pode ignorar a penalidade de dados em um único teste de ataque ou reação. O corpo de Hon-Ye foi treinado para funcionar quando a mente já desistiu."},{"nome":"Mendro","pericia":"Destreza ou Conhecimento","traco":"Mãos e Mente","tracoTexto":"Você pode usar Conhecimento para identificar, modificar ou improvisar soluções técnicas mesmo sem equipamento adequado, com 1D a menos. Ao encontrar equipamento desconhecido ou tecnologia não documentada, faça ao Narrador uma pergunta sobre como funciona. A resposta é honesta."},{"nome":"Orian","pericia":"Percepção ou Manipulação","traco":"Filho das Sombras","tracoTexto":"Em ambientes urbanos, uma vez por cena esconda-se sem cobertura estrutural, bastando sombra, multidão ou ruído visual. Além disso, você nunca é surpreendido em local urbano, mesmo que o Narrador declare que o grupo foi pego desprevenido."},{"nome":"Calem","pericia":"Lógica ou Conhecimento","traco":"Mente Analítica","tracoTexto":"Uma vez por cena, ao falhar em um teste de Lógica, relance todos os dados que não deram sucesso. O segundo resultado é definitivo. Além disso, ao analisar um local de alta Distorção, você identifica automaticamente o Pilar presente, sem teste."},{"nome":"Louina","pericia":"Intuição ou Consciência","traco":"Eco da Telura","tracoTexto":"Você percebe instintivamente a presença de Distorção elevada, corrupção ou anomalias etéreas em alguns metros, sem teste: o Narrador deve indicar quando algo não está certo. Além disso, dentro do Labirinto, você começa com +1D nos testes de Espírito."},{"nome":"Fainn","pericia":"Atletismo ou Conhecimento, Sobrevivência","traco":"Instinto de Fronteira","tracoTexto":"Você rastreia qualquer entidade, humana, aberração ou etérea, através de rastros físicos ou espirituais, sem precisar de perícia especializada. Testes de rastreio recebem +1D. Além disso, você nunca sofre penalidade de terreno em ambientes naturais."},{"nome":"Alta Velana","pericia":"Carisma ou Lábia","traco":"Língua de Prata","tracoTexto":"Ao usar Carisma ou Lábia em contexto de negociação, política ou comércio, trate um resultado de Falha como Sucesso Parcial: você não consegue tudo que queria, mas consegue algo. O Narrador define o quê."},{"nome":"Kalak","pericia":"Consciência ou Conhecimento, especialidade ligada aos Deuses Primordiais ou às tradições antigas","traco":"Sangue Antigo","tracoTexto":"Uma vez por sessão, pergunte ao Narrador uma verdade sobre um Deus Primordial, um Pilar ou a cosmologia do mundo. A resposta é honesta, mas não necessariamente completa. Além disso, efeitos de Manipulação e Intimidação vindos de fora de Kalak sofrem 1D a menos contra você."},{"nome":"Veina","pericia":"Domínio ou Conhecimento, Cifras e Sigilos","traco":"Fluência Natural","tracoTexto":"Em Veina, Catalogada é uma palavra que os outros usam. Cifras de Vínculo Baixo que você conhece podem ser conjuradas sem satisfazer o gatilho sensorial: você as internalizou ao ponto em que o gesto basta. Além disso, você sempre encontra fonte: qualquer Cifra de Vínculo Baixo ou Médio que exista em Veina está disponível para você aprender, sem teste e sem favor, restando apenas o custo em XP e Corrupção."},{"nome":"Sienna","pericia":"Resistência ou Atletismo","traco":"Fronteira Viva","tracoTexto":"Você não sofre penalidade por condições ambientais extremas: frio, calor, altitude, privação de sono por até 48 horas. Além disso, uma vez por cena, quando seria reduzido a 0 de Vitalidade por dano ambiental, queda ou colapso estrutural, você permanece em 1."},{"nome":"Narsim","pericia":"Lógica ou qualquer perícia de Espírito","traco":"Adaptação","tracoTexto":"Uma vez por sessão, substitua a perícia exigida por um teste por qualquer outra em que você tenha ao menos Grau 1, declarando como a abordagem diferente faz sentido. O Narrador valida, mas tem dificuldade em negar se a justificativa for razoável. Narsim ensina que não existe uma única forma de fazer qualquer coisa."},{"nome":"Terras Perdidas de Mireia","pericia":"Intuição ou Estabilidade","traco":"Toque de Mireia","tracoTexto":"Uma vez por sessão, declare que a lua está em posição favorável. O Narrador não pode negar isso narrativamente. Durante essa cena, todos os seus testes de Espírito recebem +1D e qualquer Cifra que você conjure não retém Corrupção, independente do Vínculo."}],"antecedentes":[{"nome":"Artista","pericia":"Performance","traco":"Presença de Palco","tracoTexto":"Uma vez por cena, quando você tem a atenção de um ou mais personagens e realiza qualquer ação de expressão direta, faça um teste de Carisma ND 2. Passando, todos que estavam atentos recebem 1D a menos em testes de resistência contra suas tentativas de Influência até o fim da cena. Você não precisa estar em um palco. Precisa estar sendo observado."},{"nome":"Acadêmico","pericia":"Conhecimento, Atualidades","traco":"Fundamentado","tracoTexto":"Uma vez por cena, ao fazer um teste de Lógica ou Conhecimento em situação onde sua formação é claramente relevante, declare a fonte: um texto, uma pesquisa, uma metodologia. Você recebe +1D. Se falhar mesmo assim, o Narrador precisa oferecer ao menos uma informação parcialmente correta sobre o tema. Você sabe o suficiente para saber que está incompleto."},{"nome":"Amnésico","pericia":"Uma à sua escolha, e o jogador deve justificar brevemente com o Narrador porque faz sentido dado o mistério do personagem","traco":"Quem Sou Eu","tracoTexto":"Uma vez por cena, foque em um objeto, local, pessoa ou situação e faça um teste de Consciência ND 2. Passando, você vislumbra um fragmento do seu passado relacionado àquele foco, definido pelo Narrador. Os detalhes são reais, mas não necessariamente completos. Falhando, o fragmento surge assim mesmo, distorcido, verdade e ficção misturadas."},{"nome":"Atleta","pericia":"Atletismo","traco":"Corpo Primeiro","tracoTexto":"Uma vez por cena, receba +1D em um teste de Movimentação. Além disso, você nunca sofre penalidade de terreno por condições que um atleta de alto nível teria treinado: superfícies irregulares, obstáculos urbanos, corrida prolongada."},{"nome":"Barra Pesada","pericia":"Briga","traco":"Socar Nunca É Demais","tracoTexto":"Você recebe +1 de dano em todos os ataques desarmados. Além disso, quando imobilizar um alvo, pode realizar um ataque desarmado contra ele como Ação Livre."},{"nome":"Cientista","pericia":"Conhecimento, Ciências (defina a área com o Narrador)","traco":"Método Científico","tracoTexto":"Sempre que fizer um teste de Lógica em situação onde uma abordagem metodológica é aplicável, você pode substituir Lógica por Conhecimento, Ciências. Além disso, ao analisar uma aberração ou fenômeno etéreo, pode fazer ao Narrador uma pergunta de natureza funcional: o que isso faz, como funciona, o que o ativa. A resposta é sempre parcialmente verdadeira."},{"nome":"Especialista de Saúde","pericia":"Conhecimento, Medicina","traco":"Método Avançado","tracoTexto":"Quando falhar ao usar um Kit de Medicina ou habilidade de cura, tente novamente imediatamente com os mesmos dados, sem penalidade. Uma vez por cena. Além disso, uma vez por cena, você pode estabilizar como Ação Livre um personagem adjacente que acabou de perder um nível de Vitalidade, sem necessidade de teste."},{"nome":"Investigador","pericia":"Lógica","traco":"Olhos de Águia","tracoTexto":"Uma vez por cena, ao falhar em um teste de Lógica ou Percepção, tente novamente imediatamente. O segundo resultado é definitivo. Além disso, você nunca deixa de notar contradições: sempre que alguém mentir para você em interação direta, o Narrador precisa te dar um sinal de que algo não está certo, mesmo que você não saiba o quê."},{"nome":"Militar","pericia":"Pontaria","traco":"Distintivo","tracoTexto":"Você possui identificação funcional de autoridade, ou algo convincente o bastante para funcionar como tal. Em interações onde essa autoridade é relevante e reconhecida, recebe +1D em testes de Carisma e Conhecimento. Além disso, uma vez por sessão, pode invocar seu histórico institucional para obter cooperação de alguém que normalmente não cooperaria. O Narrador define o limite do que esse acesso permite."},{"nome":"Rústico","pericia":"Conhecimento, Sobrevivência","traco":"Gambiarra","tracoTexto":"Uma vez por cena, substitua qualquer perícia por Conhecimento em situações onde uma solução improvisada e prática seria plausível. O Narrador valida, mas tem dificuldade em negar se a justificativa for razoável. Além disso, você cria utensílios básicos improvisados a partir de materiais do ambiente: uma faca de um pedaço de metal, uma armadilha de galhos, uma cobertura de emergência. O Narrador define o tempo necessário."},{"nome":"Técnico","pericia":"Conhecimento, Tecnologia","traco":"Especialista Técnico","tracoTexto":"Uma vez por rodada, substitua qualquer perícia de Raciocínio por Conhecimento, Tecnologia, em situações onde uma abordagem técnica é aplicável. Além disso, você interage com sistemas eletrônicos, de comunicação ou de segurança de formas que outros personagens não conseguem sem equipamento especializado. O Narrador define o que é possível com o que está disponível."}]
 };
 
 const ARQUETIPOS = [
@@ -1264,74 +1264,74 @@ const ARQUETIPOS = [
  forma:"Depois de sofrer dano em uma cena, seus ataques nela não podem ter resultado Terrível.",
  naoFaz:"Não decide nada de longe. Fora do alcance de um braço, é uma pessoa comum com uma arma.",
  talentos:[
-  {nome:"Adaptação Tática",xp:2,ativada:0,texto:"Quando seu Foco chegar depois de você ter sofrido dano na cena, o primeiro ataque recebe +1D."},
-  {nome:"Guarda Suja",xp:2,ativada:0,texto:"Você nunca sofre penalidade por lutar em espaço apertado, com uma mão presa ou sem apoio de pé."},
-  {nome:"Momento Roubado",xp:2,ativada:0,texto:"Trocar de Posição é Ação Livre, uma vez por cena."},
-  {nome:"Pressão Constante",xp:4,ativada:0,texto:"Em uma Sequência, o aumento de ND começa a valer a partir do terceiro golpe."},
-  {nome:"Leitura de Guarda",xp:4,ativada:0,texto:"Quando um alvo falhar em uma reação contra você, cobertura simples deixa de protegê-lo dos seus ataques até o fim da rodada."},
-  {nome:"Nada Cai Sozinho",xp:4,ativada:0,texto:"Quando você derruba um adversário, o inimigo mais próximo dele sofre −1D na próxima reação."},
-  {nome:"Instinto de Predador",xp:8,ativada:0,texto:"Você age primeiro em qualquer cena de combate, independente do teste de entrada no Foco."},
-  {nome:"Preço do Corpo",xp:8,ativada:0,texto:"Uma vez por cena, sofra 2 de dano para converter uma falha sua em sucesso simples."}
+  {nome:"Adaptação Tática",xp:2,carga:0,texto:"Quando seu Foco chegar depois de você ter sofrido dano na cena, o primeiro ataque recebe +1D."},
+  {nome:"Guarda Suja",xp:2,carga:0,texto:"Você nunca sofre penalidade por lutar em espaço apertado, com uma mão presa ou sem apoio de pé."},
+  {nome:"Momento Roubado",xp:2,carga:0,texto:"Trocar de Posição é Ação Livre, uma vez por cena."},
+  {nome:"Pressão Constante",xp:4,carga:0,texto:"Em uma Sequência, o aumento de ND começa a valer a partir do terceiro golpe."},
+  {nome:"Leitura de Guarda",xp:4,carga:0,texto:"Quando um alvo falhar em uma reação contra você, cobertura simples deixa de protegê-lo dos seus ataques até o fim da rodada."},
+  {nome:"Nada Cai Sozinho",xp:4,carga:0,texto:"Quando você derruba um adversário, o inimigo mais próximo dele sofre 1D a menos na próxima reação."},
+  {nome:"Instinto de Predador",xp:8,carga:0,texto:"Você age primeiro em qualquer cena de combate, independente do teste de entrada no Foco."},
+  {nome:"Preço do Corpo",xp:8,carga:0,texto:"Uma vez por cena, sofra 2 de dano para converter uma falha sua em sucesso simples."}
  ]},
 
 {nome:"Atirador de Precisão",grupo:"Ofensivos",
  mote:"Entendeu cedo que a maior parte de um tiro acontece antes do disparo. Chega na cena com metade do trabalho feito.",
- forma:"Você começa toda cena de combate já mirado, sem gastar ação.",
- naoFaz:"Não improvisa em espaço apertado. Tudo que ele é depende de distância e de um instante de sossego.",
+ forma:"Você começa toda cena de combate já mirado, sem gastar ação para isso.",
+ naoFaz:"Não improvisa em espaço apertado. Tudo que ele é depende de ter distância e um instante de sossego, e quem chega perto tira as duas coisas.",
  talentos:[
-  {nome:"Mira Firme",xp:2,ativada:0,texto:"Sofrer dano não cancela sua mira. Apenas se mover cancela."},
-  {nome:"Cadência Econômica",xp:2,ativada:0,texto:"Recarregar custa uma categoria de ação a menos."},
-  {nome:"Campo Limpo",xp:2,ativada:0,texto:"Você identifica automaticamente a melhor posição de tiro ao entrar em um ambiente."},
-  {nome:"Paciência Armada",xp:4,ativada:0,texto:"Um Foco inteiro sem se mover: o próximo disparo não pode ser Terrível e causa +1d6."},
-  {nome:"Tiro Anatômico",xp:4,ativada:0,texto:"Uma vez por cena, declare antes de rolar. Acertando, escolha: alvo Caído, alvo perde o próximo Foco, ou −2D em Movimentação até o fim da cena."},
-  {nome:"Reposicionamento",xp:4,ativada:0,texto:"Mover-se e disparar no mesmo Foco não impõe penalidade, uma vez por cena."},
-  {nome:"Linha Impossível",xp:8,ativada:0,texto:"Alcance efetivo dobrado. Cobertura simples deixa de impor penalidade aos seus disparos."},
-  {nome:"Um Só",xp:8,ativada:0,texto:"Uma vez por sessão, um disparo contra alvo que não sabe da sua posição não pode ser reagido e causa dano dobrado."}
+  {nome:"Mira Firme",xp:2,carga:0,texto:"Sofrer dano não cancela sua mira. Apenas se mover cancela."},
+  {nome:"Cadência Econômica",xp:2,carga:0,texto:"Recarregar custa uma categoria de ação a menos."},
+  {nome:"Campo Limpo",xp:2,carga:0,texto:"Você identifica automaticamente a melhor posição de tiro disponível ao entrar em um ambiente."},
+  {nome:"Paciência Armada",xp:4,carga:0,texto:"Um Foco inteiro sem se mover: o próximo disparo não pode ser Terrível e causa +1d6."},
+  {nome:"Tiro Anatômico",xp:4,carga:0,texto:"Uma vez por cena, declare antes de rolar. Acertando, escolha um efeito além do dano: o alvo fica Caído, perde o próximo Foco, ou sofre 2D a menos em Movimentação até o fim da cena."},
+  {nome:"Reposicionamento",xp:4,carga:0,texto:"Mover-se e disparar no mesmo Foco não impõe penalidade, uma vez por cena."},
+  {nome:"Linha Impossível",xp:8,carga:0,texto:"Seu alcance efetivo dobra, e cobertura simples deixa de impor penalidade aos seus disparos."},
+  {nome:"Um Só",xp:8,carga:0,texto:"Uma vez por sessão, um disparo contra alvo que não sabe da sua posição não pode ser reagido e causa dano dobrado."}
  ]},
 
 {nome:"Combatente Etéreo",grupo:"Ofensivos",
  mote:"Parou de tratar a Cifra e o golpe como duas coisas. O gesto que conjura e o gesto que acerta são o mesmo movimento visto em momentos diferentes.",
  forma:"Conjurar uma Cifra e atacar corpo a corpo no mesmo Foco não impõe penalidade a nenhum dos dois.",
- naoFaz:"Não alcança nada. Toda a integração acontece dentro do alcance do próprio corpo.",
+ naoFaz:"Não alcança nada. Toda a integração dele acontece dentro do alcance do próprio corpo.",
  talentos:[
-  {nome:"Passo Curto",xp:2,ativada:0,texto:"Aproximar-se de um alvo a até 6 metros é Ação Livre, uma vez por cena."},
-  {nome:"Canal Aberto",xp:2,ativada:0,texto:"Estar Imobilizado não invalida Cifras que exijam uma mão só. Você rola com 1D a menos."},
-  {nome:"Golpe Imbuído",xp:2,ativada:1,texto:"Imbuir um ataque com seu Selo é Ação Livre. O ataque causa dano espiritual adicional."},
-  {nome:"Fluxo Integrado",xp:2,ativada:1,texto:"Conjurar e atacar no mesmo Foco reduz em 1 a Corrupção retida pela Cifra."},
-  {nome:"Retorno",xp:4,ativada:1,texto:"Acertar um ataque imbuído remove 1 de Corrupção Assentada, uma vez por rodada."},
-  {nome:"Gesto Curto",xp:4,ativada:1,texto:"Escolha uma Cifra de Vínculo Baixo. Ela passa a ser Ação Livre."},
-  {nome:"Manifestação Física",xp:6,ativada:2,texto:"Uma vez por cena, materialize uma arma do seu Selo com estatísticas de Arma Especial de uma mão, dano metade físico e metade espiritual. Dura uma cena, não ocupa Volume."},
-  {nome:"Corpo Como Sigilo",xp:6,ativada:2,texto:"Suas Cifras de Vínculo Baixo dispensam gatilho sensorial enquanto você estiver em combate corpo a corpo."}
+  {nome:"Passo Curto",xp:2,carga:0,texto:"Aproximar-se de um alvo a até 6 metros é Ação Livre, uma vez por cena."},
+  {nome:"Canal Aberto",xp:2,carga:0,texto:"Estar Imobilizado não invalida Cifras que exijam apenas uma mão. Você rola com 1D a menos."},
+  {nome:"Golpe Imbuído",xp:2,carga:1,texto:"Imbuir um ataque com seu Pilar é Ação Livre. O ataque causa dano espiritual adicional."},
+  {nome:"Fluxo Integrado",xp:2,carga:1,texto:"Conjurar e atacar no mesmo Foco reduz em 1 a Corrupção retida pela Cifra."},
+  {nome:"Retorno",xp:4,carga:1,texto:"Acertar um ataque imbuído remove 1 de Corrupção Recente, uma vez por rodada."},
+  {nome:"Gesto Curto",xp:4,carga:1,texto:"Escolha uma Cifra de Vínculo Baixo. Ela passa a ser Ação Livre."},
+  {nome:"Manifestação Física",xp:6,carga:2,texto:"Uma vez por cena, materialize uma arma do seu Pilar com estatísticas de Arma Especial de uma mão, dano metade físico e metade espiritual. Dura uma cena e não ocupa Volume."},
+  {nome:"Corpo Como Sigilo",xp:6,carga:2,texto:"Suas Cifras de Vínculo Baixo dispensam gatilho sensorial enquanto você estiver em combate corpo a corpo."}
  ]},
 
 {nome:"Infiltrado",grupo:"Sociais",
  mote:"Não se esconde para atacar. Se esconde para estar presente. A diferença parece pequena até você perceber que ele passou a operação inteira dentro da sala.",
- forma:"Você nunca é a primeira pessoa notada em um ambiente. Quando um teste de Percepção for feito contra o grupo, você é sempre o último encontrado.",
+ forma:"Você nunca é a primeira pessoa notada em um ambiente. Quando um teste de Percepção for feito contra o grupo, você é sempre o último a ser encontrado, mesmo que o teste passe.",
  naoFaz:"Não vence nada por força. Quando a discrição acaba, é a pessoa mais frágil da sala.",
  talentos:[
-  {nome:"Identidade Fluida",xp:2,ativada:0,texto:"Uma identidade falsa sua resiste automaticamente a Percepção e Manipulação de ND 2."},
-  {nome:"Passo Curto",xp:2,ativada:0,texto:"Trocar de posição ou entrar em cobertura é Ação Livre enquanto você não estiver sendo observado."},
-  {nome:"Cara Comum",xp:2,ativada:0,texto:"Pessoas têm dificuldade em descrever você depois. Testes para identificá-lo por relato sofrem −2D."},
-  {nome:"Presença Apagada",xp:4,ativada:0,texto:"Testes de Percepção contra você sofrem −2D em ambientes onde você não quer ser notado."},
-  {nome:"Assinatura Fria",xp:4,ativada:0,texto:"Sua assinatura etérea não denuncia posição. Ascendidos precisam ver você."},
-  {nome:"Mãos Vazias",xp:4,ativada:0,texto:"Você esconde um item equipável de qualquer revista que não envolva contato físico direto."},
-  {nome:"Ninguém Aqui",xp:8,ativada:0,texto:"Uma vez por sessão, apague sua presença por uma cena. Você não pode ser alvo enquanto não agir contra ninguém."},
-  {nome:"Já Estava Dentro",xp:8,ativada:0,texto:"Uma vez por sessão, declare que você já estava no local antes da cena começar, em posição plausível à escolha do Narrador."}
+  {nome:"Identidade Fluida",xp:2,carga:0,texto:"Uma identidade falsa sua resiste automaticamente a testes de Percepção e Manipulação de ND 2. Acima disso, role com +1D."},
+  {nome:"Passo Curto",xp:2,carga:0,texto:"Trocar de posição ou entrar em cobertura é Ação Livre enquanto você não estiver sendo observado diretamente."},
+  {nome:"Cara Comum",xp:2,carga:0,texto:"Pessoas têm dificuldade em descrever você depois. Testes para identificá-lo por relato sofrem 2D a menos."},
+  {nome:"Presença Apagada",xp:4,carga:0,texto:"Testes de Percepção contra você sofrem 2D a menos em ambientes onde você não quer ser notado."},
+  {nome:"Assinatura Fria",xp:4,carga:0,texto:"Sua assinatura etérea não denuncia sua posição. Ascendidos precisam ver você para saber que você está lá."},
+  {nome:"Mãos Vazias",xp:4,carga:0,texto:"Você esconde um item equipável de qualquer revista que não envolva contato físico direto."},
+  {nome:"Ninguém Aqui",xp:8,carga:0,texto:"Uma vez por sessão, apague sua presença por uma cena. Você não pode ser alvo de nada enquanto não agir contra ninguém, e agir encerra o efeito."},
+  {nome:"Já Estava Dentro",xp:8,carga:0,texto:"Uma vez por sessão, declare que você já estava no local antes de a cena começar, em uma posição plausível à escolha do Narrador."}
  ]},
 
 {nome:"Manipulador",grupo:"Sociais",
  mote:"Trata conversa como terreno. Chega sabendo onde o outro pisa firme e conduz até o lugar onde só existe uma saída.",
- forma:"Você sempre sabe se alguém está mentindo diretamente para você. Não sabe sobre o quê.",
- naoFaz:"Não funciona sem tempo. Em combate, é alguém falando enquanto os outros trabalham.",
+ forma:"Você sempre sabe se um personagem está mentindo diretamente para você. Não sabe sobre o quê.",
+ naoFaz:"Não funciona sem tempo. Tudo que ele tem exige observar antes, e em cena de combate ele é alguém falando enquanto os outros trabalham.",
  talentos:[
-  {nome:"Leitura de Intenção",xp:2,ativada:0,texto:"Após uma rodada de interação, pergunte o que o alvo mais quer ou mais teme. A resposta é honesta."},
-  {nome:"Sem Recuo",xp:2,ativada:0,texto:"Quando você falha em um teste social, o alvo não percebe que houve tentativa."},
-  {nome:"Conversa Barata",xp:2,ativada:0,texto:"Uma tentativa social por cena que exigiria Ação Padrão passa a ser Ação Livre."},
-  {nome:"Ponto de Pressão",xp:4,ativada:0,texto:"Contra alguém cujo desejo ou medo você conhece, Manipulação, Intimidação e Lábia recebem +2D."},
-  {nome:"Terceira Voz",xp:4,ativada:0,texto:"Uma vez por cena, conduza uma conversa entre duas outras pessoas sem participar dela, direcionando o resultado."},
-  {nome:"Dívida Pequena",xp:4,ativada:0,texto:"Uma vez por sessão, alguém que você ajudou em cena passa a te dever um favor concreto que o Narrador precisa honrar."},
-  {nome:"Reescrita",xp:8,ativada:0,texto:"Uma vez por sessão, implante uma crença falsa em um personagem do Narrador. Não contradiz o que ele viveu recentemente, mas reinterpreta o passado."},
-  {nome:"Ninguém Perguntou",xp:8,ativada:0,texto:"Uma vez por sessão, uma decisão já tomada por um grupo de pessoas do Narrador é revertida sem que ninguém saiba explicar por quê."}
+  {nome:"Leitura de Intenção",xp:2,carga:0,texto:"Após uma rodada de interação, pergunte ao Narrador o que o alvo mais quer ou o que ele mais teme. A resposta é honesta."},
+  {nome:"Sem Recuo",xp:2,carga:0,texto:"Quando você falha em um teste social, o alvo não percebe que houve tentativa. Suas falhas não fecham portas."},
+  {nome:"Conversa Barata",xp:2,carga:0,texto:"Uma tentativa social por cena que exigiria Ação Padrão passa a ser Ação Livre."},
+  {nome:"Ponto de Pressão",xp:4,carga:0,texto:"Contra alguém cujo desejo ou medo você conhece, seus testes de Manipulação, Intimidação e Lábia recebem +2D."},
+  {nome:"Terceira Voz",xp:4,carga:0,texto:"Uma vez por cena, conduza uma conversa entre duas outras pessoas sem participar dela, direcionando o resultado."},
+  {nome:"Dívida Pequena",xp:4,carga:0,texto:"Uma vez por sessão, alguém que você ajudou em cena passa a te dever um favor concreto que o Narrador precisa honrar."},
+  {nome:"Reescrita",xp:8,carga:0,texto:"Uma vez por sessão, implante uma crença falsa em um personagem do Narrador, que ele defenderá ativamente. Não pode contradizer o que ele viveu recentemente, mas pode reinterpretar o passado."},
+  {nome:"Ninguém Perguntou",xp:8,carga:0,texto:"Uma vez por sessão, uma decisão já tomada por um grupo de pessoas do Narrador é revertida sem que ninguém saiba explicar por quê."}
  ]},
 
 {nome:"Líder de Operação",grupo:"Sociais",
@@ -1339,59 +1339,59 @@ const ARQUETIPOS = [
  forma:"Uma vez por rodada, um aliado que puder ouvir você repete um único dado de um teste que acabou de falhar.",
  naoFaz:"Não vale nada sozinho. Uma operação solo o transforma em um Ascendido comum.",
  talentos:[
-  {nome:"Coordenação",xp:2,ativada:0,texto:"Dar instrução tática é Ação Livre. O aliado recebe +1D no próximo teste que a seguir."},
-  {nome:"Chamada de Posição",xp:2,ativada:0,texto:"Uma vez por cena, um aliado se move até 3 metros fora do próprio Foco."},
-  {nome:"Voz Que Corta",xp:2,ativada:0,texto:"Você é sempre ouvido, independente de ruído, distorção ou confusão na cena."},
-  {nome:"Leitura de Grupo",xp:4,ativada:0,texto:"Você sabe o estado aproximado de Vitalidade, Corrupção e condições de aliados a até 10 metros, sem teste."},
-  {nome:"Segunda Voz",xp:4,ativada:0,texto:"Um aliado que falhar em uma reação por penalidade pode ignorá-la. Uma vez por cena."},
-  {nome:"Ordem na Linha",xp:4,ativada:0,texto:"Uma vez por cena, troque a ordem do Foco entre dois aliados."},
-  {nome:"Momento de Grupo",xp:8,ativada:0,texto:"Uma vez por sessão, como Ação Livre, aliados que puderem ouvir você recebem +1D em todos os testes por uma rodada."},
-  {nome:"Ninguém Fica",xp:8,ativada:0,texto:"Uma vez por sessão, quando um aliado cairia inconsciente, ele age normalmente até o fim da rodada e só então cai."}
+  {nome:"Coordenação",xp:2,carga:0,texto:"Dar uma instrução tática é Ação Livre. O aliado recebe +1D no próximo teste que seguir a instrução."},
+  {nome:"Chamada de Posição",xp:2,carga:0,texto:"Uma vez por cena, um aliado se move até 3 metros fora do próprio Foco."},
+  {nome:"Voz Que Corta",xp:2,carga:0,texto:"Você é sempre ouvido, independente de ruído, distorção ou confusão na cena."},
+  {nome:"Leitura de Grupo",xp:4,carga:0,texto:"Você sabe o estado aproximado de Vitalidade, Corrupção e condições de todos os aliados a até 10 metros, sem teste, no início de cada cena."},
+  {nome:"Segunda Voz",xp:4,carga:0,texto:"Um aliado que falhar em uma reação por causa de penalidade pode ignorar essa penalidade. Uma vez por cena."},
+  {nome:"Ordem na Linha",xp:4,carga:0,texto:"Uma vez por cena, troque a ordem do Foco entre dois aliados."},
+  {nome:"Momento de Grupo",xp:8,carga:0,texto:"Uma vez por sessão, como Ação Livre, todos os aliados que puderem ouvir você recebem +1D em todos os testes por uma rodada."},
+  {nome:"Ninguém Fica",xp:8,carga:0,texto:"Uma vez por sessão, quando um aliado cairia inconsciente, ele age normalmente até o fim da rodada e só então cai."}
  ]},
 
 {nome:"Arquivista do Passado",grupo:"Místicos",
  mote:"Aprendeu que a lista de Cifras Catalogadas é curta porque alguém a escreveu, não porque a língua acabe ali.",
- forma:"Você identifica Configuração, Vínculo e Selo de qualquer Cifra sinalizada no seu campo de visão, sem teste, e não sofre penalidade de dialeto.",
+ forma:"Você identifica Configuração, Vínculo e Pilar de qualquer Cifra sinalizada no seu campo de visão, sem teste, e não sofre penalidade de dialeto.",
  naoFaz:"Não conjura melhor que ninguém. Entender uma frase e dizê-la são coisas diferentes.",
  talentos:[
-  {nome:"Estudo Rápido",xp:2,ativada:0,texto:"Aprender uma Cifra Catalogada custa 1 XP a menos, mínimo 1."},
-  {nome:"Marginália",xp:2,ativada:0,texto:"Você percebe quando uma Cifra foi modificada, mal aprendida ou pertence a um dialeto morto."},
-  {nome:"Mão Firme",xp:2,ativada:0,texto:"Uma vez por cena, um teste de Domínio seu não pode ser Terrível."},
-  {nome:"Nota de Rodapé",xp:4,ativada:0,texto:"Uma vez por sessão, pergunte ao Narrador a origem documentada de qualquer Cifra, Item Caótico ou aberração que você tenha examinado."},
-  {nome:"Economia de Frase",xp:2,ativada:1,texto:"Escolha duas Cifras que você conhece. Cada uma retém 1 de Corrupção a menos, mínimo 0."},
-  {nome:"Repetição",xp:4,ativada:1,texto:"Ao ver uma Cifra ser conjurada com sucesso, repita a frase com Domínio de ND igual ao Vínculo mais 1. Usa a Cifra uma vez sem aprender."},
-  {nome:"Leitura Cega",xp:6,ativada:1,texto:"Você lê inscrições em dialetos extintos e articulações anteriores à padronização de Calem."},
-  {nome:"Autoria",xp:6,ativada:2,texto:"Compõe Cifras novas sem a presença de um Semblante, desde que tenha Ressonância 1 com o Selo. Uma cena de concentração."}
+  {nome:"Estudo Rápido",xp:2,carga:0,texto:"Aprender uma Cifra Catalogada custa 1 XP a menos, mínimo 1."},
+  {nome:"Marginália",xp:2,carga:0,texto:"Você percebe quando uma Cifra foi modificada, mal aprendida ou pertence a um dialeto morto."},
+  {nome:"Mão Firme",xp:2,carga:0,texto:"Uma vez por cena, um teste de Domínio seu não pode ter resultado Terrível."},
+  {nome:"Nota de Rodapé",xp:4,carga:0,texto:"Uma vez por sessão, pergunte ao Narrador a origem documentada de qualquer Cifra, Item Caótico ou aberração que você tenha examinado."},
+  {nome:"Economia de Frase",xp:2,carga:1,texto:"Escolha duas Cifras que você conhece. Cada uma retém 1 de Corrupção a menos, mínimo 0."},
+  {nome:"Repetição",xp:4,carga:1,texto:"Ao ver uma Cifra ser conjurada com sucesso, repita a frase com um teste de Domínio de ND igual ao Vínculo mais 1. Passando, usa a Cifra uma vez sem aprender. Você não entendeu o que disse. Só repetiu bem."},
+  {nome:"Leitura Cega",xp:6,carga:1,texto:"Você lê inscrições em dialetos extintos e articulações anteriores à padronização de Calem. O Narrador limita o que estava escrito, não se você lê."},
+  {nome:"Autoria",xp:6,carga:2,texto:"Compõe Cifras novas sem a presença de um Semblante, desde que tenha Ressonância 1 com o Pilar. O processo leva uma cena de concentração."}
  ]},
 
 {nome:"Invocador de Criaturas",grupo:"Místicos",
  mote:"Descobriu que o Caos já tem quem faça o trabalho, e que a dificuldade está em perguntar direito.",
- forma:"Sua manifestação age no seu Foco sem consumir sua ação.",
- naoFaz:"Não age sozinho com eficiência. Depende de uma coisa que ele colocou em campo e que pode ser destruída.",
+ forma:"Sua manifestação age no seu Foco sem consumir a sua ação.",
+ naoFaz:"Não age sozinho com eficiência. Depende de uma coisa que ele mesmo colocou em campo e que pode ser destruída.",
  talentos:[
-  {nome:"Chamado",xp:2,ativada:1,texto:"Invocar uma manifestação menor do seu Selo é Ação Padrão. Dura uma cena."},
-  {nome:"Coleira Curta",xp:2,ativada:1,texto:"Sua manifestação nunca age contra suas ordens, mesmo em alta Distorção."},
-  {nome:"Segunda Boca",xp:2,ativada:1,texto:"Reinvocar na mesma cena não gera Corrupção adicional."},
-  {nome:"Vínculo de Invocação",xp:4,ativada:2,texto:"Sua manifestação passa a ter Vitalidade igual a metade do seu Limiar e causa 1d6 por ataque. Destruída, você sofre 2 de dano espiritual."},
-  {nome:"Contrato Firme",xp:4,ativada:2,texto:"Sua manifestação não desaparece quando você sofre dano nem quando sua Corrupção sobe."},
-  {nome:"Divisão",xp:4,ativada:2,texto:"Uma vez por cena, mantenha duas manifestações menores ao mesmo tempo."},
-  {nome:"Contrato Maior",xp:6,ativada:3,texto:"Uma vez por sessão, invoque uma manifestação maior de qualquer Selo com Ressonância. Vitalidade igual à sua, dano 1d10, dura a cena. Depois, 24 horas narrativas sem invocar."},
-  {nome:"Troca de Lugar",xp:6,ativada:2,texto:"Uma vez por cena, troque de posição com sua manifestação a qualquer distância dentro da cena."}
+  {nome:"Chamado",xp:2,carga:1,texto:"Invocar uma manifestação menor do seu Pilar é Ação Padrão. Ela persiste por uma cena e interage com o ambiente de formas simples ligadas ao conceito."},
+  {nome:"Coleira Curta",xp:2,carga:1,texto:"Sua manifestação nunca age contra suas ordens, mesmo em alta Distorção."},
+  {nome:"Segunda Boca",xp:2,carga:1,texto:"Reinvocar na mesma cena não gera Corrupção adicional."},
+  {nome:"Vínculo de Invocação",xp:4,carga:2,texto:"Sua manifestação passa a ter Vitalidade igual a metade do seu Limiar e causa 1d6 por ataque. Se destruída, você sofre 2 de dano espiritual."},
+  {nome:"Contrato Firme",xp:4,carga:2,texto:"Sua manifestação não desaparece quando você sofre dano nem quando sua Corrupção sobe."},
+  {nome:"Divisão",xp:4,carga:2,texto:"Uma vez por cena, mantenha duas manifestações menores ao mesmo tempo."},
+  {nome:"Contrato Maior",xp:6,carga:3,texto:"Uma vez por sessão, invoque uma manifestação maior de qualquer Pilar com o qual tenha Ressonância. Vitalidade igual à sua, dano 1d10, dura a cena inteira. Depois, 24 horas narrativas sem invocar."},
+  {nome:"Troca de Lugar",xp:6,carga:2,texto:"Uma vez por cena, troque de posição com sua manifestação a qualquer distância dentro da cena."}
  ]},
 
 {nome:"Guardião do Véu",grupo:"Místicos",
  mote:"Trata a fronteira entre o físico e o etéreo como terreno, e terreno se ocupa antes de o inimigo chegar.",
- forma:"Você não sofre penalidades de Espírito em zonas de alta Distorção e sabe o grau exato de Distorção de onde está, além de qual Selo a assina.",
+ forma:"Você não sofre penalidades de testes de Espírito em zonas de alta Distorção, e sabe o grau exato de Distorção de onde está, além de qual Pilar a assina.",
  naoFaz:"Não para nada físico. Uma bala atravessa qualquer coisa que ele construiu.",
  talentos:[
-  {nome:"Leitura de Distorção",xp:2,ativada:0,texto:"Você quantifica Distorção com precisão e identifica de onde vem, sem teste."},
-  {nome:"Passo Estável",xp:2,ativada:0,texto:"Você nunca é surpreendido por manifestação etérea, aberração ou Cifra conjurada no seu campo de visão."},
-  {nome:"Aviso",xp:2,ativada:0,texto:"Uma vez por cena, um aliado a até 5 metros repete uma reação contra efeito etéreo."},
-  {nome:"Fundação",xp:2,ativada:1,texto:"Sustentar sua barreira não exige que você fique parado. Ela acompanha você."},
-  {nome:"Contenção",xp:4,ativada:2,texto:"Ação Completa. Barreira etérea de até 3 metros de raio. A Distorção não aumenta dentro dela e aberrações não entram por vontade própria. Dura uma cena."},
-  {nome:"Solo Firme",xp:4,ativada:1,texto:"Aliados dentro da sua barreira não sofrem resultado Terrível em testes de Espírito."},
-  {nome:"Porta Fechada",xp:6,ativada:2,texto:"Uma vez por sessão, anule uma Cifra de Vínculo Médio ou inferior conjurada dentro do seu alcance visual."},
-  {nome:"Purificação",xp:6,ativada:3,texto:"Uma vez por sessão, reduza a Distorção de um local em 1 ponto permanentemente. Uma cena de ritual. Você ganha 1 de Corrupção Assentada."}
+  {nome:"Leitura de Distorção",xp:2,carga:0,texto:"Você quantifica Distorção com precisão e identifica de onde ela vem, sem teste."},
+  {nome:"Passo Estável",xp:2,carga:0,texto:"Você nunca é surpreendido por manifestação etérea, aberração ou Cifra conjurada no seu campo de visão."},
+  {nome:"Aviso",xp:2,carga:0,texto:"Uma vez por cena, um aliado a até 5 metros repete uma reação contra efeito etéreo."},
+  {nome:"Fundação",xp:2,carga:1,texto:"Sustentar sua barreira não exige que você fique parado. Ela acompanha você."},
+  {nome:"Contenção",xp:4,carga:2,texto:"Ação Completa. Barreira etérea de até 3 metros de raio. Dentro dela a Distorção não aumenta e aberrações não entram por vontade própria. Dura uma cena."},
+  {nome:"Solo Firme",xp:4,carga:1,texto:"Aliados dentro da sua barreira não sofrem resultado Terrível em testes de Espírito."},
+  {nome:"Porta Fechada",xp:6,carga:2,texto:"Uma vez por sessão, anule uma Cifra de Vínculo Médio ou inferior conjurada dentro do seu alcance visual."},
+  {nome:"Purificação",xp:6,carga:3,texto:"Uma vez por sessão, reduza a Distorção de um local em 1 ponto permanentemente, através de um ritual que leva uma cena. Você ganha 1 de Corrupção Assentada."}
  ]},
 
 {nome:"Médico de Campo",grupo:"de Suporte",
@@ -1399,53 +1399,126 @@ const ARQUETIPOS = [
  forma:"Você percebe automaticamente quando um aliado a até 10 metros perde um nível de Vitalidade, mesmo sem ver.",
  naoFaz:"Não devolve ninguém do zero. Tudo que ele tem serve para adiar.",
  talentos:[
-  {nome:"Triagem Rápida",xp:2,ativada:0,texto:"Tratar ferimentos é Ação Livre, uma vez por cena. Cura 1d4, ou 1d8 com Kit."},
-  {nome:"Segunda Tentativa",xp:2,ativada:0,texto:"Falhando em um teste de cura, tente de novo imediatamente. O segundo resultado é definitivo."},
-  {nome:"Mão Treinada",xp:2,ativada:0,texto:"Seus testes de cura não podem ser Terríveis."},
-  {nome:"Estabilização Crítica",xp:4,ativada:0,texto:"Quando um aliado perde um nível de Vitalidade, intervenha como reação. Ele não age no próximo Foco, mas não perde outro nível por aquele dano."},
-  {nome:"Corte Limpo",xp:4,ativada:0,texto:"Uma vez por cena, remova uma condição física de um aliado adjacente como Ação Livre."},
-  {nome:"Estoque",xp:4,ativada:0,texto:"Uma vez por operação, você tinha o insumo médico específico que a situação exige."},
-  {nome:"Ressurgência",xp:8,ativada:0,texto:"Uma vez por sessão, um aliado Inconsciente retorna ao estado Ferido com metade da Vitalidade do nível atual. Ação Completa."},
-  {nome:"Ainda Não",xp:8,ativada:0,texto:"Uma vez por sessão, um aliado que morreria permanentemente fica Inconsciente. O Narrador pode cobrar depois."}
+  {nome:"Triagem Rápida",xp:2,carga:0,texto:"Tratar ferimentos é Ação Livre, uma vez por cena. Cura 1d4 de Vitalidade, ou 1d8 com um Kit de Medicina."},
+  {nome:"Segunda Tentativa",xp:2,carga:0,texto:"Falhando em um teste de cura, tente novamente imediatamente. O segundo resultado é definitivo."},
+  {nome:"Mão Treinada",xp:2,carga:0,texto:"Seus testes de cura não podem ter resultado Terrível."},
+  {nome:"Estabilização Crítica",xp:4,carga:0,texto:"Quando um aliado perde um nível de Vitalidade, intervenha como reação. Ele não age no próximo Foco, mas não perde outro nível por aquele dano. Uma vez por cena."},
+  {nome:"Corte Limpo",xp:4,carga:0,texto:"Uma vez por cena, remova uma condição física de um aliado adjacente como Ação Livre."},
+  {nome:"Estoque",xp:4,carga:0,texto:"Uma vez por operação, você tinha o insumo médico específico que a situação exige."},
+  {nome:"Ressurgência",xp:8,carga:0,texto:"Uma vez por sessão, um aliado Inconsciente retorna ao estado Ferido com metade da Vitalidade do nível atual. Ação Completa."},
+  {nome:"Ainda Não",xp:8,carga:0,texto:"Uma vez por sessão, um aliado que morreria permanentemente fica Inconsciente. O Narrador pode cobrar depois."}
  ]},
 
 {nome:"Sentinela da Proteção",grupo:"de Suporte",
  mote:"Decidiu que o trabalho é fazer com que os outros não precisem olhar para trás.",
  forma:"Enquanto você não tiver se movido no último Foco, aliados a até 3 metros recebem +1 de Resistência Física.",
- naoFaz:"Não protege contra nada etéreo. Cifras e Distorção atravessam ele como atravessam qualquer um.",
+ naoFaz:"Não protege contra nada etéreo. Cifras, Distorção e o que vem do outro lado atravessam ele como atravessam qualquer um.",
  talentos:[
-  {nome:"Postura Firme",xp:2,ativada:0,texto:"Você não pode ser derrubado, empurrado ou movido contra a vontade enquanto estiver parado."},
-  {nome:"Peso Morto",xp:2,ativada:0,texto:"Proteções pesadas e especiais não impõem penalidade de mobilidade e ocupam 1 Volume a menos."},
-  {nome:"Guarda Aberta",xp:2,ativada:0,texto:"Suas reações de Bloquear não podem ser Terríveis."},
-  {nome:"Intercepção",xp:4,ativada:0,texto:"Quando um aliado a até 3 metros for atacado, use sua reação para dividir o ataque pela metade entre vocês dois, antes de Resistência."},
-  {nome:"Espaço Negado",xp:4,ativada:0,texto:"Inimigos gastam o dobro de movimento para passar por você."},
-  {nome:"Contragolpe Firme",xp:4,ativada:0,texto:"Vencendo uma reação de Bloquear, cause o dano normal da sua arma no atacante."},
-  {nome:"Muralha",xp:8,ativada:0,texto:"Uma vez por cena, como Ação Livre, você é o único alvo físico válido por uma rodada para quem puder ver você. Ao fim, você não perde nível de Vitalidade por esse dano."},
-  {nome:"Não Passa",xp:8,ativada:0,texto:"Uma vez por sessão, um único ataque direcionado a você ou a um aliado adjacente simplesmente não acontece."}
+  {nome:"Postura Firme",xp:2,carga:0,texto:"Você não pode ser derrubado, empurrado ou movido contra a vontade enquanto estiver parado."},
+  {nome:"Peso Morto",xp:2,carga:0,texto:"Proteções pesadas e especiais não impõem penalidade de mobilidade a você e ocupam 1 Volume a menos."},
+  {nome:"Guarda Aberta",xp:2,carga:0,texto:"Suas reações de Bloquear não podem ter resultado Terrível."},
+  {nome:"Intercepção",xp:4,carga:0,texto:"Quando um aliado a até 3 metros for atacado, use sua reação para dividir o ataque pela metade entre vocês dois, antes de qualquer Resistência."},
+  {nome:"Espaço Negado",xp:4,carga:0,texto:"Inimigos gastam o dobro de movimento para passar por você."},
+  {nome:"Contragolpe Firme",xp:4,carga:0,texto:"Vencendo uma reação de Bloquear, cause o dano normal da sua arma no atacante."},
+  {nome:"Muralha",xp:8,carga:0,texto:"Uma vez por cena, como Ação Livre, você é o único alvo físico válido por uma rodada para qualquer inimigo que possa ver você. Ao fim, você pode sofrer condições, mas não perde nível de Vitalidade por esse dano."},
+  {nome:"Não Passa",xp:8,carga:0,texto:"Uma vez por sessão, um único ataque direcionado a você ou a um aliado adjacente simplesmente não acontece."}
  ]},
 
 {nome:"Estrategista",grupo:"de Suporte",
  mote:"A parte do trabalho dele acontece antes de qualquer um sacar alguma coisa.",
  forma:"Antes de qualquer operação, você sabe uma coisa concreta sobre o local ou a ameaça que o grupo ainda não descobriu. O Narrador escolhe o quê, e precisa ser útil.",
- naoFaz:"Não corrige nada em movimento. Depois que a cena começa, ele vale o que preparou.",
+ naoFaz:"Não corrige nada em movimento. Depois que a cena começa, ele vale exatamente o que preparou.",
  talentos:[
-  {nome:"Briefing",xp:2,ativada:0,texto:"Aliados que participarem do briefing recebem +1D no primeiro teste da operação."},
-  {nome:"Preparação Material",xp:2,ativada:0,texto:"Uma vez por operação, você trouxe um item comum que resolve o problema imediato."},
-  {nome:"Rota Estudada",xp:2,ativada:0,texto:"O grupo nunca se perde em um local sobre o qual você teve tempo de se informar."},
-  {nome:"Contingência",xp:4,ativada:0,texto:"Um aliado que participou do briefing ignora um resultado Terrível, uma vez na operação."},
-  {nome:"Leitura de Fraqueza",xp:4,ativada:0,texto:"Após observar um adversário por uma rodada, declare uma fraqueza tática. Quando explorada, a ação recebe +2D."},
-  {nome:"Horário",xp:4,ativada:0,texto:"Uma vez por operação, declare que o grupo chegou no momento exato em que uma janela se abre. O Narrador define a janela."},
-  {nome:"Plano B",xp:8,ativada:0,texto:"Uma vez por sessão, quando a operação colapsa, declare Plano B. O grupo recebe rota de saída, informação que muda a situação, ou janela inesperada."},
-  {nome:"Isso Estava Previsto",xp:8,ativada:0,texto:"Uma vez por sessão, anule uma consequência narrativa de uma falha do grupo declarando que você contava com ela."}
+  {nome:"Briefing",xp:2,carga:0,texto:"Aliados que participarem do seu briefing recebem +1D no primeiro teste que realizarem na operação."},
+  {nome:"Preparação Material",xp:2,carga:0,texto:"Uma vez por operação, você trouxe um item comum que resolve o problema imediato. O Narrador valida a plausibilidade, não a conveniência."},
+  {nome:"Rota Estudada",xp:2,carga:0,texto:"O grupo nunca se perde em um local sobre o qual você teve tempo de se informar."},
+  {nome:"Contingência",xp:4,carga:0,texto:"Um aliado que participou do briefing ignora um resultado Terrível, uma vez na operação."},
+  {nome:"Leitura de Fraqueza",xp:4,carga:0,texto:"Após observar um adversário por uma rodada, declare uma fraqueza tática. O Narrador confirma ou oferece a correta. Quando explorada, a ação recebe +2D."},
+  {nome:"Horário",xp:4,carga:0,texto:"Uma vez por operação, declare que o grupo chegou no momento exato em que uma janela se abre. O Narrador define a janela."},
+  {nome:"Plano B",xp:8,carga:0,texto:"Uma vez por sessão, quando a operação colapsa, declare Plano B. O grupo recebe uma rota de saída, uma informação que muda a situação, ou uma janela inesperada. O Narrador define o quê, mas precisa ser real."},
+  {nome:"Isso Estava Previsto",xp:8,carga:0,texto:"Uma vez por sessão, anule uma consequência narrativa de uma falha do grupo declarando que você contava com ela."}
  ]}
 ];
 
 /* Lista única de Talentos. Cada um carrega a Chave de quem pode comprar —
    hoje todas as Chaves são de Arquétipo, porque é o que a revisão publicou.
    Peso é sempre igual ao custo em XP; não guardamos o campo duas vezes. */
-const TALENTOS = ARQUETIPOS.flatMap(a =>
-  a.talentos.map(t => ({nome:t.nome, xp:t.xp, ativada:t.ativada, texto:t.texto, chave:a.nome}))
-);
+/* A prateleira aberta. Qualquer Ascendido compra daqui, independente de
+   Arquétipo, e por isso ela tem uma Chave própria em vez da de um Arquétipo:
+   o Talento Geral não dorme quando o modo de operar muda.
+
+   Carga é quanta Corrupção o Talento ocupa enquanto
+   estiver aceso. Talento ordinário nunca gera Corrupção; quem cobra Carga é
+   sempre quem pede alguma coisa a alguém de fora. */
+const CHAVE_GERAL = "Geral";
+
+const TALENTOS_GERAIS = [
+  // 2 XP
+  {nome:"Percepção Aguçada",xp:2,carga:0,texto:"Uma vez por cena, receba +1D em um teste de Percepção ou Intuição. Pode ser declarado depois de ver o resultado: você reage ao que percebeu, não antecipa."},
+  {nome:"Gatuno",xp:2,carga:0,texto:"Uma vez por cena, tente se esconder antes de ser percebido, mesmo sem cobertura completa, desde que haja sombra, ruído ou distração no ambiente."},
+  {nome:"Foco de Ferro",xp:2,carga:0,texto:"Uma vez por cena, antes de rolar um teste de ND 3 ou mais, declare Foco de Ferro. Passando, remova 1 de Corrupção Recente. Falhando, não há penalidade adicional. Não funciona em testes opostos."},
+  {nome:"Presença Calma",xp:2,carga:0,texto:"Você nunca sofre penalidade por nervosismo ou pressão psicológica em situações sociais tensas, e testes de Estabilidade em contexto social recebem +1D."},
+  {nome:"Sacada Rápida",xp:2,carga:0,texto:"Uma vez por cena, saque qualquer arma ou item equipável como Ação Livre."},
+  {nome:"Segundo Fôlego",xp:2,carga:0,texto:"Uma vez por cena, recupere 1d4 de Vitalidade. Não pode ser usado no estado Inconsciente."},
+  {nome:"Reflexos Treinados",xp:2,carga:0,texto:"Uma vez por cena, receba +1D em uma reação. Declare antes de rolar."},
+  {nome:"Pé Firme",xp:2,carga:0,texto:"Você recebe Vantagem para resistir a ser derrubado, empurrado ou agarrado, e nunca fica Caído por efeitos de área."},
+  {nome:"Sangue Frio",xp:2,carga:0,texto:"Você não sofre penalidade de dados pelo estado Ferido. Ela só começa para você no Gravemente Ferido."},
+  {nome:"Instinto de Combate",xp:2,carga:0,texto:"Você nunca é pego Desprevenido no início de uma cena de combate, desde que esteja consciente."},
+  {nome:"Duelista",xp:2,carga:0,texto:"Quando nenhum outro inimigo está adjacente ao seu alvo além de você, seus ataques corpo a corpo contra ele recebem +1D."},
+  {nome:"Golpe Furtivo",xp:2,carga:0,texto:"Uma vez por rodada, ao acertar um alvo Desprevenido em corpo a corpo ou à distância curta, cause +1d4 de dano."},
+  {nome:"Imobilizar",xp:2,carga:0,texto:"Agarre um alvo adjacente como Ação Padrão, com um teste oposto de Resistência. Vencendo, o alvo fica Imobilizado. Ele pode tentar escapar no próprio Foco com o mesmo teste."},
+  {nome:"Mira Letal",xp:2,carga:0,texto:"Ao mirar antes de um ataque com arma de fogo, receba +1d4 de dano no disparo seguinte contra o mesmo alvo."},
+  {nome:"Posição Feroz",xp:2,carga:0,texto:"Ao atacar, assuma postura feroz. Até o início do seu próximo Foco, +1D em ataques e 1D a menos em reações."},
+  {nome:"Posição Defensiva",xp:2,carga:0,texto:"Ao atacar, assuma postura defensiva. Até o início do seu próximo Foco, 1D a menos em ataques e +1D em reações."},
+  {nome:"Posição de Duas Armas",xp:2,carga:0,texto:"Empunhando duas armas leves, realize um ataque adicional imediato com a segunda. Se fizer isso, sofre 1D a menos em ataques até o início do seu próximo Foco."},
+  {nome:"Caótico",xp:2,carga:1,texto:"Você aprende uma Cifra de Vínculo Baixo do seu Pilar de Afinidade ou de um Pilar com Ressonância, sem precisar de fonte. Ninguém te ensinou. O gesto estava lá quando sua mão precisou dele. A Corrupção Assentada é paga normalmente. Pode ser adquirido múltiplas vezes."},
+  {nome:"Costume",xp:2,carga:1,texto:"Escolha uma Cifra que você conhece. Ela passa a ser conjurada como Ação Livre, desde que o gatilho seja satisfeito normalmente."},
+  {nome:"Conhecimento do Caos",xp:2,carga:1,texto:"Escolha uma Cifra que você conhece. Ela retém 1 de Corrupção a menos, mínimo 0. Pode ser adquirido múltiplas vezes, sempre para Cifras diferentes."},
+  {nome:"Eco de Cifra",xp:2,carga:1,texto:"Cifras de Vínculo Baixo que você conjura com sucesso persistem por uma rodada adicional. Não se aplica a Vínculo Médio ou Alto."},
+  {nome:"Conjuração Silenciosa",xp:2,carga:1,texto:"Suas Cifras podem ser conjuradas sem gesto visível nem som. Quem observa não percebe que uma Cifra foi conjurada, embora o efeito aconteça."},
+  {nome:"Ampliação",xp:2,carga:1,texto:"Suas Cifras com alcance definido sobem uma categoria de alcance."},
+  // 4 XP
+  {nome:"Pensamento Organizado",xp:4,carga:0,texto:"Uma vez por cena, receba +1 em todos os testes de Raciocínio até o fim do Foco atual. Declare antes de rolar."},
+  {nome:"Resistente",xp:4,carga:0,texto:"Você recebe +1 de Resistência Física e +1 de Resistência Espiritual."},
+  {nome:"Vem Para Cima",xp:4,carga:0,texto:"Uma vez por cena, faça um teste de Intimidação contra um alvo que possa ver e ouvir você. Passando, ele prioriza você como alvo até o início do seu próximo Foco e sofre 1D a menos em testes contra outros personagens."},
+  {nome:"Pesado",xp:4,carga:0,texto:"Você desenvolve proficiência em Proteções Pesadas e Especiais, e reduz em 1D as penalidades de mobilidade que elas impõem."},
+  {nome:"Fura Guarda",xp:4,carga:0,texto:"Ao vencer uma reação de Bloquear, realize imediatamente um ataque contra o atacante como parte da mesma reação."},
+  {nome:"Investida Rápida",xp:4,carga:0,texto:"Estando a mais de 3 metros do alvo, mova-se até ele e ataque no mesmo Foco como uma única Ação Completa. Acertando, causa +1d4. Não funciona se o caminho estiver bloqueado."},
+  {nome:"Tanque de Guerra",xp:4,carga:0,texto:"Seu equipamento de proteção ocupa 1 Volume a menos, e penalidades de mobilidade de proteções pesadas e especiais não se aplicam a testes de Atletismo."},
+  {nome:"No Susto",xp:4,carga:0,texto:"Estando Desprevenido e sendo atacado, realize um disparo de reação imediato com qualquer arma de fogo empunhada, antes de sofrer o dano. O teste sofre 2D a menos."},
+  {nome:"Mente Fechada",xp:4,carga:0,texto:"+2D em testes de Propósito contra efeitos que tentem alterar sua percepção da realidade, implantar crenças ou forçar ações involuntárias."},
+  {nome:"Leitura de Ambiente",xp:4,carga:0,texto:"Ao entrar em qualquer local novo, faça imediatamente um teste de Percepção gratuito, sem custo de ação, para identificar saídas, coberturas e qualquer presença que não pertença ao ambiente."},
+  {nome:"Contragolpe Aprimorado",xp:4,carga:0,texto:"Ao vencer uma reação de Contra-ataque, cause o dano normal da sua arma no atacante, em vez de apenas 1."},
+  {nome:"Fôlego de Combate",xp:4,carga:0,texto:"Uma vez por cena, remova imediatamente uma condição negativa de si mesmo: Caído, Atordoado, Provocado ou Imobilizado."},
+  {nome:"Elite",xp:4,carga:0,texto:"Você recebe proficiência em todas as armas de fogo, incluindo Metralhadoras e Rifles de Precisão. Além disso, cada sucesso além do necessário em um ataque com arma de fogo causa 1 de dano adicional."},
+  {nome:"Mira Furtiva",xp:4,carga:0,texto:"Realizando um Golpe Furtivo enquanto estiver mirando, receba +1D no ataque. Requer Golpe Furtivo e Mira Letal."},
+  {nome:"Briga Intuitiva",xp:4,carga:0,texto:"Você pode usar Espírito no lugar de Corpo em testes de Briga. O dano continua sendo calculado normalmente. O que muda é de onde vem a proficiência."},
+  {nome:"Conjurador Rápido",xp:4,carga:2,texto:"Uma vez por cena, conjure uma Cifra como Ação Livre. Os requisitos de gatilho e gesto não mudam."},
+  {nome:"Vínculo Amplificado",xp:4,carga:1,texto:"Escolha um Pilar com o qual você tenha Ressonância. Cifras dele causam +1 de dano ou curam +1 de Vitalidade, quando aplicável."},
+  {nome:"Vínculo de Alma",xp:4,carga:2,texto:"Uma vez por cena, estabeleça um vínculo temporário com um aliado a até 5 metros. Por uma rodada, qualquer dano que ele sofrer é dividido igualmente entre vocês dois. Você decide quando ativar e quando encerrar."},
+  // 8 XP
+  {nome:"Redução",xp:8,carga:0,texto:"Ao sofrer dano, reduza o valor em 2. Uma vez por rodada."},
+  {nome:"Até o Fim",xp:8,carga:0,texto:"Uma vez por cena, receba +2D em todos os testes de Briga ou Pontaria até o fim do seu Foco atual. Declare antes de rolar o primeiro teste."},
+  {nome:"Derrubar e Espancar",xp:8,carga:0,texto:"Faça um teste oposto de Resistência contra um alvo adjacente. Vencendo, ele fica Caído e sofre +2 de dano. Enquanto ele estiver Caído e você adjacente, seus ataques causam +1 e você realiza um ataque extra por rodada como Ação Livre."},
+  {nome:"Proximidade",xp:8,carga:0,texto:"Você não sofre as penalidades normais de disparo à distância em combate corpo a corpo. O teste sofre 1D a menos, e o ataque ganha +2 de dano se acertar."},
+  {nome:"Distanciamento",xp:8,carga:0,texto:"Em ataques com armas de longo alcance contra alvos a partir de 12 metros, o dano é dobrado. Requer Mira Letal."},
+  {nome:"Execução",xp:8,carga:0,texto:"Uma vez por cena, contra um alvo no estado Gravemente Ferido ou pior, declare Execução como Ação Completa. Acertando, o alvo perde imediatamente um nível de Vitalidade além do dano normal. Não funciona em Iluminados."},
+  {nome:"Marca do Predador",xp:8,carga:0,texto:"Quando você elimina um adversário, todos os inimigos que testemunharam devem passar em um teste de Propósito ND 2 ou sofrer 1D a menos em todos os testes até o fim da cena. Não afeta aberrações sem capacidade racional."},
+  {nome:"Mestre de Armas",xp:8,carga:0,texto:"Escolha um tipo de arma: leve, uma mão, duas mãos, ou uma categoria de arma de fogo. Você precisa de 1 sucesso a menos para acerto crítico com armas desse tipo."},
+  {nome:"Euforia",xp:8,carga:0,texto:"Uma vez por cena, realize uma Ação Padrão adicional no seu Foco. Essa ação não pode ser a conjuração de uma Cifra."},
+  {nome:"Barreira de Espírito",xp:8,carga:2,texto:"Uma vez por cena, crie uma barreira etérea ao seu redor. Por duas rodadas, você recebe +3 de Resistência Espiritual e +1 de Resistência Física. A barreira é visível para qualquer Ascendido com terceiro olho ativo."},
+  {nome:"Conjurador de Guerra",xp:8,carga:2,texto:"Uma vez por rodada, conjure uma Cifra de Vínculo Baixo e realize um ataque no mesmo Foco. O ataque sofre 1D a menos."},
+  {nome:"Transcendência Momentânea",xp:8,carga:3,texto:"Uma vez por sessão, acesse um estado de percepção ampliada. Por uma cena, seu terceiro olho opera sem limitações: você vê assinaturas de Pilares em todos os seres, Distorção como cor no ar, e o Narrador deve responder honestamente a qualquer pergunta de natureza etérea sobre o ambiente imediato. Ao fim da cena, você ganha 2 de Corrupção Assentada."}
+];
+
+/* Os de Arquétipo vêm primeiro na lista porque uma ficha antiga pode ter
+   gravado um Talento sem Chave: quando o nome sozinho precisa decidir, a
+   prateleira que existia antes é a resposta mais provável. */
+const TALENTOS = [
+  ...ARQUETIPOS.flatMap(a =>
+    a.talentos.map(t => ({nome:t.nome, xp:t.xp, carga:t.carga, texto:t.texto, chave:a.nome}))),
+  ...TALENTOS_GERAIS.map(t => ({nome:t.nome, xp:t.xp, carga:t.carga, texto:t.texto, chave:CHAVE_GERAL}))
+];
 
 /* "Passo Curto" existe no Combatente Etéreo e no Infiltrado, com efeitos
    diferentes. Nome sozinho não identifica um Talento: a chave entra junto. */
@@ -1464,8 +1537,8 @@ const ATTR_LABEL = {corpo:"Corpo",raciocinio:"Raciocínio",espirito:"Espírito",
 const VIT_LEVELS = [
   {n:5,nome:"Saudável",pen:"Nenhuma"},
   {n:4,nome:"Machucado",pen:"Nenhuma"},
-  {n:3,nome:"Ferido",pen:"−1D em todos os testes",warn:true},
-  {n:2,nome:"Grav. Ferido",pen:"−2D em todos os testes",warn:true},
+  {n:3,nome:"Ferido",pen:"1D a menos em todos os testes",warn:true},
+  {n:2,nome:"Grav. Ferido",pen:"2D a menos em todos os testes",warn:true},
   {n:1,nome:"Inconsciente",pen:"Não pode agir",bad:true},
   {n:0,nome:"Morto",pen:"Fora da mesa",bad:true}
 ];
@@ -1480,14 +1553,16 @@ const LINHAGEM_STATS = {
 
 /* A Capacidade não se compra. Vem do estágio de Ascensão, e cada estágio
    custa uma Âncora. */
-const CAPACIDADE = {"Vislumbre":12,"Despertar":20,"Aclarado":30,"Iluminado":42};
+/* A trilha vertical tem cinco degraus, e o terceiro é o maior salto único
+   de Capacidade que existe — o estágio em que o corpo para de protestar. */
+const CAPACIDADE = {"Vislumbre":12,"Despertar":18,"Despertado":24,"Aclarado":32,"Iluminado":42};
 
-const CULTURAS = ["Teala","Hon-Ye","Mendro","Orian","Calem","Louina","Fainn","Alta Velana","Sila","Kalak","Veina","Sienna","Narsim","Terras Perdidas de Mireia"];
+const CULTURAS = ["Teala","Hon-Ye","Mendro","Orian","Calem","Louina","Fainn","Alta Velana","Kalak","Veina","Sienna","Narsim","Terras Perdidas de Mireia"];
 const ANTECEDENTES = ["Artista","Acadêmico","Amnésico","Atleta","Barra Pesada","Cientista","Especialista de Saúde","Investigador","Militar","Rústico","Técnico"];
 const LINHAGENS = ["Angelical (padrão)","Dracônico","Lunar","Bestial"];
 const AFILIACOES = ["O Olho","A Penumbra","Os Acorrentados","Mysteria","Guardiões da Árvore","Sociedade dos Ceifadores","O Coletivo","A Frente","Avulso"];
 const SELOS = ["Origem","Extinção","Controle","Pesadelo","Tormento","Causalidade"];
-const ASCENSAO = ["Vislumbre","Despertar","Aclarado","Iluminado"];
+const ASCENSAO = ["Vislumbre","Despertar","Despertado","Aclarado","Iluminado"];
 const PATRIMONIOS = {"Devedor":500,"Quebrado":1500,"Comum":4000,"Confortável":10000,"Herdeiro":20000};
 /* A Cifra sempre funciona. O que o Vínculo define é quanta Corrupção entra
    e o ND do Domínio que decide quanta fica. */
@@ -1497,7 +1572,7 @@ const VINCULOS = {
   "Alto": {nd:3, corr:3, falha:3, passa:2, xp:8, extra:"reduz 1, mínimo 1"}
 };
 const GATILHOS = ["Visão","Audição","Tato","Olfato","Paladar","Terceiro Olho"];
-const LAB_ESTAGIOS = ["—","Instável (Despertar)","Consolidado (Aclarado)","Absoluto (Iluminado)"];
+const LAB_ESTAGIOS = ["—","Instável (Despertar)","Sem colapso (Despertado)","Consolidado (Aclarado)","Absoluto (Iluminado)"];
 
 /* A Corrupção não tem tabela de estados própria. A escada é a proporção
    entre ela e o Limiar, e o Limiar vem da Linhagem — por isso o mesmo
@@ -1508,21 +1583,21 @@ const LAB_ESTAGIOS = ["—","Instável (Despertar)","Consolidado (Aclarado)","Ab
    um campo numérico ao lado da barra pedia que a mesma informação fosse
    lida em dois lugares e digitada num terceiro.
 
-   A Ativada não se clica: ela vem dos Talentos acesos e muda quando o
+   A Carga não se clica: ela vem dos Talentos acesos e muda quando o
    jogador acende ou apaga um. Por isso ocupa as casas seguintes com trama
    em vez de tinta cheia — está lá, conta contra o Limiar, mas quem manda
    nela é o painel de Talentos. */
 function celulasCorrupcao(c){
   const limiar = limiarDe(c);
   const assentada = Number(c.corrAssentada) || 0;
-  const ativada = ativadaDe(c);
+  const carga = cargaDe(c);
   return Array.from({length:limiar},(_,i) => {
     const v = i + 1;
     const faixa = v >= limiar ? "max" : v > 2*limiar/3 ? "hi" : v > limiar/3 ? "mid" : "";
     const estado = v <= assentada ? "assentada"
-                 : v <= assentada + ativada ? "ativada" : "";
-    const rotulo = estado === "ativada"
-      ? "Ativada " + v + " — vem de Talento aceso; clicar marca Assentada até aqui"
+                 : v <= assentada + carga ? "carga" : "";
+    const rotulo = estado === "carga"
+      ? "Carga " + v + " — vem de Talento aceso; clicar marca Assentada até aqui"
       : "Assentada " + v + (v === assentada ? " — clique para baixar" : "");
     return `<button class="corr-c ${estado} ${faixa}" data-corr="${v}"
       title="${esc(rotulo)}" aria-label="${esc(rotulo)}"></button>`;
@@ -1532,8 +1607,8 @@ function corrState(v, limiar){
   const L = limiar || 10;
   if(v<=0)      return {t:"Limpo",      d:"Nenhum efeito."};
   if(v<=L/3)    return {t:"Marcado",    d:"Aberrações te detectam com mais facilidade. Percepções começam a mudar."};
-  if(v<=2*L/3)  return {t:"Contaminado",d:"−1D em testes de Influência. Aberrações são atraídas por você. O Narrador pode introduzir complicações ligadas à sua presença."};
-  if(v< L)      return {t:"Corrompido", d:"Sinais físicos graves. −1D em testes de Espírito. O Narrador pode exigir testes para manter controle sob tensão."};
+  if(v<=2*L/3)  return {t:"Contaminado",d:"1D a menos em testes de Influência. Aberrações são atraídas por você. O Narrador pode introduzir complicações ligadas à sua presença."};
+  if(v< L)      return {t:"Corrompido", d:"Sinais físicos graves. 1D a menos em testes de Espírito. O Narrador pode exigir testes para manter controle sob tensão."};
   return {t:"Limiar", d:"O Narrador determina a consequência definitiva, conforme a sua Linhagem."};
 }
 
@@ -1548,16 +1623,16 @@ const limiarDe  = c => linStats(c).limiar;
 
 const capacidadeDe = c => CAPACIDADE[c.ascensao] || CAPACIDADE["Vislumbre"];
 
-/* Um Talento só pesa e só cobra Ativada enquanto estiver aceso. Os demais
+/* Um Talento só pesa e só cobra Carga enquanto estiver aceso. Os demais
    continuam na ficha, dormentes. */
 const talentosAtivos = c => (c.talentos || []).filter(t => t.ativo);
 const pesoUsado = c => talentosAtivos(c).reduce((s,t) => s + (Number(t.xp)||0), 0);
-const ativadaDe = c => talentosAtivos(c).reduce((s,t) => s + (Number(t.ativada)||0), 0);
+const cargaDe = c => talentosAtivos(c).reduce((s,t) => s + (Number(t.carga)||0), 0);
 
 /* Duas Corrupções, e as duas contam igual contra o Limiar. A Assentada é o
-   que ficou e só sai em Local Seguro ou no contato com uma Âncora. A Ativada
+   que ficou e só sai em Local Seguro ou no contato com uma Âncora. A Carga
    é o que você está carregando por escolha, e sai quando o Talento apaga. */
-const corrTotal = c => (Number(c.corrAssentada)||0) + ativadaDe(c);
+const corrTotal = c => (Number(c.corrAssentada)||0) + cargaDe(c);
 
 /* ---------- experiência ----------
    O gasto não é digitado: ele é a soma do que está na ficha. Todo Talento
@@ -1754,7 +1829,7 @@ function normalize(raw){
       corrente: !!x.corrente
     };
   });
-  /* Um Talento gravado antes da revisão não tem Peso nem Ativada. Quando o
+  /* Um Talento gravado antes da revisão não tem Peso nem Carga. Quando o
      nome ainda existe no livro novo, puxamos os números de lá; quando não,
      o que sobrou vira um Talento avulso de Peso 2, para o jogador ajustar
      em vez de perder a linha. */
@@ -1765,9 +1840,9 @@ function normalize(raw){
       nome:  str(x.nome),
       chave: str(x.chave) || (doLivro ? doLivro.chave : ""),
       xp:    clampNum(x.xp, 0, 99, doLivro ? doLivro.xp : 2),
-      /* "carga" era o nome anterior deste campo; fichas gravadas com ele
-         continuam abrindo. */
-      ativada: clampNum(x.ativada ?? x.carga, 0, 99, doLivro ? doLivro.ativada : 0),
+      /* "ativada" foi o nome deste campo por uma revisão; fichas gravadas
+         com ele continuam abrindo. */
+      carga: clampNum(x.carga ?? x.ativada, 0, 99, doLivro ? doLivro.carga : 0),
       texto: str(x.texto) || str(x.desc) || (doLivro ? doLivro.texto : ""),
       ativo: x.ativo === undefined ? true : !!x.ativo
     };
@@ -2063,7 +2138,7 @@ function renderSheet(){
       ${fieldSelect("Cultura","cultura",c.cultura,CULTURAS,true)}
       ${fieldSelect("Antecedente","antecedente",c.antecedente,ANTECEDENTES,true)}
       ${fieldSelect("Linhagem de Sangue","linhagem",c.linhagem,LINHAGENS)}
-      ${fieldSelect("Selo de Afinidade","selo",c.selo,SELOS,true)}
+      ${fieldSelect("Pilar de Afinidade","selo",c.selo,SELOS,true)}
       ${fieldSelect("Afiliação","afiliacao",c.afiliacao,AFILIACOES)}
       ${fieldSelect("Patrimônio","patrimonio",c.patrimonio,Object.keys(PATRIMONIOS))}
       ${fieldInput("Estre","estre",c.estre,"number")}
@@ -2188,7 +2263,7 @@ function renderSheet(){
           <button class="btn" data-add="talentos">+ Em branco</button>
         </div>
         <p class="hint">Talento ordinário não gera Corrupção nunca. Os que pedem alguma coisa a
-        alguém de fora têm Ativada, e ela ocupa Corrupção enquanto o Talento estiver aceso.</p>
+        alguém de fora têm Carga, e ela ocupa Corrupção enquanto o Talento estiver aceso.</p>
       </section>
 
       <section class="panel">
@@ -2199,7 +2274,7 @@ function renderSheet(){
         </div>
         <p class="hint" id="corrD">${corrState(corr,limiar).d}</p>
         <p class="hint">Clique para marcar a Assentada, que é o que ficou: sai em Local Seguro
-        ou no contato com uma Âncora. As casas em trama são a Ativada, que você não marca —
+        ou no contato com uma Âncora. As casas em trama são a Carga, que você não marca —
         ela vem dos Talentos acesos e some quando você apaga o Talento que a sustenta.</p>
 
         <div class="divider"></div>
@@ -2223,7 +2298,7 @@ function renderSheet(){
         </div>
         <p class="hint">A Cifra sempre funciona. A Corrupção entra no valor do Vínculo, e o teste de
         Domínio — Espírito + grau em Domínio contra o ND — decide quanto fica.
-        Três Cifras Correntes vêm da Cultura, do Antecedente e do Selo.</p>
+        Três Cifras Correntes vêm da Cultura, do Antecedente e do Pilar de Afinidade. Não têm Vínculo, não custam XP e não geram Corrupção.</p>
       </section>
 
       <section class="panel">
@@ -2250,7 +2325,7 @@ function renderSheet(){
       <section class="panel">
         <h2 class="panel-h">Labirinto Próprio</h2>
         <div class="grid-2">
-          ${fieldSelect("Selo do Domínio","lab.selo",c.lab.selo,SELOS,true)}
+          ${fieldSelect("Pilar do Domínio","lab.selo",c.lab.selo,SELOS,true)}
           ${fieldSelect("Estágio","lab.estagio",c.lab.estagio,LAB_ESTAGIOS)}
         </div>
         <div style="margin-top:9px">
@@ -2283,11 +2358,11 @@ function renderSheet(){
       <h2 class="panel-h">Inventário</h2>
       <div class="vol" id="volRow">
         <span>Volume em uso</span>
-        <span><b id="volUsed">0</b> / <b id="volCap">${c.attrs.corpo + 5}</b> · Corpo + 5</span>
+        <span><b id="volUsed">0</b> / <b id="volCap">${c.attrs.corpo + 4}</b> · Corpo + 4</span>
       </div>
       <div class="rows" id="listInventario"></div>
       <button class="btn add-row no-print" data-add="inventario">+ Adicionar Item</button>
-      <p class="hint">Máximo de quatro itens equipados por vez. Sobrecarga impõe −2D em Atletismo e Movimentação.</p>
+      <p class="hint">Máximo de quatro itens equipados por vez. Ultrapassando o Volume máximo você fica sobrecarregado: 2D a menos em Atletismo e Movimentação, 3 metros a menos em qualquer deslocamento, e um teste de Resistência ND 2 no início de cada cena de combate. Falhando, você começa a cena Caído.</p>
     </section>
    </div>
 
@@ -2352,7 +2427,7 @@ const LIST_CFG = {
       </div>
       <div class="row-meta">
         <select class="sel" data-path="cifras.${i}.selo" style="flex:1">
-          <option value="">Selo —</option>
+          <option value="">Pilar —</option>
           ${SELOS.map(s=>`<option${s===it.selo?" selected":""}>${s}</option>`).join("")}
         </select>
         <select class="sel" data-path="cifras.${i}.vinculo" data-vinc>
@@ -2372,12 +2447,17 @@ const LIST_CFG = {
         <input class="inp" data-path="cifras.${i}.gestos" value="${esc(it.gestos)}" placeholder="Gestos (Invocar · Criar · Sentir…)">
         <textarea class="txt cresce" rows="1" data-path="cifras.${i}.efeito" placeholder="Efeito da Cifra">${esc(it.efeito)}</textarea>
       </div>
-      ${(() => { const v = VINCULOS[it.vinculo] || VINCULOS["Baixo"];
+      ${(() => {
+        /* Uma Corrente não é endereçada a Pilar nenhum, e por isso não tem
+           interlocutor a convencer: não pede teste e não deixa Corrupção.
+           Mostrar o ND do Vínculo ao lado dela seria mentir na ficha. */
+        if(it.corrente) return `<p class="legenda">Sem Vínculo · sem Corrupção · sem teste</p>`;
+        const v = VINCULOS[it.vinculo] || VINCULOS["Baixo"];
         return `<p class="legenda">+${v.corr} Corr · ND ${v.nd} · retém ${v.falha}/${v.passa}</p>`; })()}`
   },
   talentos:{
     el:"listTalentos", vazio:"Nenhum talento adquirido.",
-    novo:() => ({id:uid(),nome:"",chave:"",xp:2,ativada:0,texto:"",ativo:true}),
+    novo:() => ({id:uid(),nome:"",chave:"",xp:2,carga:0,texto:"",ativo:true}),
     row:(it,i) => `
       <div class="row-top">
         <button class="acende${it.ativo?" on":""}" data-acende="${i}"
@@ -2392,8 +2472,8 @@ const LIST_CFG = {
           <input class="inp" type="number" min="0" data-path="talentos.${i}.xp" data-peso value="${it.xp}">
         </div>
         <div class="field" style="flex:none;width:70px">
-          <label>Ativada</label>
-          <input class="inp" type="number" min="0" data-path="talentos.${i}.ativada" data-peso value="${it.ativada}">
+          <label>Carga</label>
+          <input class="inp" type="number" min="0" data-path="talentos.${i}.carga" data-peso value="${it.carga}">
         </div>
         <div class="field" style="flex:1;min-width:0">
           <label>Chave</label>
@@ -2683,7 +2763,7 @@ function updateDerived(){
   const cs = corrState(corr, limiar);
   set("corrT",cs.t); set("corrV",corr); set("corrD",cs.d);
 
-  /* a barra é pequena e depende de três grandezas (Assentada, Ativada e
+  /* a barra é pequena e depende de três grandezas (Assentada, Carga e
      Limiar): redesenhá-la inteira custa menos que sincronizar classe a
      classe, e nunca sai do passo. */
   const bar = document.getElementById("corrBar");
@@ -2725,7 +2805,7 @@ function updateCapacidade(){
 function updateVolume(){
   const c = cur();
   const used = c.inventario.reduce((s,i) => s + (Number(i.volume)||0), 0);
-  const cap = c.attrs.corpo + 5;
+  const cap = c.attrs.corpo + 4;
   const u = document.getElementById("volUsed"), p = document.getElementById("volCap"), r = document.getElementById("volRow");
   if(u) u.textContent = used;
   if(p) p.textContent = cap;
@@ -2769,6 +2849,29 @@ function renderCompendio(){
      ficam abaixo, visíveis e fechadas. Ver o que existe atrás de uma porta
      que você não abriu faz parte de escolher qual porta abrir. */
   if(compAba === "talentos"){
+    /* A prateleira aberta vem antes de qualquer Arquétipo e nunca fecha:
+       ela não depende de modo de operar nenhum, e é a única que continua
+       comprável quando o jogador troca de Arquétipo. */
+    const gerais = TALENTOS_GERAIS.filter(t => casa(t.nome, t.texto, "Geral"));
+    if(gerais.length){
+      partes.push(`<div class="comp-grupo">Talentos Gerais · ${gerais.length} · prateleira aberta</div>`);
+      for(const t of gerais){
+        const ja = c.talentos.some(x => x.nome === t.nome && x.chave === CHAVE_GERAL);
+        partes.push(`
+          <div class="comp-item${ja?" ja":""}">
+            <div class="comp-cab">
+              <span class="comp-nome">${esc(t.nome)}</span>
+              <span class="tag">${t.xp} XP · Peso ${t.xp}</span>
+              ${t.carga ? `<span class="tag">Carga ${t.carga}</span>` : ""}
+              <button class="btn btn-xs" data-comp-add="talento"
+                data-nome="${esc(t.nome)}" data-chave="${esc(CHAVE_GERAL)}"
+                ${ja?" disabled":""}>${ja?"na ficha":"+ adicionar"}</button>
+            </div>
+            <div class="comp-txt">${esc(t.texto)}</div>
+          </div>`);
+      }
+    }
+
     const ordem = ARQUETIPOS.slice().sort((a,b) =>
       (b.nome === c.arquetipo) - (a.nome === c.arquetipo));
 
@@ -2784,7 +2887,7 @@ function renderCompendio(){
             <div class="comp-cab">
               <span class="comp-nome">${esc(t.nome)}</span>
               <span class="tag">${t.xp} XP · Peso ${t.xp}</span>
-              ${t.ativada ? `<span class="tag">Ativada ${t.ativada}</span>` : ""}
+              ${t.carga ? `<span class="tag">Carga ${t.carga}</span>` : ""}
               <button class="btn btn-xs" data-comp-add="talento"
                 data-nome="${esc(t.nome)}" data-chave="${esc(a.nome)}"
                 ${ja||!aberto?" disabled":""}>${ja?"na ficha":aberto?"+ adicionar":"outro Arquétipo"}</button>
@@ -2796,7 +2899,7 @@ function renderCompendio(){
   }
 
   if(compAba === "cifras"){
-    for(const selo of ["Universal","Origem","Extinção","Controle","Pesadelo","Tormento","Causalidade"]){
+    for(const selo of ["Corrente","Origem","Extinção","Controle","Pesadelo","Tormento","Causalidade"]){
       const itens = DADOS.cifras.filter(x => x.selo === selo && casa(x.nome, x.efeito, x.gestos, x.gatilho));
       if(!itens.length) continue;
       partes.push(`<div class="comp-grupo">${selo} · ${itens.length}</div>`);
@@ -2807,9 +2910,11 @@ function renderCompendio(){
           <div class="comp-item${ja?" ja":""}">
             <div class="comp-cab">
               <span class="comp-nome">${esc(f.nome)}</span>
-              <span class="tag">${esc(f.vinculo)}</span>
-              <span class="tag">${v.xp} XP</span>
-              <span class="tag">+${v.corr} Corr · ND ${v.nd} · retém ${v.falha}/${v.passa}</span>
+              ${f.corrente
+                ? `<span class="tag">Corrente</span><span class="tag">sem XP · sem Corrupção · sem teste</span>`
+                : `<span class="tag">${esc(f.vinculo)}</span>
+                   <span class="tag">${v.xp} XP</span>
+                   <span class="tag">+${v.corr} Corr · ND ${v.nd} · retém ${v.falha}/${v.passa}</span>`}
               <button class="btn btn-xs" data-comp-add="cifra" data-nome="${esc(f.nome)}"${ja?" disabled":""}>${ja?"na ficha":"+ adicionar"}</button>
             </div>
             <div class="comp-txt">${esc(f.efeito)}</div>
@@ -2838,7 +2943,7 @@ function renderCompendio(){
             <div class="comp-txt"><b>Forma de operar.</b> ${esc(a.forma)}</div>
             <div class="comp-txt"><b>O que ele não faz.</b> ${esc(a.naoFaz)}</div>
             <div class="conc-de" style="margin-top:5px">${a.talentos.map(t =>
-              esc(t.nome) + " " + t.xp + (t.ativada ? "/" + t.ativada : "")).join(" · ")}</div>
+              esc(t.nome) + " " + t.xp + (t.carga ? "/" + t.carga : "")).join(" · ")}</div>
           </div>`);
       }
     }
@@ -2855,17 +2960,20 @@ function adicionaDoLivro(tipo, nome, chave){
     /* Entra aceso se ainda couber na Capacidade. Passar do teto não é a ficha
        que decide, mas ela também não empurra ninguém para lá sem avisar. */
     const cabe = pesoUsado(c) + t.xp <= capacidadeDe(c);
-    c.talentos.push({ id:uid(), nome:t.nome, chave:t.chave, xp:t.xp, ativada:t.ativada, texto:t.texto, ativo:cabe });
+    c.talentos.push({ id:uid(), nome:t.nome, chave:t.chave, xp:t.xp, carga:t.carga, texto:t.texto, ativo:cabe });
     renderList("talentos");
     updateDerived();
     if(!cabe) toast(`"${nome}" entrou dormente: não cabe na Capacidade.`, 4500);
   }
   if(tipo === "cifra"){
     const f = DADOS.cifras.find(x => x.nome === nome); if(!f) return;
+    /* Corrente não é endereçada a Pilar nenhum, e é por isso que não custa
+       XP: não existe ninguém do outro lado a ser convencido a atender. */
     c.cifras.push({
-      id:uid(), nome:f.nome, selo: f.selo === "Universal" ? "" : f.selo, vinculo:f.vinculo,
+      id:uid(), nome:f.nome, selo: f.corrente ? "" : f.selo, vinculo:f.vinculo,
       gatilho:f.gatilho, gestos:f.gestos, efeito:f.efeito,
-      xp:(VINCULOS[f.vinculo] || VINCULOS["Baixo"]).xp, corrente:false
+      xp: f.corrente ? 0 : (VINCULOS[f.vinculo] || VINCULOS["Baixo"]).xp,
+      corrente: !!f.corrente
     });
     renderList("cifras");
     updateDerived();
@@ -2875,7 +2983,11 @@ function adicionaDoLivro(tipo, nome, chave){
   if(tipo === "arquetipo"){
     const a = ARQUETIPOS.find(x => x.nome === nome); if(!a) return;
     c.arquetipo = a.nome;
-    c.talentos.forEach(t => { if(t.chave && t.chave !== a.nome) t.ativo = false; });
+    /* A prateleira aberta não dorme junto: um Talento Geral não foi
+       destravado por Arquétipo nenhum, então não se apaga com a troca. */
+    c.talentos.forEach(t => {
+      if(t.chave && t.chave !== a.nome && t.chave !== CHAVE_GERAL) t.ativo = false;
+    });
     save();
     renderSheet();
     renderCompendio();
