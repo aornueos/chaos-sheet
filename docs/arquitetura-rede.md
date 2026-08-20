@@ -11,7 +11,7 @@ mesa é, quem pode ler e quem pode escrever.
 
 Isso não é preguiça, é o requisito mais forte do projeto. Só nesta semana o
 sistema perdeu Essência, ganhou Limiar, trocou Especializações por Arquétipos,
-renomeou Carga para Ativada e removeu as Resistências. Se o banco tivesse
+renomeou Carga para Ativada, depois de volta para Carga, e removeu as Resistências. Se o banco tivesse
 colunas `essencia_atual` ou `corrupcao_recente`, cada uma dessas mudanças
 viraria migração de schema, deploy coordenado e fichas velhas quebradas em
 produção.

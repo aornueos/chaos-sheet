@@ -11,10 +11,12 @@ navegador ou endereço para outro.
 ## Recursos
 
 - Múltiplas fichas, com Vitalidade e Limiar vindos da Linhagem
-- Corrupção como recurso único — Assentada e Ativada somadas contra o Limiar
-- Capacidade por estágio de Ascensão, com Talentos que se acendem e apagam
+- Corrupção como recurso único — Assentada e Carga somadas contra o Limiar
+- Capacidade por estágio de Ascensão — cinco degraus, de Vislumbre a Iluminado — com Talentos que se acendem e apagam
 - XP com gasto automático: cada Talento e cada Cifra desconta o próprio custo
-- Compêndio dos doze Arquétipos e das prateleiras de Talentos de cada um
+- Compêndio dos doze Arquétipos, das prateleiras de Talentos de cada um e da
+  prateleira aberta dos Talentos Gerais, que qualquer Ascendido compra
+- Cifras Correntes separadas das Catalogadas: sem Vínculo, sem XP e sem Corrupção
 - Exportação em PDF preto e branco, A4 paisagem
 - Lixeira com desfazer, backup completo e importação que nunca substitui
 
@@ -22,13 +24,14 @@ navegador ou endereço para outro.
 
 Abrem normalmente. A Especialização escolhida vira o Arquétipo de mesmo nome,
 a Corrupção que existia entra como Assentada, e os Talentos que ainda constam
-no livro recuperam Peso e Ativada sozinhos. As Cifras herdam o custo em XP do
+no livro recuperam Peso e Carga sozinhos. As Cifras herdam o custo em XP do
 próprio Vínculo. Essência, Resistência Física e Resistência Espiritual não são
 convertidas: saíram do sistema.
 
 ## Custo das Cifras em XP
 
-Aprender custa pelo Vínculo: **Baixo 2, Médio 4, Alto 8**. O campo é editável
+Correntes não custam nada: não são endereçadas a Pilar nenhum, então não há
+interlocutor a convencer. Catalogadas custam pelo Vínculo: **Baixo 2, Médio 4, Alto 8**. O campo é editável
 linha a linha para os casos fora da tabela. Para mudar o padrão, ajuste `xp`
 em `VINCULOS`, no topo do script.
 
