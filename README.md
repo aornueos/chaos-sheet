@@ -35,8 +35,51 @@ interlocutor a convencer. Catalogadas custam pelo Vínculo: **Baixo 2, Médio 4,
 linha a linha para os casos fora da tabela. Para mudar o padrão, ajuste `xp`
 em `VINCULOS`, no topo do script.
 
+## Direção de arte
+
+Fanzine gótico ocultista. A regra é a do zine de verdade: **duas tintas**.
+Papel osso e tinta preta, mais **uma tinta especial** que muda conforme a
+Afiliação. Nada além disso entra — o que parece cor é trama, meio-tom ou
+impressão fora de registro.
+
+A mesa é preta. Os painéis são recortes de papel colados sobre ela, tortos,
+rasgados na base e presos com fita crepe. O cabeçalho é a capa: fundo preto,
+manchete chapada em condensada, selo da casa por trás e carimbo de borracha
+por cima.
+
+Texto de leitura é sempre tinta sobre papel, ou papel sobre preto. A tinta
+especial preenche, sublinha e carimba, mas nunca vira corpo de texto — é
+assim que as nove casas trocam de cor sem que nenhuma perca contraste.
+
+## As nove casas
+
+Trocar a Afiliação reimprime o dossiê inteiro: papel, tinta, trama, selo,
+carimbo e as palavras do cabeçalho.
+
+| Afiliação | Gráfica |
+| --- | --- |
+| O Olho | Noir: preto e branco de filme, luz de persiana, prata fria, sombra dura |
+| A Penumbra | Tribal: ocre de terra queimada, galões, zigue-zague e fileira de pontos |
+| Os Acorrentados | Cristã: ouro de vela, cruz e elo, filete duplo de missal |
+| O Coletivo | Jornalística: papel-jornal, filete de coluna, retícula, vermelho de última hora |
+| A Frente | Militar: verde-oliva, estêncil com as pontes da chapa, tarja de censura |
+| Mysteria | CRT de MS-DOS: só fósforo verde, varredura, barra de sincronia e cursor piscando |
+| Sociedade dos Ceifadores | Corvos: preto de pena com brilho de óleo, hachura de barbas |
+| Guardiões da Árvore | Herbário: magenta de orquídea, desenho botânico a bico de pena |
+| Avulso | Nenhuma gráfica cuida deste: o zine cru, mais sujo e mais torto |
+
+Toda a gráfica vive no CSS, em `[data-afiliacao="…"]`. O script só escreve o
+atributo na raiz e escolhe as palavras do cabeçalho, então acrescentar uma
+casa é escrever um bloco de variáveis — não um componente novo.
+
 ## Tipografia
 
 Courier Prime embutida no arquivo sob a
 [SIL Open Font License 1.1](https://scripts.sil.org/OFL),
 para que a ficha tenha a mesma aparência em qualquer máquina.
+
+Nas manchetes entra uma condensada pesada de sistema (Impact e seus
+substitutos). Ela não vai embutida: onde não existir, a pilha cai para outra
+condensada e o zine continua de pé. No PDF a ficha volta a ser inteiramente
+datilografada, porque um documento que sai diferente em cada computador não
+serve como documento.
