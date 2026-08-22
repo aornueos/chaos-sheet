@@ -17,6 +17,8 @@ navegador ou endereço para outro.
 - Compêndio dos doze Arquétipos, das prateleiras de Talentos de cada um e da
   prateleira aberta dos Talentos Gerais, que qualquer Ascendido compra
 - Cifras Correntes separadas das Catalogadas: sem Vínculo, sem XP e sem Corrupção
+- Compêndio das noventa Cifras por Pilar — quinze em cada, sete de Vínculo Baixo,
+  cinco de Médio e três de Alto — com Sigilos, gatilho e o efeito por inteiro
 - Exportação em PDF preto e branco, A4 paisagem
 - Lixeira com desfazer, backup completo e importação que nunca substitui
 
@@ -31,6 +33,16 @@ convertidas: saíram do sistema.
 O jogo se chamava **Caos Eminente**, e as fichas gravadas sob aquele nome mudam
 de lugar sozinhas na primeira vez que a página abre. Nada precisa ser
 reimportado, e nada é apagado antes de a cópia nova existir.
+
+## Ativa ou Passiva
+
+Uma Cifra **Ativa** resolve no momento em que é conjurada e acaba. Uma **Passiva**
+se instala e continua funcionando sozinha pelo tempo indicado. As duas custam Ação
+Padrão, as duas exigem teste de Domínio e as duas retêm Corrupção conforme o
+Vínculo: a diferença é só quanto tempo a Cifra fica de pé.
+
+Cifra gravada antes deste capítulo abre com o campo em branco, para o jogador
+dizer qual é, em vez de a ficha chutar por ele.
 
 ## Custo das Cifras em XP
 
