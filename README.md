@@ -1,6 +1,6 @@
-# Caos Eminente — Ficha do Ascendido
+# Devaneio — Ficha do Ascendido
 
-Ficha de personagem para o RPG **Caos Eminente**, na revisão de sistema que
+Ficha de personagem para o RPG **Devaneio**, na revisão de sistema que
 trouxe Linhagem, Corrupção, Arquétipos e Capacidade.
 
 Arquivo único, sem servidor e sem dependências. As fichas ficam salvas
@@ -28,12 +28,29 @@ no livro recuperam Peso e Carga sozinhos. As Cifras herdam o custo em XP do
 próprio Vínculo. Essência, Resistência Física e Resistência Espiritual não são
 convertidas: saíram do sistema.
 
+O jogo se chamava **Caos Eminente**, e as fichas gravadas sob aquele nome mudam
+de lugar sozinhas na primeira vez que a página abre. Nada precisa ser
+reimportado, e nada é apagado antes de a cópia nova existir.
+
 ## Custo das Cifras em XP
 
 Correntes não custam nada: não são endereçadas a Pilar nenhum, então não há
 interlocutor a convencer. Catalogadas custam pelo Vínculo: **Baixo 2, Médio 4, Alto 8**. O campo é editável
 linha a linha para os casos fora da tabela. Para mudar o padrão, ajuste `xp`
 em `VINCULOS`, no topo do script.
+
+## Ordem dos painéis
+
+A folha é uma sequência só, repartida em três colunas de fluxo: o navegador
+escolhe onde cortar de acordo com a altura, para que nenhuma coluna fique com
+4500px ao lado de outra com 900px. Por isso um painel não pertence a uma
+coluna — ele muda de coluna quando a ficha cresce, quando a janela muda de
+largura ou quando a estilização muda as alturas.
+
+O que é garantido é a **ordem de leitura**, e ela é a ordem do arquivo: quem
+você é, como você está, o que você gasta, o que você pode e o que te prende.
+Vitalidade e Corrupção são a mesma pergunta feita de dois lados, então vêm uma
+atrás da outra e são proibidas de cair em colunas diferentes.
 
 ## Direção de arte
 
