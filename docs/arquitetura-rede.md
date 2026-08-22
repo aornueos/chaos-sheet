@@ -5,7 +5,7 @@ na mesma mesa, sem perder o que já funciona.
 
 ## A decisão que sustenta todas as outras
 
-**O servidor nunca entende as regras de Caos Eminente.** Ele guarda uma ficha
+**O servidor nunca entende as regras de Devaneio.** Ele guarda uma ficha
 como um bloco de JSON opaco e sabe apenas quatro coisas: de quem é, de que
 mesa é, quem pode ler e quem pode escrever.
 
