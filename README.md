@@ -51,18 +51,29 @@ interlocutor a convencer. Catalogadas custam pelo Vínculo: **Baixo 2, Médio 4,
 linha a linha para os casos fora da tabela. Para mudar o padrão, ajuste `xp`
 em `VINCULOS`, no topo do script.
 
-## Ordem dos painéis
+## Disposição
 
-A folha é uma sequência só, repartida em três colunas de fluxo: o navegador
-escolhe onde cortar de acordo com a altura, para que nenhuma coluna fique com
-4500px ao lado de outra com 900px. Por isso um painel não pertence a uma
-coluna — ele muda de coluna quando a ficha cresce, quando a janela muda de
-largura ou quando a estilização muda as alturas.
+**Atributos, Vitalidade, Corrupção e Perícias ficam sempre no alto**, numa
+grade própria acima do resto. É o que se toca a sessão inteira, e não entra no
+fluxo: em qualquer largura e em qualquer arranjo está no mesmo lugar. Perícias
+toma a linha inteira e reparte os quatro grupos em colunas, em vez de virar uma
+tira alta e estreita.
 
-O que é garantido é a **ordem de leitura**, e ela é a ordem do arquivo: quem
-você é, como você está, o que você gasta, o que você pode e o que te prende.
-Vitalidade e Corrupção são a mesma pergunta feita de dois lados, então vêm uma
-atrás da outra e são proibidas de cair em colunas diferentes.
+O resto desce em colunas de fluxo, onde o navegador escolhe o corte pela
+altura para que nenhuma coluna fique com 4500px ao lado de outra com 900px.
+Ali um painel muda mesmo de coluna conforme a ficha cresce; o que é garantido
+é a ordem de leitura: o que você gasta, o que você pode e o que te prende.
+
+## Arranjo
+
+Botão na gaveta, três posições: **normal**, **mais na tela** e **menos na
+tela**. Muda espaçamento, corpo de texto e quantas colunas abrem — em tudo,
+inclusive nas Perícias e na faixa de cima. A escolha fica gravada por aparelho.
+
+Nenhum componente sabe que isso existe: o botão troca um atributo na raiz, e
+todo o resto lê `--gap`, `--pad-*` e as larguras mínimas de coluna. As colunas
+são declaradas por **largura mínima**, não por contagem, então o navegador abre
+quantas couberem e nunca espreme uma perícia até o nome sumir.
 
 ## Direção de arte
 
@@ -89,7 +100,7 @@ carimbo e as palavras do cabeçalho.
 | --- | --- |
 | O Olho | Noir: preto e branco de filme, luz de persiana, prata fria, sombra dura |
 | A Penumbra | Tribal: ocre de terra queimada, galões, zigue-zague e fileira de pontos |
-| Os Acorrentados | Cristã: ouro de vela, cruz e elo, filete duplo de missal |
+| Os Acorrentados | Ferro e elo: bronze oxidado, malha de corrente, braçadeira rebitada |
 | O Coletivo | Jornalística: papel-jornal, filete de coluna, retícula, vermelho de última hora |
 | A Frente | Militar: verde-oliva, estêncil com as pontes da chapa, tarja de censura |
 | Mysteria | CRT de MS-DOS: só fósforo verde, varredura, barra de sincronia e cursor piscando |

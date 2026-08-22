@@ -68,6 +68,16 @@
   --corr:0;                /* 0..1 — quanto o papel já apodreceu */
   --grain:.075;
 
+  /* ---------- arranjo ----------
+     Quanta ficha cabe na tela é escolha de quem joga: quem quer tudo à
+     vista aperta, quem quer respiro afrouxa. Todo espaçamento e toda
+     contagem de coluna saem daqui, então o botão da gaveta muda um
+     atributo e a folha inteira se reorganiza sozinha. */
+  --gap:22px;              /* distância entre um recorte e outro */
+  --pad-x:17px;            /* respiro lateral dentro do recorte */
+  --pad-topo:26px;         /* a faixa de papel onde a fita é colada */
+  --pad-base:20px;
+
   --fs-xs:11px;
   --fs-sm:12px;
   --fs-base:14px;
@@ -111,6 +121,33 @@
   /* régua da Afiliação: o traço com que ela separa as coisas */
   --fac-regua:repeating-linear-gradient(90deg,currentColor 0 7px,transparent 7px 11px);
   --fac-inclina:1;         /* multiplicador da bagunça dos recortes */
+}
+
+/* ---------- as três densidades ----------
+   Só mudam medida e contagem de coluna. Nenhum componente sabe que
+   isto existe: todos leem --gap, --pad-* e --colunas. */
+:root[data-densidade="apertado"]{
+  --gap:13px; --pad-x:12px; --pad-topo:20px; --pad-base:13px;
+  --fs-xs:10px; --fs-sm:11px; --fs-base:13px; --fs-lg:15px; --fs-2xl:32px;
+}
+:root[data-densidade="espacoso"]{
+  --gap:32px; --pad-x:23px; --pad-topo:32px; --pad-base:28px;
+  --fs-xs:12px; --fs-sm:13px; --fs-base:15px; --fs-lg:17px; --fs-2xl:44px;
+}
+
+/* Colunas por densidade e por largura. As duas coisas se cruzam, e por
+   isso cada faixa de tela repete os três seletores: um :root simples
+   perderia para o :root[data-densidade] declarado antes. */
+:root                            {--col-min:300px; --colunas:3; --topo-min:300px; --sk-min:230px}
+:root[data-densidade="apertado"] {--col-min:250px; --colunas:4; --topo-min:255px; --sk-min:205px}
+:root[data-densidade="espacoso"] {--col-min:380px; --colunas:2; --topo-min:365px; --sk-min:265px}
+
+/* Com o dedo, o pip tem 26px em vez de 13: a linha da perícia precisa
+   de mais de cem pixels a mais, e sem isto o nome sumia. */
+@media (pointer:coarse){
+  :root                            {--sk-min:295px}
+  :root[data-densidade="apertado"] {--sk-min:275px}
+  :root[data-densidade="espacoso"] {--sk-min:320px}
 }
 
 *{box-sizing:border-box}
@@ -394,13 +431,30 @@ body{
    colunas são de fluxo: o navegador reparte os painéis na ordem
    em que estão e iguala as alturas sozinho.
    ============================================================ */
-.cols{columns:3;column-gap:22px}
-.stack{display:contents}
-.cols > .stack > .panel{break-inside:avoid;margin-bottom:22px}
-/* Vitalidade e Corrupção são a mesma pergunta feita de dois lados: o que
-   o corpo aguenta e o que a alma já perdeu. O corte entre colunas não
-   pode cair entre as duas — se não couberem juntas, descem juntas. */
-.panel-cola{break-after:avoid}
+/* ---------- mesa de cabeceira ----------
+   Atributos, Vitalidade, Corrupção e Perícias não entram no fluxo. Ficam
+   numa grade própria, no alto, e por isso estão sempre no mesmo lugar —
+   em qualquer largura e em qualquer densidade. Vitalidade e Corrupção são
+   a mesma pergunta feita de dois lados, e agora nem o corte de coluna
+   consegue separá-las: não existe corte aqui. */
+.topo{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,var(--topo-min)),1fr));
+  gap:var(--gap);
+  margin-bottom:var(--gap);
+  align-items:start;
+}
+/* Perícias é lista, não medidor: toma a linha inteira e reparte os
+   quatro grupos em colunas, em vez de virar uma tira alta e estreita. */
+.topo > .panel:last-child{grid-column:1/-1}
+.sk-cols{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,var(--sk-min)),1fr));
+  gap:14px 22px;
+}
+
+.cols{columns:var(--col-min) var(--colunas);column-gap:var(--gap)}
+.cols > .panel{break-inside:avoid;margin-bottom:var(--gap)}
 
 /* ---------- o recorte de papel ---------- */
 .panel{
@@ -412,7 +466,7 @@ body{
   background:var(--paper);
   color:var(--ink);
   border:none;
-  padding:26px 17px 20px;
+  padding:var(--pad-topo) var(--pad-x) var(--pad-base);
   box-shadow:0 10px 26px rgba(0,0,0,.55);
   /* fibra do papel: dá volume sem virar textura de fundo de tela */
   background-image:
@@ -443,7 +497,7 @@ body{
 /* ---------- título do painel: tarja preta colada por cima ---------- */
 .panel-h{
   display:flex;align-items:center;gap:9px;
-  margin:0 -17px 15px -21px;
+  margin:0 calc(var(--pad-x) * -1) 15px calc(var(--pad-x) * -1 - 4px);
   padding:8px 14px 7px 15px;
   background:var(--ink);color:var(--paper);
   font-family:var(--display);font-weight:400;
@@ -566,7 +620,7 @@ body{
 /* ============================================================
    PERÍCIAS — a lista datilografada com quadradinhos de tinta
    ============================================================ */
-.sk-group + .sk-group{margin-top:13px}
+.sk-cols > .sk-group + .sk-group{margin-top:0}
 .sk-head{
   font-size:9px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;
   background:var(--fg);color:var(--bg);
@@ -893,23 +947,35 @@ body{
   background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.13) 0 4px,transparent 4px 8px);
 }
 
-/* ---- OS ACORRENTADOS · cristão ----
-   Ouro de vela, cruz e elo. A tarja do título ganha filete duplo,
-   como página de missal. */
+/* ---- OS ACORRENTADOS · ferro e elo ----
+   Não é ordem religiosa: é gente presa a um vínculo que não se rompe.
+   O motivo é a corrente — algema, elo, malha — em bronze oxidado, e a
+   fita que segura cada recorte vira uma braçadeira de metal rebitada.
+   Nenhuma cruz: o que prende aqui é ferro, não fé. */
 [data-afiliacao="Os Acorrentados"]{
-  --spot:#c8a03c; --spot-hi:#efd490; --spot-lo:#6f5410;
-  --paper:#e9e2cc; --paper-2:#dbd2b7; --paper-3:#c6ba99;
+  --spot:#a8763a; --spot-hi:#dfae72; --spot-lo:#573716;
+  --paper:#e5ded0; --paper-2:#d5ccbb; --paper-3:#bdb3a0;
+  /* malha de elos: duas grades de anéis, uma deslocada sobre a outra */
   --fac-tex:
-    repeating-linear-gradient(90deg,rgba(231,225,209,.4) 0 2px,transparent 2px 34px),
-    radial-gradient(circle at 50% 100%,rgba(231,225,209,.42) 0 12%,transparent 13%);
-  --fac-tex-size:auto,34px 58px;
-  --fac-tex-op:.24;
-  --fac-regua:repeating-linear-gradient(90deg,currentColor 0 2px,transparent 2px 5px,currentColor 5px 11px,transparent 11px 14px);
-  --fac-selo:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M42 2h16v26h26v16H58v56H42V44H16V28h26z' fill='%23000'/><g fill='none' stroke='%23000' stroke-width='5'><ellipse cx='30' cy='84' rx='13' ry='8'/><ellipse cx='70' cy='84' rx='13' ry='8'/></g></svg>");
-  --fac-marca:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M9.6 1h4.8v6.6H21v4.8h-6.6V23H9.6V12.4H3V7.6h6.6z' fill='%23000'/></svg>");
+    radial-gradient(circle at 50% 50%,transparent 0 26%,rgba(231,225,209,.5) 27% 37%,transparent 38%),
+    radial-gradient(circle at 0% 50%,transparent 0 26%,rgba(231,225,209,.5) 27% 37%,transparent 38%);
+  --fac-tex-size:28px 28px,28px 28px;
+  --fac-tex-op:.26;
+  /* a régua do título é uma corrente vista de lado */
+  --fac-regua:repeating-linear-gradient(90deg,currentColor 0 11px,transparent 11px 15px);
+  --fac-selo:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='none' stroke='%23000' stroke-width='8'><ellipse cx='50' cy='17' rx='12' ry='16'/><ellipse cx='50' cy='40' rx='17' ry='11'/><ellipse cx='50' cy='63' rx='12' ry='16'/><ellipse cx='50' cy='86' rx='17' ry='11'/></g></svg>");
+  --fac-marca:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='3'><ellipse cx='12' cy='7' rx='5' ry='6'/><ellipse cx='12' cy='17.5' rx='5' ry='6'/></g></svg>");
   --fac-inclina:.7;
 }
-[data-afiliacao="Os Acorrentados"] .panel-h{border-bottom:3px double var(--spot)}
+/* braçadeira rebitada no lugar da fita crepe */
+[data-afiliacao="Os Acorrentados"] .panel::before{
+  height:15px;top:-8px;
+  background:
+    radial-gradient(circle at 13px 7px,rgba(0,0,0,.5) 0 2px,transparent 3px),
+    radial-gradient(circle at 63px 7px,rgba(0,0,0,.5) 0 2px,transparent 3px),
+    linear-gradient(180deg,color-mix(in srgb,var(--spot-hi) 80%,transparent) 0%,color-mix(in srgb,var(--spot-lo) 70%,transparent) 100%);
+  border:none;
+}
 
 /* ---- O COLETIVO · jornalistas ----
    Papel-jornal, filete de coluna, retícula de foto e tinta de
@@ -990,7 +1056,7 @@ body{
 [data-afiliacao="Mysteria"] .panel::before,
 [data-afiliacao="Mysteria"] .panel::after{display:none}
 [data-afiliacao="Mysteria"] .panel-h{
-  background:#39ff7a;color:#000200;margin:0 -17px 15px;padding:6px 12px 5px;
+  background:#39ff7a;color:#000200;margin:0 calc(var(--pad-x) * -1) 15px;padding:6px 12px 5px;
 }
 [data-afiliacao="Mysteria"] .panel-h .h-note,
 [data-afiliacao="Mysteria"] .ajuda{color:#000200;border-color:#000200}
@@ -1126,12 +1192,12 @@ body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn,.attr,.panel-h{
 }
 .masthead{animation:assenta .42s cubic-bezier(.2,.8,.3,1) backwards;--torto:0deg}
 /* alterna o lado da inclinação para não parecer baralho enfileirado */
-.stack .panel:nth-child(6n+1){--queda:-.55deg}
-.stack .panel:nth-child(6n+2){--queda:.42deg}
-.stack .panel:nth-child(6n+3){--queda:-.3deg}
-.stack .panel:nth-child(6n+4){--queda:.6deg}
-.stack .panel:nth-child(6n+5){--queda:-.45deg}
-.stack .panel:nth-child(6n+6){--queda:.35deg}
+.topo > .panel:nth-child(6n+1),.cols > .panel:nth-child(6n+1){--queda:-.55deg}
+.topo > .panel:nth-child(6n+2),.cols > .panel:nth-child(6n+2){--queda:.42deg}
+.topo > .panel:nth-child(6n+3),.cols > .panel:nth-child(6n+3){--queda:-.3deg}
+.topo > .panel:nth-child(6n+4),.cols > .panel:nth-child(6n+4){--queda:.6deg}
+.topo > .panel:nth-child(6n+5),.cols > .panel:nth-child(6n+5){--queda:-.45deg}
+.topo > .panel:nth-child(6n+6),.cols > .panel:nth-child(6n+6){--queda:.35deg}
 
 /* a tarja de cima da capa é impressa na hora */
 @media screen and (min-width:681px){
@@ -1296,8 +1362,10 @@ body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn,.attr,.panel-h{
      página e depois transbordam. Aqui volta a ser grade, com cada painel
      como item próprio, preenchendo as páginas na ordem em que aparece. */
   .cols{display:grid;columns:auto;grid-template-columns:1fr 1fr 1fr;gap:7pt;align-items:start}
-  .stack{display:contents}
-  .cols > .stack > .panel{margin-bottom:0}
+  .cols > .panel{margin-bottom:0}
+  /* a faixa de cima imprime como está na tela, e Perícias abre em quatro */
+  .topo{grid-template-columns:1fr 1fr 1fr;gap:7pt;margin-bottom:7pt}
+  .sk-cols{grid-template-columns:1fr 1fr 1fr 1fr;gap:4pt 8pt}
 
   /* Painel comprido não cabe numa coluna de um terço sem virar uma tira
      estreita e altíssima: ele toma a largura inteira e quebra na vertical,
@@ -1357,7 +1425,6 @@ body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn,.attr,.panel-h{
    As pilhas se dissolvem e cada painel entra na coluna por conta
    própria, preenchendo as duas na ordem em que aparece. */
 @media screen and (max-width:1180px){
-  .cols{columns:2}
   .fac-selo{width:210px;height:210px}
 }
 
@@ -1388,10 +1455,11 @@ body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn,.attr,.panel-h{
   :root{--fs-2xl:28px}
 
   .sheet{padding:14px 12px 56px}
-  .cols{columns:1}
-  .cols > .stack > .panel{margin-bottom:17px}
-  .panel{padding:22px 13px 18px}
-  .panel-h{margin:0 -13px 13px -16px}
+  /* Numa coluna só, a faixa de cima continua sendo a faixa de cima: é a
+     ordem do documento que garante isso, não a grade. */
+  :root                            {--gap:17px; --pad-x:13px; --pad-topo:22px; --pad-base:18px}
+  :root[data-densidade="apertado"] {--gap:11px; --pad-x:10px; --pad-topo:18px; --pad-base:12px}
+  :root[data-densidade="espacoso"] {--gap:24px; --pad-x:16px; --pad-topo:26px; --pad-base:22px}
   .fac-selo{width:150px;height:150px;right:-40px}
 
   /* cabeçalho: o retrato fixo espremia todo o resto */
@@ -1496,6 +1564,7 @@ body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn,.attr,.panel-h{
 
     <div class="drawer-foot">
       <div class="save-state" id="saveState" data-state="salvo">salvo</div>
+      <button class="btn" id="btnArranjo">Arranjo: normal</button>
       <button class="btn" id="btnMotion">Efeitos: automático</button>
       <button class="btn btn-brass" id="btnNew">+ Nova Ficha</button>
       <button class="btn" id="btnDup">Duplicar</button>
@@ -2471,246 +2540,246 @@ function renderSheet(){
        te prende. As divisões em .stack sobraram do desenho em grade e
        hoje não separam nada — o corte entre colunas é escolhido pela
        altura, não por elas. -->
-  <div class="cols">
-
-    <div class="stack">
-      <section class="panel">
-        <h2 class="panel-h">Atributos <span class="h-note">D6 por ponto</span></h2>
-        <div class="attrs">
-          ${Object.keys(ATTR_LABEL).map(k => `
-            <div class="attr">
-              <div class="attr-n">${ATTR_LABEL[k]}</div>
-              <input class="attr-v" type="number" min="1" max="5" data-path="attrs.${k}" data-attr value="${c.attrs[k]}">
-              <div class="attr-d">${c.attrs[k]}D6</div>
-            </div>`).join("")}
-        </div>
-        <p class="hint">Criação: todos começam em 1, distribua 4 pontos, nenhum acima de 3.
-        Limite sobe para 4 no Despertar e 5 no Aclarado.</p>
-      </section>
-
-      <section class="panel">
-        <h2 class="panel-h">Perícias <span class="h-note">Grau 1–4</span></h2>
-        ${Object.keys(SKILLS).map(attr => `
-          <div class="sk-group">
-            <div class="sk-head"><span>${ATTR_LABEL[attr]}</span><span>pool</span></div>
-            ${SKILLS[attr].map(s => {
-              const g = c.skills[s] || 0;
-              return `<div class="sk${g?" has-grade":""}" data-skill-row="${esc(s)}">
-                <span class="sk-name">${s}</span>
-                <span class="pips">${[1,2,3,4].map(i =>
-                  `<button class="pip${i<=g?" on":""}" data-skill="${esc(s)}" data-grade="${i}"
-                    title="Grau ${i}" aria-label="${s} grau ${i}"></button>`).join("")}</span>
-                <span class="sk-pool" data-pool="${esc(s)}" data-attr-of="${attr}">${c.attrs[attr]+g}D6</span>
-              </div>`;
-            }).join("")}
-          </div>`).join("")}
-        <p class="hint">Clique no mesmo grau para zerar. Pool = atributo + grau. Sucesso em 4+; 1 é Terrível.</p>
-      </section>
-    </div>
-
-    <div class="stack">
-      <section class="panel panel-cola">
-        <h2 class="panel-h">Estado</h2>
-
-        <div class="track">
-          <div class="track-top">
-            <span class="track-name">Vitalidade</span>
-            <span class="track-max">máx <b id="vitMax">${vitMax}</b> · da Linhagem</span>
-          </div>
-          <div class="levels">
-            ${VIT_LEVELS.map(l => `<button class="lvl vit${l.warn?" warn":""}${l.bad?" bad":""}${c.vitLvl===l.n?" on":""}"
-              data-vit="${l.n}" title="${esc(l.pen)}">${l.n}</button>`).join("")}
-          </div>
-          <div class="track-state">
-            <span><b id="vitNome">${(VIT_LEVELS.find(l=>l.n===c.vitLvl)||VIT_LEVELS[0]).nome}</b></span>
-            <span id="vitPen">${(VIT_LEVELS.find(l=>l.n===c.vitLvl)||VIT_LEVELS[0]).pen}</span>
-          </div>
-          <div class="pool-row">
-            <span class="pool-lbl">Pontos</span>
-            <input class="inp" type="number" data-path="vitPts" value="${c.vitPts}">
-            <span class="pool-lbl">/ <span id="vitMax2">${vitMax}</span></span>
-          </div>
-        </div>
-        <p class="hint">A Vitalidade mede o estado físico e vem da Linhagem, não de atributo:
-        o corpo aguenta o que o sangue permite. São cinco níveis, e os Pontos são a reserva
-        dentro do nível em que você está.</p>
-        <p class="hint">Quando os Pontos chegam a zero, você perde um nível e os Pontos voltam
-        ao máximo. Do nível 3 em diante a queda cobra dados em todos os testes. No nível 1 o
-        personagem não age, e no 0 sai da mesa em definitivo.</p>
-
-      </section>
-
-      <section class="panel">
-        <h2 class="panel-h">Corrupção <span class="h-note">Limiar ${limiar} · ${esc(linChave(c))}</span></h2>
-        <div class="corr-bar" id="corrBar">${celulasCorrupcao(c)}</div>
-        <div class="corr-state">
-          <span><b id="corrT">${corrState(corr,limiar).t}</b> · <span id="corrV">${corr}</span>/${limiar}</span>
-        </div>
-        <p class="hint" id="corrD">${corrState(corr,limiar).d}</p>
-        <p class="hint">Clique para marcar a Assentada, que é o que ficou: sai em Local Seguro
-        ou no contato com uma Âncora. As casas em trama são a Carga, que você não marca —
-        ela vem dos Talentos acesos e some quando você apaga o Talento que a sustenta.</p>
-
-        <div class="divider"></div>
-        <div class="grid-2">
-          ${fieldInput("Confiança","nc",c.nc,"number")}
-          ${fieldInput("Falhas","marcas",c.marcas,"number")}
-        </div>
-        <p class="hint">Duas Falhas rebaixam 1 de Confiança e zeram no processo.
-        Avulsos não têm Confiança nem Falhas.</p>
-      </section>
-
-      <section class="panel">
-        <h2 class="panel-h">Experiência <span class="h-note">gasto automático</span></h2>
-        <div class="grid-3">
-          ${fieldInput("Ganho","xp",c.xp,"number")}
-          <div class="field">
-            <label>Gasto</label>
-            <input class="inp" id="xpGasto" value="${xpGasto(c)}" disabled title="Soma dos Talentos e Cifras na ficha">
-          </div>
-          <div class="field">
-            <label>Disponível</label>
-            <input class="inp" id="xpLivre" value="${xpLivre(c)}" disabled>
-          </div>
-        </div>
-        <div class="vol" id="xpRow" style="margin:9px 0 0">
-          <span>Saldo</span>
-          <span><b id="xpLivre2">${xpLivre(c)}</b> de <b>${c.xp}</b></span>
-        </div>
-        <p class="hint">Some aqui só o que o personagem ganhou. Cada Talento e cada Cifra na
-        ficha desconta o próprio custo sozinho — Talento dormente continua comprado e continua
-        pago. O custo da Cifra vem do Vínculo e pode ser corrigido linha a linha.</p>
-      </section>
-
-      <section class="panel">
-        <h2 class="panel-h">Capacidade <span class="h-note">${esc(c.ascensao)}</span></h2>
-        <div class="vol" id="capRow">
-          <span>Peso aceso</span>
-          <span><b id="capUsed">${pesoUsado(c)}</b> / <b id="capMax">${cap}</b></span>
-        </div>
-        <div class="cap-barra"><div class="cap-cheio" id="capCheio"></div></div>
-        <p class="hint">A soma do Peso dos Talentos acesos não pode passar da Capacidade.
-        Os dormentes continuam na ficha e voltam quando você quiser — mas trocar quais
-        estão acesos só acontece em Local Seguro, durante um Repouso Completo.
-        A forma de operar do Arquétipo não ocupa nada.</p>
-      </section>
-
-      <!-- Talentos mora aqui, e não na coluna das Cifras, porque Peso e
-           Capacidade são a mesma conta lida de dois lados: o jogador precisa
-           ver as duas sem rolar a página. -->
-      <section class="panel">
-        <h2 class="panel-h">Talentos <span class="h-note">Peso = XP</span></h2>
-        <div class="rows" id="listTalentos"></div>
-        <div class="add-dupla no-print">
-          <button class="btn btn-brass" data-abre-compendio="talentos">Escolher do Livro</button>
-          <button class="btn" data-add="talentos">+ Em branco</button>
-        </div>
-        <p class="hint">Talento ordinário não gera Corrupção nunca. Os que pedem alguma coisa a
-        alguém de fora têm Carga, e ela ocupa Corrupção enquanto o Talento estiver aceso.</p>
-      </section>
-
-    </div>
-
-    <div class="stack">
-      <section class="panel">
-        <h2 class="panel-h">Cifras <span class="h-note">Domínio ND 1 · 2 · 3</span></h2>
-        <div class="rows" id="listCifras"></div>
-        <div class="add-dupla no-print">
-          <button class="btn btn-brass" data-abre-compendio="cifras">Escolher do Livro</button>
-          <button class="btn" data-add="cifras">+ Em branco</button>
-        </div>
-        <p class="hint">A Cifra sempre funciona. A Corrupção entra no valor do Vínculo, e o teste de
-        Domínio — Espírito + grau em Domínio contra o ND — decide quanto fica.
-        Três Cifras Correntes vêm da Cultura, do Antecedente e do Pilar de Afinidade. Não têm Vínculo, não custam XP e não geram Corrupção.</p>
-        <p class="hint">Uma Cifra <b>Ativa</b> resolve no momento em que é conjurada e acaba.
-        Uma <b>Passiva</b> se instala e continua funcionando sozinha pelo tempo indicado.
-        As duas custam Ação Padrão, as duas exigem teste de Domínio e as duas retêm
-        Corrupção conforme o Vínculo — a diferença é só quanto tempo a Cifra fica de pé.</p>
-        <p class="hint">Você só aprende Cifras do Pilar a que tem acesso: o Pilar de Afinidade
-        escolhido na criação, ou um Pilar com o qual estabeleceu Ressonância suficiente.</p>
-      </section>
-
-      <section class="panel">
-        <h2 class="panel-h">Habilidades de Origem <span class="h-note">automático</span></h2>
-        <div id="listConcedidas"></div>
-        <p class="hint">Nada aqui se preenche à mão: tudo vem da Cultura, do Antecedente, da
-        Linhagem e do Arquétipo escolhidos no cabeçalho. Como é derivado e não copiado, trocar
-        qualquer uma dessas escolhas troca o que aparece aqui, sem sobrar nada da anterior.</p>
-        <p class="hint">O "?" ao lado de cada traço abre o que ele faz. A perícia concedida pela
-        Cultura e pelo Antecedente você escolhe, e o grau entra sozinho na lista de Perícias.</p>
-      </section>
-
-      <section class="panel">
-        <h2 class="panel-h">Arquétipo <span class="h-note">um por vez</span></h2>
-        ${fieldSelect("Modo de operar","arquetipo",c.arquetipo,ARQUETIPOS.map(a=>a.nome),true)}
-        <div class="add-dupla no-print" style="margin-top:9px">
-          <button class="btn btn-brass" data-abre-compendio="arquetipos">Ver os Doze</button>
-        </div>
-        <p class="hint">O Arquétipo não dá poder, dá acesso: destrava uma prateleira de Talentos
-        que ninguém fora dele compra. Trocar exige um arco na ficção, e o que você comprou
-        fica dormente em vez de sumir.</p>
-      </section>
-
-      <section class="panel">
-        <h2 class="panel-h">Labirinto Próprio</h2>
-        <div class="grid-2">
-          ${fieldSelect("Pilar do Domínio","lab.selo",c.lab.selo,SELOS,true)}
-          ${fieldSelect("Estágio","lab.estagio",c.lab.estagio,LAB_ESTAGIOS)}
-        </div>
-        <div style="margin-top:9px">
-          ${fieldInput("Cargas usadas (1 por cena)","lab.cargas",c.lab.cargas,"number")}
-        </div>
-        <div style="margin-top:9px">
-          ${fieldArea("Traços","lab.tracos",c.lab.tracos,2)}
-        </div>
-        <p class="hint">Custo: 1 Corrupção + 1 carga por cena.</p>
-      </section>
-
-    </div>
-   <div class="stack">
+  <!-- ===== MESA DE CABECEIRA =====
+       Atributos, Vitalidade, Corrupção e Perícias são o que se toca a
+       sessão inteira. Ficam fora do fluxo, numa grade própria e sempre
+       no alto: em qualquer tela, em qualquer densidade, estão no mesmo
+       lugar. Ninguém deve ter de procurar o próprio estado. -->
+  <div class="topo">
     <section class="panel">
-      <h2 class="panel-h">Âncoras <span class="h-note">duas pessoas do mundo ordinário</span></h2>
-      ${c.ancoras.map((a,i) => `
-        <div class="anchor">
-          <div class="anchor-n">Âncora ${i+1}</div>
-          ${fieldInput("Quem é, e o que é para você","ancoras."+i+".nome",a.nome)}
-          ${fieldInput("O que ela acredita que aconteceu com você","ancoras."+i+".cre",a.cre)}
-          ${fieldInput("O que você faria por ela, mesmo comprometendo a operação","ancoras."+i+".faria",a.faria)}
+      <h2 class="panel-h">Atributos <span class="h-note">D6 por ponto</span></h2>
+      <div class="attrs">
+      ${Object.keys(ATTR_LABEL).map(k => `
+        <div class="attr">
+          <div class="attr-n">${ATTR_LABEL[k]}</div>
+          <input class="attr-v" type="number" min="1" max="5" data-path="attrs.${k}" data-attr value="${c.attrs[k]}">
+          <div class="attr-d">${c.attrs[k]}D6</div>
         </div>`).join("")}
-      <p class="hint">Contato: uma cena presencial remove 1 de Corrupção Assentada, e continua sendo
-      a única forma que existe fora de um Local Seguro. Cada estágio de Ascensão queima uma Âncora
-      e sobe a Assentada — quem sobe rápido chega ao topo sem nenhuma válvula.
-      No terceiro Contato do arco, o Olho percebe.</p>
-    </section>
-
-    <section class="panel">
-      <h2 class="panel-h">Inventário</h2>
-      <div class="vol" id="volRow">
-        <span>Volume em uso</span>
-        <span><b id="volUsed">0</b> / <b id="volCap">${c.attrs.corpo + 4}</b> · Corpo + 4</span>
       </div>
-      <div class="rows" id="listInventario"></div>
-      <button class="btn add-row no-print" data-add="inventario">+ Adicionar Item</button>
-      <p class="hint">Máximo de quatro itens equipados por vez. Ultrapassando o Volume máximo você fica sobrecarregado: 2D a menos em Atletismo e Movimentação, 3 metros a menos em qualquer deslocamento, e um teste de Resistência ND 2 no início de cada cena de combate. Falhando, você começa a cena Caído.</p>
-    </section>
-   </div>
-
-   <div class="stack">
-    <section class="panel">
-      <h2 class="panel-h">A Dívida <span class="h-note">o que a Afiliação tem sobre você</span></h2>
-      ${fieldArea("O fato arquivado","divida",c.divida,3)}
-      <div style="margin-top:9px">${fieldArea("Linhas acrescentadas (cada Chamado cumprido)","dividaLinhas",c.dividaLinhas,2)}</div>
-      <p class="hint">Acesso: uma vez por sessão, sem teste. No terceiro Acesso do arco, eles cobram.
-      Cumprir o Chamado sobe 1 de Confiança e faz a Dívida crescer.
-      Recusar desce 1 e coloca uma Âncora na mira.</p>
+      <p class="hint">Criação: todos começam em 1, distribua 4 pontos, nenhum acima de 3.
+      Limite sobe para 4 no Despertar e 5 no Aclarado.</p>
     </section>
 
     <section class="panel">
-      <h2 class="panel-h">Anotações</h2>
-      ${fieldArea("","notas",c.notas,14)}
+      <h2 class="panel-h">Estado</h2>
+
+      <div class="track">
+      <div class="track-top">
+        <span class="track-name">Vitalidade</span>
+        <span class="track-max">máx <b id="vitMax">${vitMax}</b> · da Linhagem</span>
+      </div>
+      <div class="levels">
+        ${VIT_LEVELS.map(l => `<button class="lvl vit${l.warn?" warn":""}${l.bad?" bad":""}${c.vitLvl===l.n?" on":""}"
+          data-vit="${l.n}" title="${esc(l.pen)}">${l.n}</button>`).join("")}
+      </div>
+      <div class="track-state">
+        <span><b id="vitNome">${(VIT_LEVELS.find(l=>l.n===c.vitLvl)||VIT_LEVELS[0]).nome}</b></span>
+        <span id="vitPen">${(VIT_LEVELS.find(l=>l.n===c.vitLvl)||VIT_LEVELS[0]).pen}</span>
+      </div>
+      <div class="pool-row">
+        <span class="pool-lbl">Pontos</span>
+        <input class="inp" type="number" data-path="vitPts" value="${c.vitPts}">
+        <span class="pool-lbl">/ <span id="vitMax2">${vitMax}</span></span>
+      </div>
+      </div>
+      <p class="hint">A Vitalidade mede o estado físico e vem da Linhagem, não de atributo:
+      o corpo aguenta o que o sangue permite. São cinco níveis, e os Pontos são a reserva
+      dentro do nível em que você está.</p>
+      <p class="hint">Quando os Pontos chegam a zero, você perde um nível e os Pontos voltam
+      ao máximo. Do nível 3 em diante a queda cobra dados em todos os testes. No nível 1 o
+      personagem não age, e no 0 sai da mesa em definitivo.</p>
+
     </section>
-   </div>
+
+    <section class="panel">
+      <h2 class="panel-h">Corrupção <span class="h-note">Limiar ${limiar} · ${esc(linChave(c))}</span></h2>
+      <div class="corr-bar" id="corrBar">${celulasCorrupcao(c)}</div>
+      <div class="corr-state">
+      <span><b id="corrT">${corrState(corr,limiar).t}</b> · <span id="corrV">${corr}</span>/${limiar}</span>
+      </div>
+      <p class="hint" id="corrD">${corrState(corr,limiar).d}</p>
+      <p class="hint">Clique para marcar a Assentada, que é o que ficou: sai em Local Seguro
+      ou no contato com uma Âncora. As casas em trama são a Carga, que você não marca —
+      ela vem dos Talentos acesos e some quando você apaga o Talento que a sustenta.</p>
+
+      <div class="divider"></div>
+      <div class="grid-2">
+      ${fieldInput("Confiança","nc",c.nc,"number")}
+      ${fieldInput("Falhas","marcas",c.marcas,"number")}
+      </div>
+      <p class="hint">Duas Falhas rebaixam 1 de Confiança e zeram no processo.
+      Avulsos não têm Confiança nem Falhas.</p>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel-h">Perícias <span class="h-note">Grau 1–4</span></h2>
+      <div class="sk-cols">
+      ${Object.keys(SKILLS).map(attr => `
+      <div class="sk-group">
+        <div class="sk-head"><span>${ATTR_LABEL[attr]}</span><span>pool</span></div>
+        ${SKILLS[attr].map(s => {
+          const g = c.skills[s] || 0;
+          return `<div class="sk${g?" has-grade":""}" data-skill-row="${esc(s)}">
+            <span class="sk-name" title="${esc(s)}">${s}</span>
+            <span class="pips">${[1,2,3,4].map(i =>
+              `<button class="pip${i<=g?" on":""}" data-skill="${esc(s)}" data-grade="${i}"
+                title="Grau ${i}" aria-label="${s} grau ${i}"></button>`).join("")}</span>
+            <span class="sk-pool" data-pool="${esc(s)}" data-attr-of="${attr}">${c.attrs[attr]+g}D6</span>
+          </div>`;
+        }).join("")}
+      </div>`).join("")}
+      </div>
+      <p class="hint">Clique no mesmo grau para zerar. Pool = atributo + grau. Sucesso em 4+; 1 é Terrível.</p>
+    </section>
   </div>
+
+  <!-- ===== O RESTO =====
+       Uma sequência só, repartida em colunas de fluxo. A ordem aqui é a
+       ordem de leitura: o que você gasta, o que você pode e o que te
+       prende. O corte entre colunas é escolhido pela altura, então um
+       painel daqui muda de coluna conforme a ficha cresce. -->
+  <div class="cols">
+    <section class="panel">
+      <h2 class="panel-h">Experiência <span class="h-note">gasto automático</span></h2>
+      <div class="grid-3">
+      ${fieldInput("Ganho","xp",c.xp,"number")}
+      <div class="field">
+        <label>Gasto</label>
+        <input class="inp" id="xpGasto" value="${xpGasto(c)}" disabled title="Soma dos Talentos e Cifras na ficha">
+      </div>
+      <div class="field">
+        <label>Disponível</label>
+        <input class="inp" id="xpLivre" value="${xpLivre(c)}" disabled>
+      </div>
+      </div>
+      <div class="vol" id="xpRow" style="margin:9px 0 0">
+      <span>Saldo</span>
+      <span><b id="xpLivre2">${xpLivre(c)}</b> de <b>${c.xp}</b></span>
+      </div>
+      <p class="hint">Some aqui só o que o personagem ganhou. Cada Talento e cada Cifra na
+      ficha desconta o próprio custo sozinho — Talento dormente continua comprado e continua
+      pago. O custo da Cifra vem do Vínculo e pode ser corrigido linha a linha.</p>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel-h">Capacidade <span class="h-note">${esc(c.ascensao)}</span></h2>
+      <div class="vol" id="capRow">
+      <span>Peso aceso</span>
+      <span><b id="capUsed">${pesoUsado(c)}</b> / <b id="capMax">${cap}</b></span>
+      </div>
+      <div class="cap-barra"><div class="cap-cheio" id="capCheio"></div></div>
+      <p class="hint">A soma do Peso dos Talentos acesos não pode passar da Capacidade.
+      Os dormentes continuam na ficha e voltam quando você quiser — mas trocar quais
+      estão acesos só acontece em Local Seguro, durante um Repouso Completo.
+      A forma de operar do Arquétipo não ocupa nada.</p>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel-h">Talentos <span class="h-note">Peso = XP</span></h2>
+      <div class="rows" id="listTalentos"></div>
+      <div class="add-dupla no-print">
+      <button class="btn btn-brass" data-abre-compendio="talentos">Escolher do Livro</button>
+      <button class="btn" data-add="talentos">+ Em branco</button>
+      </div>
+      <p class="hint">Talento ordinário não gera Corrupção nunca. Os que pedem alguma coisa a
+      alguém de fora têm Carga, e ela ocupa Corrupção enquanto o Talento estiver aceso.</p>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel-h">Cifras <span class="h-note">Domínio ND 1 · 2 · 3</span></h2>
+      <div class="rows" id="listCifras"></div>
+      <div class="add-dupla no-print">
+      <button class="btn btn-brass" data-abre-compendio="cifras">Escolher do Livro</button>
+      <button class="btn" data-add="cifras">+ Em branco</button>
+      </div>
+      <p class="hint">A Cifra sempre funciona. A Corrupção entra no valor do Vínculo, e o teste de
+      Domínio — Espírito + grau em Domínio contra o ND — decide quanto fica.
+      Três Cifras Correntes vêm da Cultura, do Antecedente e do Pilar de Afinidade. Não têm Vínculo, não custam XP e não geram Corrupção.</p>
+      <p class="hint">Uma Cifra <b>Ativa</b> resolve no momento em que é conjurada e acaba.
+      Uma <b>Passiva</b> se instala e continua funcionando sozinha pelo tempo indicado.
+      As duas custam Ação Padrão, as duas exigem teste de Domínio e as duas retêm
+      Corrupção conforme o Vínculo — a diferença é só quanto tempo a Cifra fica de pé.</p>
+      <p class="hint">Você só aprende Cifras do Pilar a que tem acesso: o Pilar de Afinidade
+      escolhido na criação, ou um Pilar com o qual estabeleceu Ressonância suficiente.</p>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel-h">Habilidades de Origem <span class="h-note">automático</span></h2>
+      <div id="listConcedidas"></div>
+      <p class="hint">Nada aqui se preenche à mão: tudo vem da Cultura, do Antecedente, da
+      Linhagem e do Arquétipo escolhidos no cabeçalho. Como é derivado e não copiado, trocar
+      qualquer uma dessas escolhas troca o que aparece aqui, sem sobrar nada da anterior.</p>
+      <p class="hint">O "?" ao lado de cada traço abre o que ele faz. A perícia concedida pela
+      Cultura e pelo Antecedente você escolhe, e o grau entra sozinho na lista de Perícias.</p>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel-h">Arquétipo <span class="h-note">um por vez</span></h2>
+      ${fieldSelect("Modo de operar","arquetipo",c.arquetipo,ARQUETIPOS.map(a=>a.nome),true)}
+      <div class="add-dupla no-print" style="margin-top:9px">
+      <button class="btn btn-brass" data-abre-compendio="arquetipos">Ver os Doze</button>
+      </div>
+      <p class="hint">O Arquétipo não dá poder, dá acesso: destrava uma prateleira de Talentos
+      que ninguém fora dele compra. Trocar exige um arco na ficção, e o que você comprou
+      fica dormente em vez de sumir.</p>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel-h">Labirinto Próprio</h2>
+      <div class="grid-2">
+      ${fieldSelect("Pilar do Domínio","lab.selo",c.lab.selo,SELOS,true)}
+      ${fieldSelect("Estágio","lab.estagio",c.lab.estagio,LAB_ESTAGIOS)}
+      </div>
+      <div style="margin-top:9px">
+      ${fieldInput("Cargas usadas (1 por cena)","lab.cargas",c.lab.cargas,"number")}
+      </div>
+      <div style="margin-top:9px">
+      ${fieldArea("Traços","lab.tracos",c.lab.tracos,2)}
+      </div>
+      <p class="hint">Custo: 1 Corrupção + 1 carga por cena.</p>
+    </section>
+
+    <section class="panel">
+    <h2 class="panel-h">Âncoras <span class="h-note">duas pessoas do mundo ordinário</span></h2>
+    ${c.ancoras.map((a,i) => `
+      <div class="anchor">
+      <div class="anchor-n">Âncora ${i+1}</div>
+      ${fieldInput("Quem é, e o que é para você","ancoras."+i+".nome",a.nome)}
+      ${fieldInput("O que ela acredita que aconteceu com você","ancoras."+i+".cre",a.cre)}
+      ${fieldInput("O que você faria por ela, mesmo comprometendo a operação","ancoras."+i+".faria",a.faria)}
+      </div>`).join("")}
+    <p class="hint">Contato: uma cena presencial remove 1 de Corrupção Assentada, e continua sendo
+    a única forma que existe fora de um Local Seguro. Cada estágio de Ascensão queima uma Âncora
+    e sobe a Assentada — quem sobe rápido chega ao topo sem nenhuma válvula.
+    No terceiro Contato do arco, o Olho percebe.</p>
+    </section>
+
+    <section class="panel">
+    <h2 class="panel-h">Inventário</h2>
+    <div class="vol" id="volRow">
+      <span>Volume em uso</span>
+      <span><b id="volUsed">0</b> / <b id="volCap">${c.attrs.corpo + 4}</b> · Corpo + 4</span>
+    </div>
+    <div class="rows" id="listInventario"></div>
+    <button class="btn add-row no-print" data-add="inventario">+ Adicionar Item</button>
+    <p class="hint">Máximo de quatro itens equipados por vez. Ultrapassando o Volume máximo você fica sobrecarregado: 2D a menos em Atletismo e Movimentação, 3 metros a menos em qualquer deslocamento, e um teste de Resistência ND 2 no início de cada cena de combate. Falhando, você começa a cena Caído.</p>
+    </section>
+
+    <section class="panel">
+    <h2 class="panel-h">A Dívida <span class="h-note">o que a Afiliação tem sobre você</span></h2>
+    ${fieldArea("O fato arquivado","divida",c.divida,3)}
+    <div style="margin-top:9px">${fieldArea("Linhas acrescentadas (cada Chamado cumprido)","dividaLinhas",c.dividaLinhas,2)}</div>
+    <p class="hint">Acesso: uma vez por sessão, sem teste. No terceiro Acesso do arco, eles cobram.
+    Cumprir o Chamado sobe 1 de Confiança e faz a Dívida crescer.
+    Recusar desce 1 e coloca uma Âncora na mira.</p>
+    </section>
+
+    <section class="panel">
+    <h2 class="panel-h">Anotações</h2>
+    ${fieldArea("","notas",c.notas,14)}
+    </section>
+  </div>
+
   `;
 
   renderList("cifras");
@@ -2731,7 +2800,7 @@ function renderSheet(){
 const PAPEL_TIMBRADO = {
   "O Olho":                   {kicker:"Vigilância Permanente · Uso Interno", registro:"Registro",     carimbo:"Confidencial"},
   "A Penumbra":               {kicker:"Marcado na Pele · Não Se Fala Fora",  registro:"Marca",        carimbo:"Sob Juramento"},
-  "Os Acorrentados":          {kicker:"Cadastro de Almas · Sob Vigília",     registro:"Fólio",        carimbo:"Penitência"},
+  "Os Acorrentados":          {kicker:"Preso ao Registro · Nada Se Solta",   registro:"Elo",          carimbo:"Sob Custódia"},
   "O Coletivo":               {kicker:"Edição Restrita · Não Publicar",      registro:"Pauta",        carimbo:"Embargado"},
   "A Frente":                 {kicker:"Setor Operacional · Difusão Restrita",registro:"Matrícula",    carimbo:"Reservado"},
   "Mysteria":                 {kicker:"C:\\ASCENDIDO> DIR /DOSSIE",          registro:"UID",          carimbo:"Criptografado"},
@@ -3618,6 +3687,33 @@ document.getElementById("btnUndo").onclick = restoreLast;
 /* ---------- movimento ----------
    "auto" segue o sistema. "on" e "off" mandam nele. A escolha fica
    gravada por aparelho, porque é preferência de quem olha a tela. */
+/* ============================================================
+   ARRANJO
+   Quanta ficha cabe na tela é escolha de quem joga, e não do
+   desenho: numa mesa de tábua grande vale tudo à vista; num
+   notebook de treze polegadas, vale respiro. A preferência fica
+   gravada por aparelho, porque é de quem olha a tela — como a
+   de movimento, e pela mesma razão.
+
+   O botão só troca um atributo na raiz. Quem sabe o que fazer
+   com ele é o CSS, onde --gap, --pad-* e a contagem de colunas
+   estão declarados por densidade.
+   ============================================================ */
+
+const LS_ARR = "devaneio:arranjo";
+const ARRANJOS = ["normal","apertado","espacoso"];
+const ARRANJO_ROTULO = {normal:"normal", apertado:"mais na tela", espacoso:"menos na tela"};
+
+function aplicaArranjo(modo){
+  if(!ARRANJOS.includes(modo)) modo = "normal";
+  const raiz = document.documentElement;
+  if(modo === "normal") delete raiz.dataset.densidade;
+  else raiz.dataset.densidade = modo;
+  const b = document.getElementById("btnArranjo");
+  if(b) b.textContent = "Arranjo: " + ARRANJO_ROTULO[modo];
+  try{ localStorage.setItem(LS_ARR, modo); }catch(_){}
+}
+
 const LS_MOV = "devaneio:movimento";
 
 function temMovimento(){
@@ -3644,6 +3740,14 @@ document.getElementById("btnMotion").onclick = () => {
     toast("Seu sistema pede movimento reduzido. A ficha vai ignorar isso e animar mesmo assim.", 7000);
   }
   renderSheet();   // redesenha para as animações de chegada rodarem na hora
+};
+
+document.getElementById("btnArranjo").onclick = () => {
+  const atual = document.documentElement.dataset.densidade || "normal";
+  const proximo = ARRANJOS[(ARRANJOS.indexOf(atual) + 1) % ARRANJOS.length];
+  aplicaArranjo(proximo);
+  /* as caixas que crescem com o texto foram medidas na largura antiga */
+  ajustaCaixas();
 };
 
 document.getElementById("drawerToggle").onclick = e => {
@@ -3734,6 +3838,7 @@ document.getElementById("fileInput").onchange = e => {
 /* ---------- início ---------- */
 load();
 (function(){ let m="auto"; try{ m = localStorage.getItem(LS_MOV) || "auto"; }catch(_){} aplicaMovimento(m); })();
+(function(){ let a="normal"; try{ a = localStorage.getItem(LS_ARR) || "normal"; }catch(_){} aplicaArranjo(a); })();
 renderSheet();
 renderFileList();
 </script>
