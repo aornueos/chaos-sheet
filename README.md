@@ -64,6 +64,14 @@ altura para que nenhuma coluna fique com 4500px ao lado de outra com 900px.
 Ali um painel muda mesmo de coluna conforme a ficha cresce; o que é garantido
 é a ordem de leitura: o que você gasta, o que você pode e o que te prende.
 
+## Gaveta
+
+Recolhida por padrão, em qualquer largura. No desktop vira uma lombada de 54px
+com o nome descendo na vertical; no celular, uma linha só no alto. A lista de
+fichas se consulta uma vez por sessão e não vale 242px de folha o tempo todo.
+O estado fica gravado por aparelho, e o aviso de gravação continua à vista
+mesmo recolhida — esconder o erro junto com os botões seria esconder o erro.
+
 ## Arranjo
 
 Botão na gaveta, três posições: **normal**, **mais na tela** e **menos na
@@ -90,6 +98,10 @@ por cima.
 Texto de leitura é sempre tinta sobre papel, ou papel sobre preto. A tinta
 especial preenche, sublinha e carimba, mas nunca vira corpo de texto — é
 assim que as nove casas trocam de cor sem que nenhuma perca contraste.
+
+Todo texto da ficha passa de 4,5:1 nas nove casas; o pior caso mede 5,6:1.
+Onde a caixa aperta e o texto corta — a nota do título, o nome da perícia no
+arranjo apertado — o conteúdo inteiro fica no `title`, para não se perder.
 
 ## As nove casas
 

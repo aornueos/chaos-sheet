@@ -61,8 +61,8 @@
   --fg:var(--on-void);
   --bg:var(--void);
   --spot-fg:var(--spot-hi);
-  --fg-2:color-mix(in srgb, var(--fg) 62%, var(--bg));
-  --fg-3:color-mix(in srgb, var(--fg) 58%, var(--bg));
+  --fg-2:color-mix(in srgb, var(--fg) 74%, var(--bg));
+  --fg-3:color-mix(in srgb, var(--fg) 66%, var(--bg));
   --rule:color-mix(in srgb, var(--fg) 48%, var(--bg));
 
   --corr:0;                /* 0..1 — quanto o papel já apodreceu */
@@ -271,7 +271,34 @@ body{
 }
 
 .drawer-foot{padding:10px;border-top:2px solid var(--on-void);display:grid;gap:5px}
-.drawer-toggle{display:none}
+.drawer .drawer-toggle{display:block;width:100%;margin-top:11px;border-color:var(--void);color:var(--void)}
+.drawer .drawer-toggle:hover{background:var(--void);color:var(--on-void)}
+
+/* ---------- recolhida: só a lombada ---------- */
+:root[data-gaveta="fechada"] .wrap{grid-template-columns:54px minmax(0,1fr)}
+:root[data-gaveta="fechada"] .drawer-head{
+  padding:14px 0 16px;display:flex;flex-direction:column;align-items:center;gap:14px;
+}
+/* o nome do jogo desce pela lombada, como em capa de livro na estante */
+:root[data-gaveta="fechada"] .brand{
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  font-size:19px;letter-spacing:.05em;line-height:1;
+}
+:root[data-gaveta="fechada"] .brand-sub{display:none}
+:root[data-gaveta="fechada"] .drawer-head::after{display:none}
+:root[data-gaveta="fechada"] .drawer-list{display:none}
+/* o estado de gravação continua à vista: é o único aviso de que algo
+   deu errado, e escondê-lo junto com os botões seria esconder o erro */
+:root[data-gaveta="fechada"] .drawer-foot{padding:8px 3px;border-top-width:2px}
+:root[data-gaveta="fechada"] .drawer-foot > .btn,
+:root[data-gaveta="fechada"] .drawer-foot > input{display:none}
+:root[data-gaveta="fechada"] .save-state{font-size:8px;letter-spacing:.03em;padding:2px 0}
+/* na lombada o rótulo não cabe: vira seta, sem mexer no texto que o
+   script escreve nem no rótulo que o leitor de tela anuncia */
+:root[data-gaveta="fechada"] .drawer-toggle{
+  width:auto;margin:0;padding:8px 9px;font-size:0;
+}
+:root[data-gaveta="fechada"] .drawer-toggle::after{content:"▸";font-size:13px;line-height:1}
 .save-state{
   font-size:9px;letter-spacing:.2em;text-transform:uppercase;
   color:var(--fg-3);text-align:center;padding:2px 0 6px;
@@ -283,8 +310,8 @@ body{
 /* ---------- aviso persistente: uma tarja colada na tela ---------- */
 .toast{
   --fg:var(--ink); --bg:var(--paper); --spot-fg:var(--spot-lo);
-  --fg-2:color-mix(in srgb, var(--fg) 62%, var(--bg));
-  --fg-3:color-mix(in srgb, var(--fg) 58%, var(--bg));
+  --fg-2:color-mix(in srgb, var(--fg) 74%, var(--bg));
+  --fg-3:color-mix(in srgb, var(--fg) 66%, var(--bg));
   --rule:color-mix(in srgb, var(--fg) 48%, var(--bg));
   position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:10000;
   max-width:min(680px,92vw);display:flex;align-items:center;gap:12px;
@@ -336,8 +363,8 @@ body{
    ============================================================ */
 .masthead{
   --fg:var(--on-void); --bg:var(--void); --spot-fg:var(--spot-hi);
-  --fg-2:color-mix(in srgb, var(--fg) 62%, var(--bg));
-  --fg-3:color-mix(in srgb, var(--fg) 58%, var(--bg));
+  --fg-2:color-mix(in srgb, var(--fg) 74%, var(--bg));
+  --fg-3:color-mix(in srgb, var(--fg) 66%, var(--bg));
   --rule:color-mix(in srgb, var(--fg) 48%, var(--bg));
   position:relative;overflow:hidden;
   background:var(--void);
@@ -459,8 +486,8 @@ body{
 /* ---------- o recorte de papel ---------- */
 .panel{
   --fg:var(--ink); --bg:var(--paper); --spot-fg:var(--spot-lo);
-  --fg-2:color-mix(in srgb, var(--fg) 62%, var(--bg));
-  --fg-3:color-mix(in srgb, var(--fg) 58%, var(--bg));
+  --fg-2:color-mix(in srgb, var(--fg) 74%, var(--bg));
+  --fg-3:color-mix(in srgb, var(--fg) 66%, var(--bg));
   --rule:color-mix(in srgb, var(--fg) 48%, var(--bg));
   position:relative;
   background:var(--paper);
@@ -533,8 +560,10 @@ body{
 .ajuda:hover,.ajuda[aria-expanded="true"]{background:var(--spot-hi);border-color:var(--spot-hi);color:var(--void)}
 /* o bilhete é papel: caiu na mesa e ficou onde parou */
 .balao{
-  --fg:var(--ink); --bg:var(--paper);
-  --fg-2:color-mix(in srgb, var(--fg) 62%, var(--bg));
+  --fg:var(--ink); --bg:var(--paper); --spot-fg:var(--spot-lo);
+  --fg-2:color-mix(in srgb, var(--fg) 74%, var(--bg));
+  --fg-3:color-mix(in srgb, var(--fg) 66%, var(--bg));
+  --rule:color-mix(in srgb, var(--fg) 48%, var(--bg));
   position:fixed;z-index:9998;max-width:330px;
   border:2px solid var(--ink);background:var(--paper);
   padding:11px 13px;font-size:var(--fs-sm);line-height:1.55;color:var(--fg-2);
@@ -821,7 +850,7 @@ body{
 }
 /* linha de corte: onde a tesoura passaria */
 .divider{
-  height:0;border-top:1.5px dashed var(--rule);margin:15px 0 14px;position:relative;
+  height:0;border-top:1.5px dashed var(--rule);margin:19px 0 14px;position:relative;
 }
 .divider::before{
   content:"✂";position:absolute;left:0;top:-9px;font-size:12px;
@@ -851,8 +880,8 @@ body{
 .compendio[hidden]{display:none}
 .comp-caixa{
   --fg:var(--ink); --bg:var(--paper); --spot-fg:var(--spot-lo);
-  --fg-2:color-mix(in srgb, var(--fg) 62%, var(--bg));
-  --fg-3:color-mix(in srgb, var(--fg) 58%, var(--bg));
+  --fg-2:color-mix(in srgb, var(--fg) 74%, var(--bg));
+  --fg-3:color-mix(in srgb, var(--fg) 66%, var(--bg));
   --rule:color-mix(in srgb, var(--fg) 48%, var(--bg));
   background:var(--paper);color:var(--ink);
   border:3px solid var(--on-void);
@@ -1059,7 +1088,7 @@ body{
   background:#39ff7a;color:#000200;margin:0 calc(var(--pad-x) * -1) 15px;padding:6px 12px 5px;
 }
 [data-afiliacao="Mysteria"] .panel-h .h-note,
-[data-afiliacao="Mysteria"] .ajuda{color:#000200;border-color:#000200}
+[data-afiliacao="Mysteria"] .panel-h .ajuda{color:#000200;border-color:#000200}
 [data-afiliacao="Mysteria"] .panel-h::before{background:#000200}
 [data-afiliacao="Mysteria"] .attr{border:1.5px solid #39ff7a;background:transparent}
 [data-afiliacao="Mysteria"] .attr-n,
@@ -1151,7 +1180,7 @@ body{
    Nenhuma gráfica cuida deste: o zine cru, verdete de cobre
    oxidado, papel mais sujo, recortes mais tortos. */
 [data-afiliacao="Avulso"]{
-  --spot:#2f9c8c; --spot-hi:#7fd8c9; --spot-lo:#1b6a5e;
+  --spot:#2f9c8c; --spot-hi:#7fd8c9; --spot-lo:#175a50;
   --paper:#ded7c3; --paper-2:#cdc4ac; --paper-3:#b3a88c;
   --fac-tex-op:.1;
   --fac-inclina:2;
@@ -1198,6 +1227,12 @@ body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn,.attr,.panel-h{
 .topo > .panel:nth-child(6n+4),.cols > .panel:nth-child(6n+4){--queda:.6deg}
 .topo > .panel:nth-child(6n+5),.cols > .panel:nth-child(6n+5){--queda:-.45deg}
 .topo > .panel:nth-child(6n+6),.cols > .panel:nth-child(6n+6){--queda:.35deg}
+/* Um recorte de 1300px deitado no mesmo ângulo de um de 320px rende
+   quatro vezes mais desnível entre as pontas: 7px em vez de 1,5px, e
+   27px nas casas mais tortas. Deixa de parecer papel torto e passa a
+   parecer alinhamento errado. Precisa vir depois das regras acima,
+   que têm a mesma especificidade. */
+.topo > .panel:last-child{--queda:.07deg}
 
 /* a tarja de cima da capa é impressa na hora */
 @media screen and (min-width:681px){
@@ -1435,14 +1470,22 @@ body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn,.attr,.panel-h{
   .drawer::after,.drawer-head::after{display:none}
   .sheet{padding:20px 18px 60px}
 
-  /* aberta, a gaveta empurrava a ficha para fora da tela (493px antes de
-     qualquer conteúdo). Recolhida por padrão em tudo que não é desktop. */
+  /* Aqui a gaveta não é lombada: é uma faixa no alto da página, e
+     recolhida some inteira menos o cabeçalho. O estado é o mesmo
+     data-gaveta do desktop. */
+  :root[data-gaveta="fechada"] .wrap{grid-template-columns:1fr}
   .drawer-head{padding:12px 14px 11px}
-  .drawer-toggle{display:block;width:100%;margin-top:10px;border-color:var(--void);color:var(--void)}
-  .drawer-toggle:hover{background:var(--void);color:var(--on-void)}
-  .drawer-list,.drawer-foot{display:none}
-  .drawer.is-open .drawer-list{display:block}
-  .drawer.is-open .drawer-foot{display:grid}
+  :root[data-gaveta="fechada"] .drawer-head{
+    padding:9px 14px;display:flex;flex-direction:row;align-items:center;
+    justify-content:space-between;gap:12px;
+  }
+  :root[data-gaveta="fechada"] .brand{writing-mode:horizontal-tb;transform:none;font-size:22px;letter-spacing:.01em}
+  :root[data-gaveta="fechada"] .brand-sub{display:none}
+  :root[data-gaveta="fechada"] .drawer-foot{display:none}
+  :root[data-gaveta="fechada"] .drawer .drawer-toggle{
+    width:auto;flex:none;margin-top:0;padding:15px 14px;font-size:10px;
+  }
+  :root[data-gaveta="fechada"] .drawer-toggle::after{content:" ▾";font-size:10px}
   .drawer-list{padding:12px 14px 0;overflow:visible}
   #fileList{display:flex;gap:9px;overflow-x:auto;padding-bottom:9px}
   .file{flex:0 0 194px;margin-bottom:0}
@@ -2592,7 +2635,7 @@ function renderSheet(){
     </section>
 
     <section class="panel">
-      <h2 class="panel-h">Corrupção <span class="h-note">Limiar ${limiar} · ${esc(linChave(c))}</span></h2>
+      <h2 class="panel-h">Corrupção <span class="h-note">Limiar ${limiar}</span></h2>
       <div class="corr-bar" id="corrBar">${celulasCorrupcao(c)}</div>
       <div class="corr-state">
       <span><b id="corrT">${corrState(corr,limiar).t}</b> · <span id="corrV">${corr}</span>/${limiar}</span>
@@ -2601,6 +2644,8 @@ function renderSheet(){
       <p class="hint">Clique para marcar a Assentada, que é o que ficou: sai em Local Seguro
       ou no contato com uma Âncora. As casas em trama são a Carga, que você não marca —
       ela vem dos Talentos acesos e some quando você apaga o Talento que a sustenta.</p>
+      <p class="hint">O Limiar é ${limiar}, e quem o define é a Linhagem: ${esc(linChave(c))}.
+      Trocar de sangue muda o número de casas desta barra.</p>
 
       <div class="divider"></div>
       <div class="grid-2">
@@ -2740,7 +2785,7 @@ function renderSheet(){
     </section>
 
     <section class="panel">
-    <h2 class="panel-h">Âncoras <span class="h-note">duas pessoas do mundo ordinário</span></h2>
+    <h2 class="panel-h">Âncoras <span class="h-note">duas do mundo ordinário</span></h2>
     ${c.ancoras.map((a,i) => `
       <div class="anchor">
       <div class="anchor-n">Âncora ${i+1}</div>
@@ -2766,7 +2811,7 @@ function renderSheet(){
     </section>
 
     <section class="panel">
-    <h2 class="panel-h">A Dívida <span class="h-note">o que a Afiliação tem sobre você</span></h2>
+    <h2 class="panel-h">A Dívida <span class="h-note">o que eles têm sobre você</span></h2>
     ${fieldArea("O fato arquivado","divida",c.divida,3)}
     <div style="margin-top:9px">${fieldArea("Linhas acrescentadas (cada Chamado cumprido)","dividaLinhas",c.dividaLinhas,2)}</div>
     <p class="hint">Acesso: uma vez por sessão, sem teste. No terceiro Acesso do arco, eles cobram.
@@ -2956,6 +3001,11 @@ function recolheAjuda(){
     /* ":scope >" é essencial: sem ele a varredura desce nas linhas de
        Cifra e Talento e engole a legenda de cada uma, que é por linha e
        não por painel. */
+    /* a nota encolhe com ellipsis quando o painel aperta: guarda o
+       texto inteiro para quem passar o ponteiro */
+    const nota = titulo.querySelector(".h-note");
+    if(nota) nota.title = nota.textContent.trim();
+
     const dicas = [...painel.querySelectorAll(":scope > .hint:not([id])")];
     if(!dicas.length) return;
 
@@ -3750,10 +3800,32 @@ document.getElementById("btnArranjo").onclick = () => {
   ajustaCaixas();
 };
 
-document.getElementById("drawerToggle").onclick = e => {
-  const aberta = document.querySelector(".drawer").classList.toggle("is-open");
-  e.currentTarget.setAttribute("aria-expanded", aberta);
-  e.currentTarget.textContent = aberta ? "Fichas ▴" : "Fichas ▾";
+/* ============================================================
+   GAVETA
+   Recolhida por padrão, em qualquer largura: a lista de fichas se
+   consulta uma vez por sessão, e não vale 242px de folha o tempo
+   todo. Um estado só, gravado por aparelho — antes eram dois
+   mecanismos, um por classe no desktop e outro por largura.
+   ============================================================ */
+
+const LS_GAV = "devaneio:gaveta";
+
+function aplicaGaveta(estado){
+  const aberta = estado === "aberta";
+  document.documentElement.dataset.gaveta = aberta ? "aberta" : "fechada";
+  const b = document.getElementById("drawerToggle");
+  if(b){
+    b.setAttribute("aria-expanded", String(aberta));
+    /* o texto continua existindo mesmo quando a lombada o esconde por
+       CSS: é ele que o leitor de tela lê */
+    b.textContent = aberta ? "Fichas ▴" : "Fichas";
+    b.setAttribute("aria-label", aberta ? "Esconder a lista de fichas" : "Mostrar a lista de fichas");
+  }
+  try{ localStorage.setItem(LS_GAV, document.documentElement.dataset.gaveta); }catch(_){}
+}
+
+document.getElementById("drawerToggle").onclick = () => {
+  aplicaGaveta(document.documentElement.dataset.gaveta === "aberta" ? "fechada" : "aberta");
 };
 
 /* Quais painéis são "compridos" depende da ficha, não do desenho: a mesma
@@ -3839,6 +3911,7 @@ document.getElementById("fileInput").onchange = e => {
 load();
 (function(){ let m="auto"; try{ m = localStorage.getItem(LS_MOV) || "auto"; }catch(_){} aplicaMovimento(m); })();
 (function(){ let a="normal"; try{ a = localStorage.getItem(LS_ARR) || "normal"; }catch(_){} aplicaArranjo(a); })();
+(function(){ let g="fechada"; try{ g = localStorage.getItem(LS_GAV) || "fechada"; }catch(_){} aplicaGaveta(g); })();
 renderSheet();
 renderFileList();
 </script>
