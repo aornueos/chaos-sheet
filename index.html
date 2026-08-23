@@ -141,9 +141,9 @@
 /* Colunas por densidade e por largura. As duas coisas se cruzam, e por
    isso cada faixa de tela repete os três seletores: um :root simples
    perderia para o :root[data-densidade] declarado antes. */
-:root                            {--col-min:300px; --colunas:3; --topo-min:300px; --sk-min:230px}
-:root[data-densidade="apertado"] {--col-min:250px; --colunas:4; --topo-min:255px; --sk-min:205px}
-:root[data-densidade="espacoso"] {--col-min:380px; --colunas:2; --topo-min:365px; --sk-min:265px}
+:root                            {--col-min:300px; --colunas:3; --sk-min:230px}
+:root[data-densidade="apertado"] {--col-min:250px; --colunas:4; --sk-min:205px}
+:root[data-densidade="espacoso"] {--col-min:380px; --colunas:2; --sk-min:265px}
 
 /* Com o dedo, o pip tem 26px em vez de 13: a linha da perícia precisa
    de mais de cem pixels a mais, e sem isto o nome sumia. */
@@ -469,7 +469,7 @@ body{
    consegue separá-las: não existe corte aqui. */
 .topo{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(min(100%,var(--topo-min)),1fr));
+  grid-template-columns:repeat(3,minmax(0,1fr));
   gap:var(--gap);
   margin-bottom:var(--gap);
   align-items:start;
@@ -477,6 +477,9 @@ body{
 /* Perícias é lista, não medidor: toma a linha inteira e reparte os
    quatro grupos em colunas, em vez de virar uma tira alta e estreita. */
 .topo > .panel:last-child{grid-column:1/-1}
+/* medida de referência para a consulta abaixo: quem manda no arranjo
+   dos atributos é a largura do recorte, não a da tela */
+.topo > .panel{container-type:inline-size}
 .sk-cols{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(min(100%,var(--sk-min)),1fr));
@@ -628,7 +631,16 @@ body{
 /* ============================================================
    ATRIBUTOS — quatro caixas de tinta chapada
    ============================================================ */
-.attrs{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.attrs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+/* 4 células precisam de ~337px de grade; abaixo disso, dois por dois */
+@container (max-width:380px){
+  .attrs{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+/* rede de segurança para navegador sem consulta de contêiner: no
+   celular o recorte nunca chega perto dos 380px */
+@media screen and (max-width:680px){
+  .attrs{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 .attr{
   background:var(--ink);color:var(--paper);
   padding:9px 5px 7px;text-align:center;position:relative;
@@ -1460,6 +1472,7 @@ body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn,.attr,.panel-h{
 
 /* ---- tablet ---- */
 @media screen and (max-width:900px){
+  .topo{grid-template-columns:repeat(2,minmax(0,1fr))}
   .wrap{grid-template-columns:1fr}
   .drawer{position:static;height:auto;border-right:none;border-bottom:3px solid var(--on-void)}
   .drawer::after,.drawer-head::after{display:none}
@@ -1493,6 +1506,7 @@ body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn,.attr,.panel-h{
   :root{--fs-2xl:28px}
 
   .sheet{padding:14px 12px 56px}
+  .topo{grid-template-columns:minmax(0,1fr)}
   /* Numa coluna só, a faixa de cima continua sendo a faixa de cima: é a
      ordem do documento que garante isso, não a grade. */
   :root                            {--gap:17px; --pad-x:13px; --pad-topo:22px; --pad-base:18px}
@@ -1522,7 +1536,6 @@ body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn,.attr,.panel-h{
 
   /* grelhas densas não cabem em 375px */
   .grid-4,.grid-3{grid-template-columns:1fr 1fr}
-  .attrs{grid-template-columns:1fr 1fr;gap:6px}
   .attr-v{font-size:30px}
 }
 

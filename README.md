@@ -79,9 +79,16 @@ tela**. Muda espaçamento, corpo de texto e quantas colunas abrem — em tudo,
 inclusive nas Perícias e na faixa de cima. A escolha fica gravada por aparelho.
 
 Nenhum componente sabe que isso existe: o botão troca um atributo na raiz, e
-todo o resto lê `--gap`, `--pad-*` e as larguras mínimas de coluna. As colunas
-são declaradas por **largura mínima**, não por contagem, então o navegador abre
-quantas couberem e nunca espreme uma perícia até o nome sumir.
+todo o resto lê `--gap`, `--pad-*` e as larguras mínimas de coluna.
+
+O fluxo e as Perícias abrem por **largura mínima**, não por contagem: o
+navegador cabe quantas couberem. Onde o número de itens é fixo, porém, contar é
+o certo — a faixa de cima tem exatamente três medidores, e `auto-fit` abria
+cinco trilhas numa tela larga porque Perícias ocupa a linha inteira e nenhuma
+trilha ficava vazia para recolher. E os quatro Atributos querem quatro colunas
+ou duas, nunca três: quem decide é a largura do próprio recorte, por
+`@container`, e não a da janela — recorte estreito em janela larga acontece o
+tempo todo aqui.
 
 ## Direção de arte
 
