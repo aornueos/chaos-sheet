@@ -115,9 +115,12 @@
   --fac-marca:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2.8'><circle cx='12' cy='12' r='8.5'/><path d='M12 3.5v17M3.5 12h17'/></g></svg>");
 
   /* trama de fundo da capa, própria de cada Afiliação */
-  --fac-tex:radial-gradient(circle at 50% 50%, rgba(231,225,209,.55) 0 26%, transparent 28%);
+  --fac-tex:radial-gradient(circle at 50% 50%, rgba(231,225,209,1) 0 26%, transparent 28%);
   --fac-tex-size:7px 7px;
-  --fac-tex-op:.15;
+  /* A trama é fundo de fundo: tem de se notar só quando se procura.
+     Um só número manda em todas as casas — o alfa de dentro de cada
+     gradiente está normalizado em 1 justamente para isso. */
+  --fac-tex-op:.05;
   /* régua da Afiliação: o traço com que ela separa as coisas */
   --fac-regua:repeating-linear-gradient(90deg,currentColor 0 7px,transparent 7px 11px);
   --fac-inclina:1;         /* multiplicador da bagunça dos recortes */
@@ -388,7 +391,7 @@ body{
   position:absolute;right:-26px;top:50%;transform:translateY(-50%);
   width:270px;height:270px;pointer-events:none;z-index:0;
   background:var(--spot);
-  opacity:.17;
+  opacity:.08;
   -webkit-mask:var(--fac-selo) center/contain no-repeat;
           mask:var(--fac-selo) center/contain no-repeat;
 }
@@ -942,10 +945,9 @@ body{
   --spot:#aab4bd; --spot-hi:#f1f5f8; --spot-lo:#39444d;
   --paper:#e9e9e7; --paper-2:#d9d9d6; --paper-3:#c2c2be;
   --fac-tex:
-    repeating-linear-gradient(74deg,rgba(231,225,209,.62) 0 13px,transparent 13px 44px),
-    radial-gradient(58% 120% at 78% -12%,rgba(231,225,209,.34) 0%,transparent 62%);
+    repeating-linear-gradient(74deg,rgba(231,225,209,1) 0 13px,transparent 13px 44px),
+    radial-gradient(58% 120% at 78% -12%,rgba(231,225,209,.55) 0%,transparent 62%);
   --fac-tex-size:auto,auto;
-  --fac-tex-op:.3;
   --fac-regua:linear-gradient(90deg,currentColor 0 100%);
   --fac-selo:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 100'><path d='M4 50C28 14 92 14 116 50 92 86 28 86 4 50Z' fill='none' stroke='%23000' stroke-width='6'/><circle cx='60' cy='50' r='19' fill='%23000'/><g stroke='%23000' stroke-width='5' stroke-linecap='round'><path d='M60 6V-2M18 20l-6-7M102 20l6-7M60 94v8M18 80l-6 7M102 80l6 7'/></g></svg>");
   --fac-marca:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M1.5 12C5 5.5 19 5.5 22.5 12 19 18.5 5 18.5 1.5 12Z' fill='none' stroke='%23000' stroke-width='2.4'/><circle cx='12' cy='12' r='4' fill='%23000'/></svg>");
@@ -962,10 +964,9 @@ body{
   --spot:#c1683a; --spot-hi:#e8a475; --spot-lo:#7a3a1c;
   --paper:#e6ddca; --paper-2:#d6cab2; --paper-3:#bfae90;
   --fac-tex:
-    repeating-linear-gradient(135deg,rgba(231,225,209,.5) 0 6px,transparent 6px 12px),
-    repeating-linear-gradient(45deg,rgba(231,225,209,.5) 0 6px,transparent 6px 12px);
+    repeating-linear-gradient(135deg,rgba(231,225,209,1) 0 6px,transparent 6px 12px),
+    repeating-linear-gradient(45deg,rgba(231,225,209,1) 0 6px,transparent 6px 12px);
   --fac-tex-size:26px 26px,26px 26px;
-  --fac-tex-op:.2;
   --fac-regua:repeating-linear-gradient(135deg,currentColor 0 3px,transparent 3px 6px);
   --fac-selo:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='none' stroke='%23000' stroke-width='8' stroke-linecap='square'><path d='M10 60 50 16 90 60'/><path d='M18 88 50 52 82 88' opacity='.6'/></g><g fill='%23000'><circle cx='24' cy='34' r='5'/><circle cx='76' cy='34' r='5'/><circle cx='50' cy='96' r='5'/></g></svg>");
   --fac-marca:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='3' stroke-linecap='square'><path d='M3 14 12 4l9 10'/><path d='M6 21l6-6 6 6' opacity='.65'/></g></svg>");
@@ -986,10 +987,9 @@ body{
   --paper:#e5ded0; --paper-2:#d5ccbb; --paper-3:#bdb3a0;
   /* malha de elos: duas grades de anéis, uma deslocada sobre a outra */
   --fac-tex:
-    radial-gradient(circle at 50% 50%,transparent 0 26%,rgba(231,225,209,.5) 27% 37%,transparent 38%),
-    radial-gradient(circle at 0% 50%,transparent 0 26%,rgba(231,225,209,.5) 27% 37%,transparent 38%);
+    radial-gradient(circle at 50% 50%,transparent 0 26%,rgba(231,225,209,1) 27% 37%,transparent 38%),
+    radial-gradient(circle at 0% 50%,transparent 0 26%,rgba(231,225,209,1) 27% 37%,transparent 38%);
   --fac-tex-size:28px 28px,28px 28px;
-  --fac-tex-op:.26;
   /* a régua do título é uma corrente vista de lado */
   --fac-regua:repeating-linear-gradient(90deg,currentColor 0 11px,transparent 11px 15px);
   --fac-selo:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='none' stroke='%23000' stroke-width='8'><ellipse cx='50' cy='17' rx='12' ry='16'/><ellipse cx='50' cy='40' rx='17' ry='11'/><ellipse cx='50' cy='63' rx='12' ry='16'/><ellipse cx='50' cy='86' rx='17' ry='11'/></g></svg>");
@@ -1013,10 +1013,9 @@ body{
   --spot:#b3341f; --spot-hi:#ea7a63; --spot-lo:#7c1f10;
   --paper:#e3e0d6; --paper-2:#d3cfc2; --paper-3:#bcb7a7;
   --fac-tex:
-    repeating-linear-gradient(90deg,rgba(231,225,209,.45) 0 1px,transparent 1px 96px),
-    radial-gradient(circle at 50% 50%,rgba(231,225,209,.5) 0 30%,transparent 32%);
+    repeating-linear-gradient(90deg,rgba(231,225,209,.9) 0 1px,transparent 1px 96px),
+    radial-gradient(circle at 50% 50%,rgba(231,225,209,1) 0 30%,transparent 32%);
   --fac-tex-size:auto,5px 5px;
-  --fac-tex-op:.22;
   --fac-regua:linear-gradient(180deg,currentColor 0 34%,transparent 34% 66%,currentColor 66% 100%);
   --fac-selo:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path fill='%23000' fill-rule='evenodd' d='M50 2 82 46 50 98 18 46Z M45 40h10v40H45z'/><rect x='30' y='84' width='40' height='7' fill='%23000'/></svg>");
   --fac-marca:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23000' fill-rule='evenodd' d='M12 1 20 12 12 23 4 12Z M10.6 10h2.8v9h-2.8z'/></svg>");
@@ -1034,9 +1033,8 @@ body{
 [data-afiliacao="A Frente"]{
   --spot:#8b9455; --spot-hi:#c8d090; --spot-lo:#4a5222;
   --paper:#e4e1cf; --paper-2:#d3cfba; --paper-3:#bab595;
-  --fac-tex:repeating-linear-gradient(45deg,rgba(231,225,209,.42) 0 10px,transparent 10px 22px);
+  --fac-tex:repeating-linear-gradient(45deg,rgba(231,225,209,1) 0 10px,transparent 10px 22px);
   --fac-tex-size:auto;
-  --fac-tex-op:.2;
   --fac-regua:repeating-linear-gradient(90deg,currentColor 0 14px,transparent 14px 21px);
   --fac-selo:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path fill='%23000' d='M50 4l12 25 27 4-19 19 4 27-24-13-24 13 4-27-19-19 27-4z'/><g fill='%23000'><path d='M14 78h72v9H14z'/><path d='M14 92h72v7H14z' opacity='.7'/></g></svg>");
   --fac-marca:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23000' d='M12 1.5l3 6.2 6.8 1-5 4.8 1.2 6.7L12 17l-6 3.2 1.2-6.7-5-4.8 6.8-1z'/></svg>");
@@ -1063,9 +1061,8 @@ body{
   --on-void:#39ff7a;
   --spot:#39ff7a; --spot-hi:#a6ffc6; --spot-lo:#39ff7a;
   --grain:.05;
-  --fac-tex:repeating-linear-gradient(180deg,rgba(57,255,122,.55) 0 1px,transparent 1px 3px);
+  --fac-tex:repeating-linear-gradient(180deg,rgba(57,255,122,1) 0 1px,transparent 1px 3px);
   --fac-tex-size:auto;
-  --fac-tex-op:.22;
   --fac-regua:repeating-linear-gradient(90deg,currentColor 0 4px,transparent 4px 8px);
   --fac-selo:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='5' y='14' width='90' height='72' fill='none' stroke='%23000' stroke-width='6'/><path fill='%23000' d='M20 36l17 13-17 13v-10l5-3-5-3zM45 56h30v9H45z'/></svg>");
   --fac-marca:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23000' d='M2 5l9 7-9 7v-4.6L6 12 2 9.6z'/><rect x='13' y='16' width='9' height='3.4' fill='%23000'/></svg>");
@@ -1138,10 +1135,9 @@ body{
   --spot:#7f83ac; --spot-hi:#c6c9e4; --spot-lo:#3a3d63;
   --paper:#e2e0dd; --paper-2:#d0cdcb; --paper-3:#b6b3b3;
   --fac-tex:
-    repeating-linear-gradient(62deg,rgba(231,225,209,.5) 0 2px,transparent 2px 9px),
-    repeating-linear-gradient(-62deg,rgba(231,225,209,.5) 0 2px,transparent 2px 9px);
+    repeating-linear-gradient(62deg,rgba(231,225,209,1) 0 2px,transparent 2px 9px),
+    repeating-linear-gradient(-62deg,rgba(231,225,209,1) 0 2px,transparent 2px 9px);
   --fac-tex-size:auto,auto;
-  --fac-tex-op:.16;
   --fac-regua:repeating-linear-gradient(62deg,currentColor 0 2px,transparent 2px 6px);
   --fac-selo:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='%23000'><ellipse cx='46' cy='52' rx='27' ry='18' transform='rotate(-14 46 52)'/><circle cx='72' cy='29' r='12'/><path d='M83 26 L99 32 L83 38Z'/><path d='M22 64 L1 86 L28 74Z'/><rect x='42' y='66' width='4.4' height='17'/><rect x='55' y='66' width='4.4' height='15'/></g></svg>");
   --fac-marca:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='%23000'><ellipse cx='11' cy='13' rx='7' ry='4.6' transform='rotate(-14 11 13)'/><circle cx='17.5' cy='7.5' r='3.2'/><path d='M20.2 6.8 24 8.2 20.2 9.6Z'/><path d='M5 16 0.5 21 6.5 18Z'/></g></svg>");
@@ -1159,10 +1155,9 @@ body{
   --spot:#b0559a; --spot-hi:#e39ad0; --spot-lo:#6b2757;
   --paper:#e6e4d2; --paper-2:#d6d3bd; --paper-3:#bcbc9d;
   --fac-tex:
-    repeating-linear-gradient(115deg,rgba(231,225,209,.44) 0 2px,transparent 2px 17px),
-    radial-gradient(circle at 50% 50%,rgba(231,225,209,.42) 0 22%,transparent 24%);
+    repeating-linear-gradient(115deg,rgba(231,225,209,1) 0 2px,transparent 2px 17px),
+    radial-gradient(circle at 50% 50%,rgba(231,225,209,.95) 0 22%,transparent 24%);
   --fac-tex-size:auto,19px 19px;
-  --fac-tex-op:.2;
   --fac-regua:repeating-linear-gradient(90deg,currentColor 0 9px,transparent 9px 12px,currentColor 12px 14px,transparent 14px 23px);
   --fac-selo:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='%23000'><ellipse cx='50' cy='21' rx='9' ry='18'/><ellipse cx='25' cy='35' rx='9' ry='18' transform='rotate(-42 25 35)'/><ellipse cx='75' cy='35' rx='9' ry='18' transform='rotate(42 75 35)'/><ellipse cx='30' cy='60' rx='8' ry='15' transform='rotate(-68 30 60)'/><ellipse cx='70' cy='60' rx='8' ry='15' transform='rotate(68 70 60)'/><path d='M50 50c-13 5-15 23-6 32 4 4 8 4 12 0 9-9 7-27-6-32z'/><rect x='47' y='80' width='6' height='20'/></g></svg>");
   --fac-marca:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='%23000'><ellipse cx='12' cy='6' rx='3.2' ry='5.4'/><ellipse cx='5.6' cy='10' rx='3.2' ry='5.4' transform='rotate(-45 5.6 10)'/><ellipse cx='18.4' cy='10' rx='3.2' ry='5.4' transform='rotate(45 18.4 10)'/><path d='M12 13c-3.4 1.4-4 6.2-1.6 8.6 1 1 2.2 1 3.2 0C16 19.2 15.4 14.4 12 13Z'/></g></svg>");
@@ -1182,11 +1177,11 @@ body{
 [data-afiliacao="Avulso"]{
   --spot:#2f9c8c; --spot-hi:#7fd8c9; --spot-lo:#175a50;
   --paper:#ded7c3; --paper-2:#cdc4ac; --paper-3:#b3a88c;
-  --fac-tex-op:.1;
+  --fac-tex-op:.03;
   --fac-inclina:2;
   --grain:.11;
 }
-[data-afiliacao="Avulso"] .fac-selo{opacity:.09}
+[data-afiliacao="Avulso"] .fac-selo{opacity:.05}
 
 /* A troca de casa não é um corte seco: o papel é substituído, não
    repintado. */
@@ -1287,7 +1282,7 @@ body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn,.attr,.panel-h{
 }
 .masthead::before{animation:lampada 13s steps(1,end) infinite}
 /* o selo da casa respira devagar atrás de tudo */
-@keyframes respira-selo{0%,100%{opacity:.17}50%{opacity:.26}}
+@keyframes respira-selo{0%,100%{opacity:.08}50%{opacity:.12}}
 .fac-selo{animation:respira-selo 11s ease-in-out infinite}
 
 /* ---- 2. ambiente: a maré só existe se houver Corrupção ---- */

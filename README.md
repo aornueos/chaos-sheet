@@ -124,6 +124,11 @@ Toda a gráfica vive no CSS, em `[data-afiliacao="…"]`. O script só escreve o
 atributo na raiz e escolhe as palavras do cabeçalho, então acrescentar uma
 casa é escrever um bloco de variáveis — não um componente novo.
 
+A trama de fundo da capa é fundo de fundo: só se nota quando se procura.
+A força dela é **um número no `:root`**, `--fac-tex-op`, e vale para as nove
+casas — o alfa de dentro de cada gradiente está normalizado em 1 justamente
+para que esse número signifique a mesma coisa em todas.
+
 ## Tipografia
 
 Courier Prime embutida no arquivo sob a
