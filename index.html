@@ -131,7 +131,7 @@
    isto existe: todos leem --gap, --pad-* e --colunas. */
 :root[data-densidade="apertado"]{
   --gap:13px; --pad-x:12px; --pad-topo:20px; --pad-base:13px;
-  --fs-xs:10px; --fs-sm:11px; --fs-base:13px; --fs-lg:15px; --fs-2xl:32px;
+  --fs-xs:11px; --fs-sm:11px; --fs-base:13px; --fs-lg:15px; --fs-2xl:32px;
 }
 :root[data-densidade="espacoso"]{
   --gap:32px; --pad-x:23px; --pad-topo:32px; --pad-base:28px;
@@ -199,7 +199,7 @@ body{
   content:"";position:absolute;inset:0;
   background-image:radial-gradient(circle at 50% 50%,#000 0 36%,transparent 38%);
   background-size:3px 3px;
-  opacity:.3;
+  opacity:.16;
   mix-blend-mode:multiply;
 }
 
@@ -239,13 +239,13 @@ body{
   color:var(--void);margin:0;line-height:.92;
 }
 .brand-sub{
-  font-size:9px;letter-spacing:.28em;text-transform:uppercase;
+  font-size:var(--fs-xs);letter-spacing:.14em;text-transform:uppercase;
   color:var(--void);margin:6px 0 0;opacity:.7;
 }
 
 .drawer-list{flex:1;overflow-y:auto;padding:22px 11px 4px}
 .drawer-label{
-  font-size:9px;letter-spacing:.24em;text-transform:uppercase;
+  font-size:var(--fs-xs);letter-spacing:.14em;text-transform:uppercase;
   color:var(--fg-3);padding:0 3px 11px;display:flex;justify-content:space-between;
 }
 /* cada ficha é um recorte de papel, torto, colado na lombada */
@@ -269,7 +269,7 @@ body{
   font-size:17px;letter-spacing:.01em;text-transform:uppercase;line-height:1.06;
 }
 .file span{
-  display:block;font-size:9px;letter-spacing:.15em;text-transform:uppercase;
+  display:block;font-size:var(--fs-xs);letter-spacing:.1em;text-transform:uppercase;
   margin-top:3px;opacity:.72;
 }
 
@@ -295,7 +295,7 @@ body{
 :root[data-gaveta="fechada"] .drawer-foot{padding:8px 3px;border-top-width:2px}
 :root[data-gaveta="fechada"] .drawer-foot > .btn,
 :root[data-gaveta="fechada"] .drawer-foot > input{display:none}
-:root[data-gaveta="fechada"] .save-state{font-size:8px;letter-spacing:.03em;padding:2px 0}
+:root[data-gaveta="fechada"] .save-state{font-size:var(--fs-xs);letter-spacing:.02em;padding:2px 0}
 /* na lombada o rótulo não cabe: vira seta, sem mexer no texto que o
    script escreve nem no rótulo que o leitor de tela anuncia */
 :root[data-gaveta="fechada"] .drawer-toggle{
@@ -303,7 +303,7 @@ body{
 }
 :root[data-gaveta="fechada"] .drawer-toggle::after{content:"▸";font-size:13px;line-height:1}
 .save-state{
-  font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  font-size:var(--fs-xs);letter-spacing:.12em;text-transform:uppercase;
   color:var(--fg-3);text-align:center;padding:2px 0 6px;
 }
 .save-state[data-state="erro"]{
@@ -335,7 +335,7 @@ body{
    então o mesmo botão serve no papel e sobre a mesa preta.
    ============================================================ */
 .btn{
-  font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-family:var(--mono);font-size:var(--fs-xs);letter-spacing:.1em;text-transform:uppercase;
   background:transparent;color:var(--fg);border:1.5px solid var(--fg);
   padding:8px 10px;cursor:pointer;position:relative;
   transition:background .1s,color .1s,transform .07s;
@@ -350,7 +350,7 @@ body{
 .btn-brass:hover{background:var(--spot-fg);color:var(--bg);box-shadow:none}
 .btn-danger{border-style:dashed}
 .btn-danger:hover{background:var(--spot-hi);border-color:var(--spot-hi);color:var(--void)}
-.btn-xs{padding:3px 7px;font-size:9px;letter-spacing:.12em;border-width:1px}
+.btn-xs{padding:3px 7px;font-size:var(--fs-xs);letter-spacing:.09em;border-width:1px}
 
 /* ============================================================
    FOLHA — a mesa onde os recortes caem
@@ -421,12 +421,12 @@ body{
 /* a linha de cima da capa: tarja de tinta especial */
 .mast-kicker{
   display:inline-block;margin:0 0 9px;
-  font-size:9px;letter-spacing:.3em;text-transform:uppercase;font-weight:700;
+  font-size:var(--fs-xs);letter-spacing:.14em;text-transform:uppercase;font-weight:700;
   background:var(--spot-hi);color:var(--void);
   padding:4px 9px 3px;
 }
 .mast-meta{
-  font-size:9px;letter-spacing:.19em;text-transform:uppercase;color:var(--fg-3);
+  font-size:var(--fs-xs);letter-spacing:.12em;text-transform:uppercase;color:var(--fg-3);
   margin:11px 0 0;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
 }
 /* a classificação vem tarjada, como documento liberado pela metade */
@@ -546,7 +546,7 @@ body{
   background:var(--fac-regua);color:var(--paper);opacity:.4;
 }
 .panel-h .h-note{
-  font-family:var(--mono);font-size:9px;letter-spacing:.15em;
+  font-family:var(--mono);font-size:var(--fs-xs);letter-spacing:.1em;
   color:var(--spot-hi);font-weight:400;text-transform:uppercase;
   /* a nota é decorativa: apertando, ela encolhe antes de empurrar o
      "?" para fora da tela */
@@ -588,7 +588,7 @@ body{
    ============================================================ */
 .field{display:flex;flex-direction:column;gap:3px;min-width:0}
 .field > label{
-  font-size:9px;letter-spacing:.17em;text-transform:uppercase;color:var(--fg-2);
+  font-size:var(--fs-xs);letter-spacing:.12em;text-transform:uppercase;color:var(--fg-2);
 }
 .inp,.sel,.txt{
   font-family:var(--mono);font-size:var(--fs-base);color:var(--fg);
@@ -634,7 +634,7 @@ body{
   padding:9px 5px 7px;text-align:center;position:relative;
 }
 .attr-n{
-  font-size:9px;letter-spacing:.15em;text-transform:uppercase;
+  font-size:var(--fs-xs);letter-spacing:.1em;text-transform:uppercase;
   color:var(--paper);opacity:.75;margin-bottom:3px;
 }
 .attr-v{
@@ -646,7 +646,7 @@ body{
 .attr-v::-webkit-outer-spin-button,.attr-v::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .attr-v:focus{outline:none;color:var(--spot-hi)}
 .attr-d{
-  font-size:9px;letter-spacing:.15em;color:var(--spot-hi);margin-top:2px;font-weight:700;
+  font-size:var(--fs-xs);letter-spacing:.1em;color:var(--spot-hi);margin-top:2px;font-weight:700;
 }
 
 /* ============================================================
@@ -654,7 +654,7 @@ body{
    ============================================================ */
 .sk-cols > .sk-group + .sk-group{margin-top:0}
 .sk-head{
-  font-size:9px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;
+  font-size:var(--fs-xs);letter-spacing:.12em;text-transform:uppercase;font-weight:700;
   background:var(--fg);color:var(--bg);
   padding:3px 7px;margin-bottom:7px;
   display:flex;justify-content:space-between;
@@ -689,11 +689,11 @@ body{
   font-family:var(--display);font-weight:400;
   font-size:16px;letter-spacing:.04em;text-transform:uppercase;color:var(--fg);
 }
-.track-max{font-size:9px;letter-spacing:.12em;color:var(--fg-3);font-variant-numeric:tabular-nums;text-transform:uppercase}
+.track-max{font-size:var(--fs-xs);letter-spacing:.09em;color:var(--fg-3);font-variant-numeric:tabular-nums;text-transform:uppercase}
 .levels{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin-bottom:7px}
 .lvl{
   border:1.5px solid var(--fg);background:transparent;padding:6px 2px;text-align:center;cursor:pointer;
-  font-family:var(--mono);font-size:10px;letter-spacing:.05em;color:var(--fg-2);
+  font-family:var(--mono);font-size:var(--fs-xs);letter-spacing:.05em;color:var(--fg-2);
   transition:background .1s;
 }
 .lvl:hover{background:color-mix(in srgb,var(--spot) 28%,transparent)}
@@ -707,14 +707,14 @@ body{
   border-left:4px solid var(--spot);padding-left:9px;
 }
 .track-state b{
-  color:var(--fg);text-transform:uppercase;letter-spacing:.1em;font-size:10px;
+  color:var(--fg);text-transform:uppercase;letter-spacing:.1em;font-size:var(--fs-xs);
 }
 .pool-row{display:flex;align-items:center;gap:9px;margin-top:8px}
 .pool-row .inp{
   text-align:center;font-family:var(--display);font-weight:400;font-size:24px;
   padding:1px 4px;border-bottom-width:2px;
 }
-.pool-lbl{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--fg-3);white-space:nowrap}
+.pool-lbl{font-size:var(--fs-xs);letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);white-space:nowrap}
 
 /* ============================================================
    CORRUPÇÃO
@@ -756,7 +756,7 @@ body{
 /* interruptor de Talento: aceso ocupa Capacidade, dormente não ocupa nada */
 .acende{
   flex:none;font:inherit;font-family:var(--mono);
-  font-size:9px;letter-spacing:.13em;text-transform:uppercase;
+  font-size:var(--fs-xs);letter-spacing:.1em;text-transform:uppercase;
   padding:4px 7px;border:1.5px solid var(--rule);background:transparent;color:var(--fg-2);
   cursor:pointer;transition:background .12s,color .12s,border-color .12s;
 }
@@ -766,7 +766,7 @@ body{
 /* legenda derivada do Vínculo, repetida em toda linha de Cifra: terse,
    porque quem lê já sabe o que significa depois da segunda vez. */
 .legenda{
-  margin:6px 0 0;font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  margin:6px 0 0;font-size:var(--fs-xs);letter-spacing:.1em;text-transform:uppercase;
   color:var(--fg-3);
 }
 
@@ -789,10 +789,10 @@ body{
 .row-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
 .row-meta .sel,.row-meta .inp{font-size:var(--fs-sm);padding:4px 3px}
 .tag{
-  font-size:9px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;
+  font-size:var(--fs-xs);letter-spacing:.1em;text-transform:uppercase;font-weight:700;
   background:var(--fg);color:var(--bg);padding:3px 7px 2px;white-space:nowrap;align-self:center;
 }
-.empty{font-size:var(--fs-xs);color:var(--fg-3);letter-spacing:.13em;padding:7px 0;text-transform:uppercase}
+.empty{font-size:var(--fs-xs);color:var(--fg-3);letter-spacing:.1em;padding:7px 0;text-transform:uppercase}
 .empty::before{content:"✕ "}
 .add-row{margin-top:9px;width:100%}
 .add-dupla{display:grid;grid-template-columns:1fr auto;gap:6px;margin-top:10px}
@@ -812,14 +812,14 @@ body{
 
 /* ---------- inventário e volume ---------- */
 .vol{
-  display:flex;justify-content:space-between;font-size:9px;letter-spacing:.15em;
+  display:flex;justify-content:space-between;font-size:var(--fs-xs);letter-spacing:.1em;
   text-transform:uppercase;color:var(--fg-2);margin-bottom:9px;
   border-bottom:2px solid var(--fg);padding-bottom:5px;
 }
 .vol b{color:var(--fg);font-variant-numeric:tabular-nums;font-size:12px}
 .vol.over b{background:var(--spot-hi);color:var(--void);padding:0 4px}
 .eq{
-  display:flex;align-items:center;gap:6px;font-size:9px;letter-spacing:.14em;
+  display:flex;align-items:center;gap:6px;font-size:var(--fs-xs);letter-spacing:.1em;
   text-transform:uppercase;color:var(--fg-2);cursor:pointer;white-space:nowrap;
   align-self:flex-end;padding-bottom:5px;
 }
@@ -841,14 +841,14 @@ body{
   filter:grayscale(1) contrast(2.1) brightness(.95);
 }
 .portrait span{
-  font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-3);
+  font-size:var(--fs-xs);letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);
   text-align:center;padding:0 8px;line-height:1.5;
 }
 .portrait:hover{border-color:var(--spot-hi)}
 
 /* ---------- utilitários ---------- */
 .hint{
-  font-size:10px;letter-spacing:.04em;color:var(--fg-2);margin-top:9px;line-height:1.55;
+  font-size:var(--fs-xs);letter-spacing:.04em;color:var(--fg-2);margin-top:9px;line-height:1.55;
   border-left:2px solid var(--rule);padding-left:8px;
 }
 /* linha de corte: onde a tesoura passaria */
@@ -864,7 +864,7 @@ body{
 /* ---------- habilidades concedidas (derivadas, não editáveis) ---------- */
 .conc{border-left:5px solid var(--spot);padding:1px 0 1px 11px;margin-bottom:13px}
 .conc:last-child{margin-bottom:0}
-.conc-de{font-size:9px;letter-spacing:.17em;text-transform:uppercase;color:var(--fg-3)}
+.conc-de{font-size:var(--fs-xs);letter-spacing:.12em;text-transform:uppercase;color:var(--fg-3)}
 .conc-nome{
   font-family:var(--display);font-weight:400;font-size:16px;letter-spacing:.03em;
   text-transform:uppercase;color:var(--fg);line-height:1.15;margin-top:2px;
@@ -895,7 +895,7 @@ body{
 .comp-topo .panel-h{margin:-17px 0 0 -17px;flex:1}
 .comp-abas{display:flex;gap:6px;flex-wrap:wrap}
 .comp-aba{
-  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  font-family:var(--mono);font-size:var(--fs-xs);letter-spacing:.1em;text-transform:uppercase;
   background:transparent;border:1.5px solid var(--fg);color:var(--fg);padding:6px 11px;cursor:pointer;
 }
 .comp-aba:hover{background:color-mix(in srgb,var(--spot) 25%,transparent)}
@@ -1098,7 +1098,7 @@ body{
 [data-afiliacao="Mysteria"] .comp-caixa{background:#04140a;color:#39ff7a;border-color:#39ff7a}
 /* carimbo de borracha não existe em terminal: vira etiqueta de sistema */
 [data-afiliacao="Mysteria"] .stamp{
-  font-family:var(--mono);font-weight:700;font-size:12px;letter-spacing:.14em;
+  font-family:var(--mono);font-weight:700;font-size:12px;letter-spacing:.1em;
 }
 /* varredura densa do tubo, no lugar do meio-tom de fotocópia */
 [data-afiliacao="Mysteria"] .tex-2::before{
@@ -1478,9 +1478,9 @@ body,.panel,.masthead,.drawer,.inp,.sel,.txt,.stamp,.btn,.attr,.panel-h{
   :root[data-gaveta="fechada"] .brand-sub{display:none}
   :root[data-gaveta="fechada"] .drawer-foot{display:none}
   :root[data-gaveta="fechada"] .drawer .drawer-toggle{
-    width:auto;flex:none;margin-top:0;padding:15px 14px;font-size:10px;
+    width:auto;flex:none;margin-top:0;padding:15px 14px;font-size:var(--fs-xs);
   }
-  :root[data-gaveta="fechada"] .drawer-toggle::after{content:" ▾";font-size:10px}
+  :root[data-gaveta="fechada"] .drawer-toggle::after{content:" ▾";font-size:var(--fs-xs)}
   .drawer-list{padding:12px 14px 0;overflow:visible}
   #fileList{display:flex;gap:9px;overflow-x:auto;padding-bottom:9px}
   .file{flex:0 0 194px;margin-bottom:0}

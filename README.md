@@ -135,6 +135,12 @@ Courier Prime embutida no arquivo sob a
 [SIL Open Font License 1.1](https://scripts.sil.org/OFL),
 para que a ficha tenha a mesma aparência em qualquer máquina.
 
+Rótulo nenhum desce de **11px**, em qualquer arranjo, e o rastreamento das
+caps miúdas para em **.14em**: passando disso a palavra se desmancha em letras
+soltas e o olho perde o contorno dela. A retícula de meio-tom que cobre a
+página fica em 16% — acima disso ela deixa de ser grão de fotocópia e passa a
+comer os finos da letra.
+
 Nas manchetes entra uma condensada pesada de sistema (Impact e seus
 substitutos). Ela não vai embutida: onde não existir, a pilha cai para outra
 condensada e o zine continua de pé. No PDF a ficha volta a ser inteiramente
