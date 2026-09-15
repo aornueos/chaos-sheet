@@ -116,24 +116,48 @@ não sabe o que estava escondido.
 
 ## Disposição
 
-**Afiliação e Dossiê abrem o fluxo.** É a casa que reimprime a ficha inteira, e
-é o dossiê que diz de quem ela é.
+A ficha se lê por assunto, não por painel solto. **Cinco faixas**, cada uma
+aberta pela própria régua:
 
-**Atributos, Vitalidade, Corrupção e Perícias ficam sempre no alto**, numa
-grade própria acima do resto. É o que se toca a sessão inteira, e não entra no
-fluxo: em qualquer largura e em qualquer arranjo está no mesmo lugar. Perícias
-toma a linha inteira e reparte os quatro grupos em colunas.
+| Faixa | O que traz |
+| --- | --- |
+| **Importantes** | Atributos, Vitalidade, Corrupção — o que se toca a sessão inteira |
+| **Perícias** | as quinze, tomando a linha inteira |
+| **Criação de Personagem** | Dossiê, Arquétipo, Afiliação, Âncoras, Progressão |
+| **Espiritual** | Cifras Correntes, Cifras Catalogadas, Semblante, Labirinto Próprio |
+| **Utensílios** | Talentos, Equipamento, Anotações |
 
-O resto desce em colunas de fluxo, onde o navegador escolhe o corte pela
-altura. Ali um painel muda mesmo de coluna conforme a ficha cresce; o que é
-garantido é a ordem de leitura — quem você é, como você resolve, o que você
-gasta, o que te prende.
+Progressão fica em Criação porque o XP e a trilha de Ascensão são o registro
+de como este personagem chegou aqui — e a Ascensão queima Âncora, que está na
+mesma faixa.
 
-A faixa de cima abre por **contagem** (são exatamente três medidores), e o
-fluxo e as Perícias abrem por **largura mínima**. Os quatro Atributos querem
-quatro colunas ou duas, nunca três, e quem decide é a largura do próprio
-recorte, por `@container`, não a da janela: recorte estreito em janela larga
-acontece o tempo todo aqui.
+**Todo painel toma a faixa inteira.** Quem cresce para o lado é o conteúdo
+dele: as entradas de Talento, Cifra e Bênção descem em colunas dentro do
+próprio painel; os cartões de Âncora e de Corrente ficam lado a lado; e os
+pares de campo abrem em quantas colunas couberem. Painel estreito empilhado
+jogava tudo para baixo — numa tela larga sobrava meia folha em branco e a
+ficha virava um rolo.
+
+A exceção é **Importantes**, que abre por contagem: são exatamente três
+medidores, e eles ficam no mesmo lugar em qualquer largura.
+
+O que decide o número de colunas dentro do painel é sempre uma **largura
+mínima**, nunca uma contagem — `--col-item` para lista, `--col-per` para
+perícia. Assim o mesmo painel dá três colunas numa tela larga e uma no
+celular, sem regra nova.
+
+Os quatro Atributos querem quatro colunas ou duas, nunca três, e quem decide é
+a largura do próprio recorte, por `@container`, não a da janela: recorte
+estreito em janela larga acontece o tempo todo aqui.
+
+### Perícias não pertencem a atributo
+
+A fórmula é 1D do Atributo Chave mais 1D da Perícia Chave, e **qual é o
+Atributo Chave quem decide é a cena**. O livro passa metade do Capítulo 4
+trocando um pelo outro: Intimidação por Corpo, Percepção por Fortitude, Lógica
+por Movimentação, Domínio por Fortitude. Agrupar perícia sob atributo na ficha
+ensinaria o contrário do que o sistema faz, então as quinze são uma lista
+solta, em ordem alfabética, repartida em colunas pela largura disponível.
 
 ## Gaveta
 
@@ -157,8 +181,8 @@ todo o resto lê `--gap`, `--pad-*` e as larguras mínimas de coluna.
 
 ## Direção de arte
 
-Fanzine gótico ocultista, e a estética é protagonista. A regra é de três
-materiais, e só três.
+Fanzine gótico ocultista com estrutura **Art Déco**, e a estética é
+protagonista. A regra é de três materiais, e só três.
 
 **Papel** é o mundo ordinário: atributos, perícias, equipamento, dinheiro.
 Tinta preta sobre papel osso, o que qualquer pessoa de Elinia entenderia se
@@ -176,6 +200,20 @@ trocam de cor sem que nenhuma perca contraste.
 
 A mesa é preta. Os painéis são recortes de papel colados sobre ela — tortos,
 rasgados à mão, alguns presos com fita, e nenhum no mesmo ângulo do vizinho.
+
+### Onde o Déco entra
+
+Na estrutura, e não na superfície. **A geometria manda no layout, a sujeira
+manda na textura** — é esse o acordo entre Déco e zine, e é o que impede um de
+virar enfeite do outro.
+
+A régua de cada faixa é filete triplo — fino, grosso, fino —, com a ponta
+descendo em **degrau de zigurate** e um losango de tinta da casa de cada lado
+do nome. Os painéis ganham **cantoneira** em dois cantos opostos, não moldura
+nos quatro: fechar a caixa brigaria com o recorte de tesoura, e dois cantos
+bastam para o olho completar o retângulo. Etiqueta, botão e carimbo têm o
+**canto chanfrado**, que é a assinatura mais barata e mais reconhecível do
+período.
 
 **Quem entorta é o papel, não o texto.** A folha é um elemento próprio por
 baixo do painel: é ela que gira, pega grão e rasga, e o conteúdo fica reto em
@@ -218,7 +256,14 @@ perda como a vida trata: com piada do lado. O texto de apoio responde ao
 estado da ficha, e responde falando — no degrau 2 de Vitalidade, no terceiro
 Contato do arco, quando a Capacidade estoura, quando sobra XP demais parado.
 
-Todo texto de leitura passa de 4,5:1 nas nove casas; o pior caso mede 4,78:1.
+Uma cor não é papel nem tinta nem casa: **`--realce`**, o "este é o atual" da
+régua de Vitalidade. Ela precisa ser a mais forte do conjunto, e o que é forte
+depende do fundo: escura em papel claro, clara em tela de fósforo. Sem essa
+variável a Mysteria pintava o nível atual mais escuro que os vazios, e a régua
+passava a ler ao contrário.
+
+Todo texto de leitura passa de 4,5:1 nas nove casas; o pior caso mede 5,09:1,
+medido contra o pé do papel — que é onde o gradiente é mais escuro.
 
 ## As nove casas
 
@@ -250,11 +295,16 @@ número signifique a mesma coisa em todas.
 ## A marca
 
 A manchete da capa não flutua no preto: é um **retalho de papel rasgado**,
-colado torto, com a marca impressa em cima dele. O PNG do logotipo já vem com
-fundo transparente, então ele cai direto sobre o papel e o grão da fotocópia
-aparece através dele — que é o que aconteceria se alguém tivesse mesmo
-xerocado a folha. Quando existe arquivo, a cruz desenhada some: a arte traz a
-própria.
+colado torto, com a marca impressa em cima dele. Quando existe arquivo, a cruz
+desenhada some: a arte traz a própria.
+
+E a marca entra como **máscara, não como imagem**. O PNG é arte preta sobre
+fundo transparente; mascarando, quem pinta passa a ser a tinta da casa. Isso
+resolve o caso que uma imagem não resolveria: na Mysteria o papel é tela e a
+tinta é fósforo, e um logotipo preto ali era preto sobre preto. Agora ele sai
+verde, junto com todo o resto. A proporção vem do cabeçalho do próprio
+arquivo, então trocar a marca por outra de formato diferente não pede CSS
+novo.
 
 ## Tipografia
 

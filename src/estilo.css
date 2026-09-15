@@ -47,6 +47,8 @@
   --casa:      #6d8496;
   --casa-esc:  #3c4b57;
   --casa-clr:  #a9bfcd;
+  --realce:    var(--casa-esc);   /* "este é o atual" */
+  --realce-tinta: #fff;
 
   /* trama de fundo da capa. A força é um número só, e vale para as nove
      casas: o alfa interno de cada gradiente está normalizado em 1. */
@@ -63,6 +65,7 @@
   --tr:        .08em;  /* rastreamento das caps miúdas */
   --col-min:   310px;
   --col-per:   220px;
+  --col-item:  330px;   /* largura mínima de coluna de lista dentro do painel */
 
   --som:       0 2px 0 rgba(0,0,0,.55), 0 10px 26px -12px rgba(0,0,0,.9);
 
@@ -78,11 +81,11 @@
 
 [data-arranjo="apertado"]{
   --gap: 9px; --pad: 10px; --pad-2: 7px; --fs: 14px; --fs-mini: 12px;
-  --col-min: 268px; --col-per: 184px;
+  --col-min: 268px; --col-per: 184px; --col-item: 290px;
 }
 [data-arranjo="espacoso"]{
   --gap: 20px; --pad: 21px; --pad-2: 15px; --fs: 16px; --fs-mini: 12px;
-  --col-min: 360px; --col-per: 250px;
+  --col-min: 360px; --col-per: 250px; --col-item: 380px;
 }
 
 *{ box-sizing: border-box; }
@@ -275,15 +278,23 @@ body::before{
 /* Quando existe arquivo de marca, o retalho de papel vira a moldura dele e
    a cruz desenhada some: a arte já traz a própria. O SVG herda a cor da
    tinta, então a marca continua sendo preto sobre papel nas nove casas. */
-.marca__palavra--arte{ line-height: 0; margin: 0; }
+.marca__palavra--arte{ line-height: 0; margin: 0; color: var(--tinta); }
 .marca__chapa--arte{ padding: 10px 18px 12px 16px; }
 .marca__palavra--arte svg,
 .marca__arte{
   display: block;
-  width: clamp(230px, 42vw, 470px); height: auto;
+  width: clamp(230px, 42vw, 470px);
   max-width: 100%;
 }
-.marca__palavra--arte svg{ fill: currentColor; }
+.marca__palavra--arte svg{ height: auto; fill: currentColor; }
+/* a arte é recorte, não imagem: o que pinta é a tinta da casa, e o grão do
+   papel continua aparecendo por baixo dela */
+.marca__arte{
+  background: currentColor;
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+}
 .marca__chapa--arte::before,
 .marca__chapa--arte::after{ display: none; }
 /* a cruz é impressa no papel: onde o papel acaba, a linha acaba junto */
@@ -330,19 +341,106 @@ body::before{
 
 .folha{ padding: 0 var(--gap) calc(var(--gap) * 3); }
 
-/* a faixa de cima não entra no fluxo: é o que se toca a sessão inteira, e em
-   qualquer largura fica no mesmo lugar. Contagem fixa, não auto-fit. */
-.faixa{
-  display: grid; gap: var(--gap); align-items: start;
-  grid-template-columns: repeat(3, minmax(0,1fr));
-  margin-bottom: var(--gap);
-}
-.faixa > .painel--largo{ grid-column: 1 / -1; }
-@media (max-width: 900px){ .faixa{ grid-template-columns: 1fr; } }
+/* ------------------------------------------------- 4b. tópicos e Art Déco
 
-/* o resto desce em colunas de fluxo: o navegador corta pela altura */
-.fluxo{ column-width: var(--col-min); column-gap: var(--gap); }
-.fluxo > .painel{ break-inside: avoid; margin: 0 0 var(--gap); display: inline-block; width: 100%; }
+   A ficha se lê por assunto. Cinco faixas, cada uma aberta por uma régua.
+
+   A régua é o ponto onde o Déco entra sem discutir com o zine: filete triplo
+   — fino, grosso, fino —, ponta em degrau de zigurate e losango de tinta da
+   casa nas duas bordas do nome. Déco é geometria simétrica e repetida; zine
+   é fotocópia torta. O acordo é que a geometria manda na estrutura e a
+   sujeira manda na superfície.                                             */
+
+.topico{ margin: 0 0 calc(var(--gap) * 2.2); }
+.topico:first-child{ margin-top: 4px; }
+
+.topico__regua{
+  display: flex; align-items: center; gap: 12px;
+  margin: 0 0 3px;
+  font: 400 clamp(14px, 1.7vw, 20px)/1 var(--titulo);
+  letter-spacing: .3em; text-transform: uppercase;
+  color: var(--prata-2);
+}
+.topico__nome{
+  position: relative; flex: 0 0 auto;
+  padding: 0 4px;
+  white-space: nowrap;
+  text-shadow: 0 2px 0 rgba(0,0,0,.6);
+}
+/* losango de tinta da casa dos dois lados do nome */
+.topico__nome::before,
+.topico__nome::after{
+  content: ""; position: absolute; top: 50%;
+  width: 7px; height: 7px; margin-top: -4px;
+  background: var(--casa);
+  transform: rotate(45deg);
+}
+.topico__nome::before{ left: -13px; }
+.topico__nome::after{ right: -13px; }
+
+/* o filete triplo, com a ponta descendo em degrau */
+.topico__fio{
+  flex: 1 1 auto; min-width: 22px; height: 11px;
+  background:
+    linear-gradient(var(--prata-1), var(--prata-1)) 0 0 / 100% 1px no-repeat,
+    linear-gradient(var(--prata-2), var(--prata-2)) 0 5px / 100% 3px no-repeat,
+    linear-gradient(var(--prata-1), var(--prata-1)) 0 100% / 100% 1px no-repeat;
+  opacity: .8;
+}
+.topico__regua .topico__fio:first-child{
+  clip-path: polygon(0 36%, 8px 36%, 8px 18%, 16px 18%, 16px 0, 100% 0, 100% 100%, 16px 100%, 16px 82%, 8px 82%, 8px 64%, 0 64%);
+}
+.topico__regua .topico__fio:last-child{
+  clip-path: polygon(0 0, calc(100% - 16px) 0, calc(100% - 16px) 18%, calc(100% - 8px) 18%, calc(100% - 8px) 36%, 100% 36%, 100% 64%, calc(100% - 8px) 64%, calc(100% - 8px) 82%, calc(100% - 16px) 82%, calc(100% - 16px) 100%, 0 100%);
+}
+
+.topico__nota{
+  margin: 0 0 var(--gap);
+  text-align: center;
+  font: 400 var(--fs-mini)/1.4 var(--mono);
+  letter-spacing: var(--tr); text-transform: uppercase;
+  color: var(--prata-1);
+}
+
+/* Três arranjos de faixa. Contagem fixa onde o número de painéis é fixo,
+   largura mínima onde ele cresce com a ficha. */
+.topico__corpo{ position: relative; }
+.topico__corpo--largo > .painel{ width: 100%; }
+.topico__corpo--grade3{
+  display: grid; gap: var(--gap); align-items: start;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.topico__corpo--fluxo{ display: flex; flex-direction: column; gap: var(--gap); }
+.topico__corpo--fluxo > .painel{ width: 100%; }
+@media (max-width: 900px){
+  .topico__corpo{ position: relative; }
+.topico__corpo--largo > .painel{ width: 100%; }
+.topico__corpo--grade3{ grid-template-columns: 1fr; }
+}
+
+/* ---- o Déco no painel: cantoneira, não moldura ----
+   Quatro cantos inteiros fechariam a caixa e brigariam com o recorte de
+   tesoura. Dois cantos opostos bastam para o olho fechar o retângulo. */
+.painel__folha::after{
+  content: ""; position: absolute; inset: 5px; z-index: 2;
+  pointer-events: none; opacity: .5;
+  background:
+    linear-gradient(var(--tinta-2), var(--tinta-2)) 0 0 / 22px 1px no-repeat,
+    linear-gradient(var(--tinta-2), var(--tinta-2)) 0 0 / 1px 22px no-repeat,
+    linear-gradient(var(--tinta-2), var(--tinta-2)) 100% 100% / 22px 1px no-repeat,
+    linear-gradient(var(--tinta-2), var(--tinta-2)) 100% 100% / 1px 22px no-repeat;
+}
+
+/* ---- canto cortado em etiqueta e botão: o chanfro é a assinatura Déco ---- */
+.tag{
+  clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
+}
+.bt{
+  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+}
+.carimbo{
+  clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 7px 100%, 0 calc(100% - 7px));
+}
 
 /* --------------------------------------------------------------- 5. painel */
 
@@ -486,7 +584,8 @@ select.ent{ cursor: pointer; }
 .ent--num{ text-align: center; font-variant-numeric: tabular-nums; }
 
 .grade{ display: grid; gap: var(--pad-2) 10px; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); }
-.grade--2{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+/* "duas" era o mínimo, não o teto: numa faixa inteira cabem cinco */
+.grade--2{ grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
 
 /* botões */
 .bt{
@@ -587,7 +686,7 @@ select.ent{ cursor: pointer; }
   opacity: .75;
 }
 .degrau[data-atual="1"]{
-  background: var(--casa-esc); color: #fff; font-weight: 700;
+  background: var(--realce); color: var(--realce-tinta); font-weight: 700;
   box-shadow: inset 0 0 0 1.5px var(--tinta), 0 0 0 2px var(--casa);
 }
 .degrau:hover{ outline: 2px solid var(--casa); outline-offset: 1px; }
@@ -693,13 +792,12 @@ select.ent{ cursor: pointer; }
 
 /* ------------------------------------------------------------- 8. perícias */
 
-.pers{ display: grid; gap: var(--pad-2) var(--gap); grid-template-columns: repeat(auto-fit, minmax(var(--col-per), 1fr)); }
-.pers__grupo > h4{
-  margin: 0 0 6px;
-  padding-bottom: 3px;
-  border-bottom: 1.5px solid var(--tinta);
-  font: 400 var(--fs-mini)/1.3 var(--titulo);
-  letter-spacing: var(--tr); text-transform: uppercase;
+/* Quinze linhas soltas, em colunas que o navegador escolhe pela largura.
+   Não há cabeçalho de grupo porque perícia não pertence a atributo: o
+   Atributo Chave é escolha da cena. */
+.pers{
+  display: grid; gap: 0 var(--gap);
+  grid-template-columns: repeat(auto-fit, minmax(var(--col-per), 1fr));
 }
 .per{
   display: flex; align-items: center; gap: 7px;
@@ -732,6 +830,12 @@ select.ent{ cursor: pointer; }
 /* ---------------------------------------------------------------- 9. listas */
 
 .itens{ list-style: none; margin: 0; padding: 0; }
+/* Talento, Cifra e Bênção são entradas independentes: numa faixa larga elas
+   descem em colunas em vez de esticarem uma linha de texto de 1400px, que
+   nenhum olho acompanha. */
+.itens--colunas{ column-width: var(--col-item); column-gap: calc(var(--gap) * 1.6); }
+.itens--colunas > .item{ break-inside: avoid; }
+.itens--colunas > .item:first-child{ border-top: 1.5px solid rgba(22,19,15,.34); }
 .item{
   position: relative;
   padding: 8px 0 9px;
@@ -781,6 +885,12 @@ select.ent{ cursor: pointer; }
 .acende[aria-pressed="true"]::after{ transform: translateX(15px); background: var(--prata-3); }
 
 /* âncora: ficha de papel dentro do papel */
+.cartoes{
+  display: grid; gap: var(--gap);
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  margin-bottom: var(--pad-2);
+}
+.cartoes > .ancora{ margin: 0; }
 .ancora{
   position: relative;
   margin: 0 0 calc(var(--pad-2) + 4px);
@@ -1046,6 +1156,7 @@ body[data-gaveta="fechada"] .palco{ margin-left: 54px; }
    É a única casa que inverte o material, e ela inverte de propósito. */
 [data-casa="Mysteria"]{
   --casa: #3ddc86; --casa-esc: #0d3f24; --casa-clr: #8ef8bb; --capa-tinta: #a6f8c6;
+  --realce: #8ef8bb; --realce-tinta: #04140a;
   --papel: #0d1410; --papel-2: #0a100c; --papel-3: #070b08;
   --tinta: #a6f8c6; --tinta-2: #6fca92; --tinta-3: #468f64;
   --trama: repeating-linear-gradient(0deg,
@@ -1063,7 +1174,11 @@ body[data-gaveta="fechada"] .palco{ margin-left: 54px; }
 [data-casa="Mysteria"] .degrau[data-cheio="1"],
 [data-casa="Mysteria"] .cap__usada,
 [data-casa="Mysteria"] .grau__casa[data-feito="1"],
-[data-casa="Mysteria"] .trilha__passo[data-atual="1"]{ background: #3ddc86; color: #04140a; }
+[data-casa="Mysteria"] .medidor--papel .medidor__casa[data-tipo="cheio"],
+[data-casa="Mysteria"] .trilha__passo[data-atual="1"]{ background: #2aa462; color: #04140a; }
+/* o botão de recolher precisa existir contra tela preta */
+[data-casa="Mysteria"] .painel__olho{ background: rgba(62,220,134,.18); color: var(--tinta); }
+[data-casa="Mysteria"] .painel__olho:hover{ background: var(--casa); color: #04140a; }
 [data-casa="Mysteria"] .corr__estado{ background: #0d3f24; color: #8ef8bb; }
 [data-casa="Mysteria"] .tag{ box-shadow: inset 0 0 0 1px var(--tinta-2); color: var(--tinta-2); background: rgba(62,220,134,.06); }
 

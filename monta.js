@@ -40,7 +40,23 @@ function marca() {
       if (!fs.existsSync(arq)) continue;
       const tipo = ext === "jpg" ? "jpeg" : ext;
       const b64 = fs.readFileSync(arq).toString("base64");
-      return { tipo: base + "." + ext, html: `<img class="marca__arte" alt="Devaneio" src="data:image/${tipo};base64,${b64}">` };
+      const uri = `url("data:image/${tipo};base64,${b64}")`;
+      /* a proporção sai do cabeçalho do próprio arquivo: trocar a marca por
+         outra de formato diferente não deve exigir mexer no CSS */
+      const bytes = fs.readFileSync(arq);
+      const proporcao = ext === "png" && bytes.length > 24
+        ? `${bytes.readUInt32BE(16)} / ${bytes.readUInt32BE(20)}`
+        : "3 / 1";
+      /* Bitmap de marca entra como MÁSCARA, não como imagem. A arte é preta
+         com fundo transparente; mascarada, ela passa a ser pintada com a
+         tinta da casa — e na Mysteria, onde o papel é tela e a tinta é
+         fósforo, a marca deixa de ser preto sobre preto. */
+      return {
+        tipo: base + "." + ext,
+        html: `<span class="marca__arte" role="img" aria-label="Devaneio"></span>`,
+        /* a URI vai numa variável para não ser escrita duas vezes: são 64 KB */
+        css: `.marca__arte{--arte:${uri};-webkit-mask-image:var(--arte);mask-image:var(--arte);aspect-ratio:${proporcao};}`,
+      };
     }
   }
   return null;
@@ -64,6 +80,7 @@ const html = `<!doctype html>
    Vai embutida para a ficha ter a mesma cara em qualquer máquina. */
 ${fontes}
 ${estilo}
+${marcaArte && marcaArte.css ? "/* a marca do autor, recortada como máscara para pegar a tinta da casa */\n" + marcaArte.css : ""}
 </style>
 </head>
 <body data-casa="O Olho" data-gaveta="fechada">

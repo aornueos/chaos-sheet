@@ -22,16 +22,17 @@ const ATRIBUTOS = [
 const DADO_ATRIBUTO = ["—", "1D6", "1D8", "1D10", "1D12", "1D20"];
 const DADO_PERICIA  = ["—", "1D6", "1D8", "1D10", "1D12"];
 
-/* Quinze, e só estas quinze. A família do Arquétipo diz de qual atributo cada
-   uma costuma sair; o Atributo Chave de um teste continua sendo escolha da
-   cena, e o livro é explícito sobre trocas (Intimidação por Corpo, e assim). */
-const PERICIAS = {
-  corpo:      ["Atletismo", "Briga", "Destreza", "Fortitude", "Movimentação", "Pontaria"],
-  raciocinio: ["Conhecimento", "Lógica", "Percepção"],
-  espirito:   ["Domínio", "Propósito"],
-  influencia: ["Intimidação", "Lábia", "Manipulação", "Performance"],
-};
-const TODAS_PERICIAS = Object.values(PERICIAS).flat();
+/* Quinze, e só estas quinze. Elas não pertencem a atributo nenhum: a fórmula
+   é 1D do Atributo Chave mais 1D da Perícia Chave, e qual é o Atributo Chave
+   quem decide é a cena. O livro passa metade do Capítulo 4 trocando um pelo
+   outro — Intimidação por Corpo, Percepção por Fortitude, Lógica por
+   Movimentação. Amarrar perícia a atributo na ficha ensinaria errado.
+   Em ordem alfabética, porque a lista é para procurar. */
+const TODAS_PERICIAS = [
+  "Atletismo", "Briga", "Conhecimento", "Destreza", "Domínio",
+  "Fortitude", "Intimidação", "Lábia", "Lógica", "Manipulação",
+  "Movimentação", "Percepção", "Performance", "Pontaria", "Propósito",
+];
 
 /* Duas coisas dependem da Linhagem: quanto o corpo aguenta, e quanta alma cabe. */
 const LINHAGENS = {
@@ -368,6 +369,7 @@ const marcasDe = f => (grauDe(f).marcas || []).slice(0, Math.floor(nivelGrau(gra
 const contaMarca = (f, tipo) => marcasDe(f).filter(m => m === tipo).length;
 
 const vitMax   = f => LINHAGENS[f.linhagem].vit + contaMarca(f, "corpo");
+const vitPontosDe = f => Math.min(Math.max(0, f.vitPontos), vitMax(f));
 const limiarDe = f => LINHAGENS[f.linhagem].limiar + contaMarca(f, "cordao");
 
 /* Cultura e Antecedente concedem um nível de perícia cada. O nível gratuito
@@ -687,8 +689,8 @@ function faixaVitalidade(f) {
     }).join("") + `</div>` +
     `<div class="vit__estado"><b class="vit__nome">${esc(est.nome)}</b>` +
       `<span class="vit__pen">${esc(est.pen)}</span></div>` +
-    `<div class="slot__rot"><span>Pontos de Vitalidade</span><b>${f.vitPontos} de ${max}</b></div>` +
-    medidor("vitPts", max, i => i <= f.vitPontos ? "cheio" : "vazio", { classe: "medidor--papel", rot: "Ponto de Vitalidade" }) +
+    `<div class="slot__rot"><span>Pontos de Vitalidade</span><b>${vitPontosDe(f)} de ${max}</b></div>` +
+    medidor("vitPts", max, i => i <= vitPontosDe(f) ? "cheio" : "vazio", { classe: "medidor--papel", rot: "Ponto de Vitalidade" }) +
     `<div class="linha-bts naoimprime"><button class="bt bt--fino" type="button" data-acao="vitCheia">encher tudo</button></div>` +
     `<p class="margem">Zerou os pontos, cai um nível e a reserva volta ao máximo. Chegou ao <b>0</b>, acabou — e não é o tipo de coisa que repouso conserta.</p>` +
     (f.vitNivel === 2 ? `<p class="margem"><b>Este é o degrau que mata gente.</b> A Face você aguenta. Não poder reagir significa que o próximo golpe entra inteiro, e o combate deste jogo não perdoa golpe que entra inteiro.</p>` : "") +
@@ -731,8 +733,8 @@ function faixaCorrupcao(f) {
 
 function faixaPericias(f) {
   const teto = estagioDe(f).tetoEsp;
-  const corpo = `<div class="pers">` + ATRIBUTOS.map(a =>
-    `<div class="pers__grupo"><h4>${esc(a.rot)}</h4>` + PERICIAS[a.chave].map(p => {
+  const corpo = `<div class="pers">` + [TODAS_PERICIAS].map(lista =>
+    lista.map(p => {
       const comprado = f.pericias[p];
       const gratis = concedidoEm(f, p);
       const total = periciaTotal(f, p);
@@ -745,20 +747,17 @@ function faixaPericias(f) {
           `<button class="passo" type="button" data-acao="per" data-alvo="${esc(p)}" data-d="-1"${comprado <= 0 ? " disabled" : ""} aria-label="Baixar ${esc(p)}">−</button>` +
           `<button class="passo" type="button" data-acao="per" data-alvo="${esc(p)}" data-d="1"${total >= teto ? " disabled" : ""} aria-label="Subir ${esc(p)}">+</button>` +
         `</span></div>`;
-    }).join("") + `</div>`
+    }).join("")
   ).join("") + `</div>` +
   `<p class="margem">Perícia sem Especialização funciona com o atributo sozinho. A diferença entre tentar e saber fazer é real, e é exatamente um dado. Teto <b>${teto}</b> agora; nenhuma perícia chega ao D20, nunca.</p>` +
   (TODAS_PERICIAS.some(p => f.pericias[p] > teto)
     ? `<p class="margem"><b>Acima do teto:</b> ${esc(TODAS_PERICIAS.filter(p => f.pericias[p] > teto).join(", "))}.</p>` : "") +
   (pontosLivres(f)
     ? `<p class="margem"><b>${pontosLivres(f)} ponto${pontosLivres(f) > 1 ? "s" : ""} livre${pontosLivres(f) > 1 ? "s" : ""}.</b> Um nível gratuito caiu em perícia que você já treinou. O livro é explícito: ele não se perde e não fura o teto — vira ponto livre, e você realoca onde quiser.</p>` : "");
-  return painel("Perícias", `Conhecimento: ${f.conhecimento || "—"}`, corpo, { largo: true });
+  return painel("Perícias", `Conhecimento: ${f.conhecimento || "—"}`, corpo);
 }
 
-function desenhaFaixa() {
-  const f = fichaAtiva();
-  $("#faixa").innerHTML = faixaAtributos(f) + faixaVitalidade(f) + faixaCorrupcao(f) + faixaPericias(f);
-}
+
 
 /* --------------------------------------------------------- 9. os painéis */
 
@@ -872,7 +871,7 @@ function painelTalentos(f) {
   if (!lista.length) {
     corpo += `<p class="vazio">Nenhum Talento comprado ainda. A prateleira do Arquétipo tem doze e a Geral tem vinte, e a Capacidade nunca deixa vestir tudo. É de propósito.</p>`;
   } else {
-    corpo += `<ul class="itens">` + lista.map(t => {
+    corpo += `<ul class="itens itens--colunas">` + lista.map(t => {
       const i = f.talentos.indexOf(t);
       return `<li class="item"><div class="item__topo">` +
         `<button class="acende naoimprime" type="button" data-acao="acende" data-i="${i}" aria-pressed="${t.ativo}" aria-label="${t.ativo ? "Apagar" : "Acender"} ${esc(t.nome)}"></button>` +
@@ -902,11 +901,11 @@ function painelCorrentes(f) {
     `<p class="margem">Não se endereçam a Pilar nenhum, então não há a quem pedir licença. Sem teste, sem Vínculo, sem Corrupção. Nenhuma serve para machucar alguém — não por proibição, é o que elas <b>são</b>.</p>` +
     `<div class="campo"><span class="campo__rot">As quatro que nunca puderam ser catalogadas</span>` +
       `<div class="item__tags" style="margin:0">` + CORRENTES_UNIVERSAIS.map(c => `<span class="tag tag--prata">${esc(c)}</span>`).join("") + `</div></div>` +
-    f.correntes.map((c, i) =>
+    `<div class="cartoes">` + f.correntes.map((c, i) =>
       `<div class="ancora"><div class="slot__rot"><span>Corrente ${i + 1}</span><b>${esc(c.origem || "livre")}</b></div>` +
       campo("Nome", `correntes.${i}.nome`, c.nome) +
       area("O que ela faz, em uma frase", `correntes.${i}.efeito`, c.efeito, 2) +
-      `</div>`).join("") +
+      `</div>`).join("") + `</div>` +
     `<p class="margem">Isso não é privilégio seu: todo mundo em Elinia tem as suas. O padeiro de Alta Velana usa três antes das nove da manhã e não acha aquilo notável.</p>`;
   return painel("Cifras Correntes", "a língua é livre", corpo, { prata: true });
 }
@@ -927,7 +926,7 @@ function painelCifras(f) {
   if (!lista.length) {
     corpo += `<p class="vazio">Nenhuma Catalogada. Ninguém aprende sozinho: não existe frase endereçada a um Pilar circulando na rua. Organizações entregam, e foi isso que você comprou ao assinar.</p>`;
   } else {
-    corpo += `<ul class="itens">` + lista.map(c => {
+    corpo += `<ul class="itens itens--colunas">` + lista.map(c => {
       const i = f.cifras.indexOf(c);
       const v = VINCULOS[c.vinculo];
       const alto = ordemV[c.vinculo] > aguenta;
@@ -976,7 +975,7 @@ function painelLabirinto(f) {
           const tem = f.labTracos.includes(t.nome);
           return `<button class="chip naoimprime" type="button" data-acao="traco" data-nome="${esc(t.nome)}" aria-pressed="${tem}" title="${esc(t.efeito)}">${esc(t.nome)}</button>`;
         }).join("") + `</div></div>` +
-      (f.labTracos.length ? `<ul class="itens">` + f.labTracos.map(n => {
+      (f.labTracos.length ? `<ul class="itens itens--colunas">` + f.labTracos.map(n => {
         const t = DADOS.tracos.pessoais.find(x => x.nome === n);
         return t ? `<li class="item"><div class="item__topo"><b class="item__nome">${esc(t.nome)}</b></div><p class="item__texto">${esc(t.efeito)}</p></li>` : "";
       }).join("") + `</ul>` : "") +
@@ -990,7 +989,7 @@ function painelAncoras(f) {
   const vivas = f.ancoras.filter(a => !a.queimada && a.nome).length;
   let corpo =
     `<p class="margem">Ascender não apagou a sua vida anterior. Apagou o seu direito de tê-la. Quase todo mundo assina. Quase ninguém cumpre.</p>` +
-    f.ancoras.map((a, i) =>
+    `<div class="cartoes">` + f.ancoras.map((a, i) =>
       `<div class="ancora" data-queimada="${a.queimada ? 1 : 0}">` +
         `<div class="slot__rot"><span>Âncora ${i + 1}</span>${a.queimada ? `<b>queimada</b>` : ""}</div>` +
         campo("Quem ela é, e o que ela é para você", `ancoras.${i}.nome`, a.nome) +
@@ -1000,7 +999,7 @@ function painelAncoras(f) {
           `<button class="bt bt--fino bt--fantasma" type="button" data-acao="queima" data-i="${i}">${a.queimada ? "destriscar" : "queimar"}</button>` +
           (f.ancoras.length > 2 ? `<button class="bt bt--fino bt--fantasma bt--perigo" type="button" data-acao="tiraAncora" data-i="${i}">remover</button>` : "") +
         `</div>` +
-      `</div>`).join("") +
+      `</div>`).join("") + `</div>` +
     `<div class="linha-bts naoimprime"><button class="bt bt--fantasma" type="button" data-acao="novaAncora">+ Âncora nova</button></div>` +
     `<div class="grade grade--2">` +
       contador("Contatos neste arco", "contatos", f.contatos, 0, 9, "cada um remove 1 de Assentada") +
@@ -1032,8 +1031,10 @@ function painelAfiliacao(f) {
         `<label class="campo"><span class="campo__rot">Requisita até</span><input class="ent" value="${f.confiancaTeto >= 4 ? "Vínculo Alto" : f.confiancaTeto >= 2 ? "Vínculo Médio" : "Vínculo Baixo"}" disabled></label>` +
       `</div>` +
       `<p class="margem">Confiança não é nível, é crédito. Um operador de teto alto com a reserva vazia tem menos poder de fogo que um novato com a reserva cheia.</p>` +
-      area("A Dívida — o fato que eles guardaram", "divida", f.divida, 3) +
-      area("Segunda linha — escrita quando você cumpriu o Chamado", "dividaSegunda", f.dividaSegunda, 2) +
+      `<div class="grade grade--2">` +
+        area("A Dívida — o fato que eles guardaram", "divida", f.divida, 3) +
+        area("Segunda linha — escrita quando você cumpriu o Chamado", "dividaSegunda", f.dividaSegunda, 3) +
+      `</div>` +
       `<p class="margem">Cumprir sobe o teto em 1 e faz a Dívida crescer. Recusar gasta a Dívida: o teto desce, você perde Acesso pelo resto do arco, e uma Âncora sua entra na mira.</p>`;
     if (f.acessos >= 3) corpo += `<p class="margem"><b>Terceiro Acesso.</b> Eles cobram. Não costuma ser punição — costuma ser um registro, e registros viram Dívida.</p>`;
   }
@@ -1060,7 +1061,7 @@ function painelSemblante(f) {
     (f.ressonancia >= 3 ? `<p class="margem">Vale lembrar que um Semblante que repara em alguém e depois vê essa pessoa virar outra coisa não fica com raiva. Fica sem interesse, que é pior.</p>` : "") +
     `<p class="margem">O jogador nunca vê este número: o Narrador anota. Está aqui porque alguém precisa anotar, e porque Ressonância decide o que você <b>consegue</b> aprender, enquanto a Afiliação decide o que alguém <b>te oferece</b>.</p>` +
     (f.bencaos.length
-      ? `<ul class="itens">` + f.bencaos.map((b, i) =>
+      ? `<ul class="itens itens--colunas">` + f.bencaos.map((b, i) =>
           `<li class="item"><div class="item__topo"><b class="item__nome">${esc(b.nome)}</b>` +
           `<span class="item__tags"><span class="tag tag--casa">${esc(b.pilar)}</span><span class="tag tag--prata">Bênção</span></span></div>` +
           `<p class="item__texto">${esc(b.efeito)}</p>` +
@@ -1118,22 +1119,55 @@ function painelNotas(f) {
     `<div class="linha-bts naoimprime"><button class="bt bt--fantasma" type="button" data-acao="abreComp" data-aba="regras">Regras que se esquece na mesa</button></div>`);
 }
 
-function desenhaFluxo() {
+/* A ficha se lê por assunto, não por painel solto. Cinco faixas, cada uma
+   com a própria régua: o que se toca a sessão inteira, as perícias, quem o
+   personagem é, o que passa pela Tessera, e o que ele carrega.
+
+   Progressão fica em Criação: o XP e a trilha de Ascensão são o registro de
+   como este personagem chegou aqui, e a Ascensão queima Âncora, que está na
+   mesma faixa. */
+const TOPICOS = [
+  {
+    rot: "Importantes", nota: "o que se toca a sessão inteira", arranjo: "grade3",
+    monta: f => faixaAtributos(f) + faixaVitalidade(f) + faixaCorrupcao(f),
+  },
+  {
+    rot: "Perícias", nota: "quinze, e só estas quinze", arranjo: "largo",
+    monta: f => faixaPericias(f),
+  },
+  {
+    rot: "Criação de Personagem", nota: "de que você é feito, e quem ficou com a conta", arranjo: "fluxo",
+    monta: f => painelDossie(f) + painelArquetipo(f) + painelAfiliacao(f) +
+                painelAncoras(f) + painelProgressao(f),
+  },
+  {
+    rot: "Espiritual", nota: "tudo que passa pela Tessera", arranjo: "fluxo",
+    monta: f => painelCorrentes(f) + painelCifras(f) + painelSemblante(f) + painelLabirinto(f),
+  },
+  {
+    rot: "Utensílios", nota: "o que você leva, e o que não cabe em campo nenhum", arranjo: "fluxo",
+    monta: f => painelTalentos(f) + painelEquipamento(f) + painelNotas(f),
+  },
+];
+
+function desenhaTopicos() {
   const f = fichaAtiva();
-  /* Afiliação e Dossiê abrem o fluxo: é a casa que reimprime a ficha
-     inteira, e é o dossiê que diz de quem ela é. O resto desce depois. */
-  $("#fluxo").innerHTML =
-    painelAfiliacao(f) + painelDossie(f) +
-    painelArquetipo(f) + painelTalentos(f) +
-    painelCorrentes(f) + painelCifras(f) + painelLabirinto(f) +
-    painelAncoras(f) + painelSemblante(f) +
-    painelEquipamento(f) + painelProgressao(f) + painelNotas(f);
+  recorte = 0;
+  $("#topicos").innerHTML = TOPICOS.map(t =>
+    `<section class="topico" aria-label="${esc(t.rot)}">` +
+      `<h2 class="topico__regua">` +
+        `<i class="topico__fio" aria-hidden="true"></i>` +
+        `<span class="topico__nome">${esc(t.rot)}</span>` +
+        `<i class="topico__fio" aria-hidden="true"></i>` +
+      `</h2>` +
+      `<p class="topico__nota">${esc(t.nota)}</p>` +
+      `<div class="topico__corpo topico__corpo--${t.arranjo}">${t.monta(f)}</div>` +
+    `</section>`).join("");
 }
 
 function desenha() {
   desenhaCapa();
-  desenhaFaixa();
-  desenhaFluxo();
+  desenhaTopicos();
   desenhaGaveta();
 }
 
@@ -1367,7 +1401,7 @@ const ACOES = {
   vitCheia(f) { f.vitNivel = 5; f.vitPontos = vitMax(f); },
   vitPts(f, d) {
     const alvo = Number(d.n);
-    f.vitPontos = num(f.vitPontos === alvo ? alvo - 1 : alvo, 0, vitMax(f), 0);
+    f.vitPontos = num(vitPontosDe(f) === alvo ? alvo - 1 : alvo, 0, vitMax(f), 0);
   },
 
   /* Clicar numa casa diz onde o total deve parar; quem se mexe para chegar
