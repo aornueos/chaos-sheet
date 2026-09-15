@@ -105,13 +105,22 @@ A explicação fica **atrás de um "?"**, não em cima da mesa. O jogador precis
 dela duas vezes e depois nunca mais, e enquanto isso ela ocupava metade de
 cada painel.
 
-O corte é por natureza do texto, não por tamanho. **Sai** o que explica a
-regra do livro: como o teto de atributo funciona, por que alma é acúmulo, o
-que a Cultura concede, os dois portões do Vínculo, o que acontece com uma
-Âncora. **Fica** o que muda com o estado desta ficha: o efeito do estado de
+O corte é por natureza do texto, não por tamanho, e tem três categorias.
+
+**Sai para o "?"** tudo que explica regra ou descreve: como o teto de atributo
+funciona, por que alma é acúmulo, o que a Cultura concede, os dois portões do
+Vínculo, o que a Roda faz, o que acontece com uma Âncora, o traço da sua
+Linhagem no Limiar, o que cada Arquétipo é. Também os subtítulos explicativos
+dentro dos painéis e as notas de rodapé dos contadores.
+
+**Fica na mesa** o que muda com o estado desta ficha — o efeito do estado de
 Corrupção agora, a penalidade do nível de Vitalidade agora, "passou do que
-cabe", "terceiro Contato neste arco", "você gastou o que não tinha". Regra do
-livro se consulta; estado do personagem se lê de relance.
+cabe", "terceiro Contato neste arco", "você gastou o que não tinha" — e o que
+o personagem **sabe fazer**: efeito de Talento, de Cifra, de Traço, de Bênção,
+a habilidade do Antecedente e a forma de operar do Arquétipo. Essas não são
+explicação: são a razão de a ficha existir.
+
+Regra do livro se consulta; estado e capacidade se leem de relance.
 
 Aberta ou fechada é **estado de sessão**, não da ficha: é leitura de agora e
 não configuração do personagem, então sobrevive ao redesenho — clicar num

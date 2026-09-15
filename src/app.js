@@ -740,7 +740,7 @@ function faixaCorrupcao(f) {
       `<span><i data-tipo="rec"></i>Recente ${rec}</span>` +
     `</div>` +
     `<p class="margem">${esc(est.efeito)}</p>` +
-    contador("Assentada", "corrAssentada", ass, 0, 99, "não sai com descanso comum") +
+    contador("Assentada", "corrAssentada", ass, 0, 99) +
     `<div class="linha-bts naoimprime">` +
       `<button class="bt bt--fino" type="button" data-acao="repousoRapido">Repouso rápido</button>` +
       `<button class="bt bt--fino" type="button" data-acao="repousoCompleto">Repouso completo</button>` +
@@ -748,7 +748,8 @@ function faixaCorrupcao(f) {
     `</div>` +
     ``;
   return painel("Corrupção", `Limiar ${l} · ${f.linhagem}`, corpo, { prata: true, ajuda: [
-    `Alma não é combustível, é acúmulo. Você não gasta: você desloca, e ela fica onde parou.`,
+    `<b>Alma não é combustível, é acúmulo.</b> Você não gasta: você desloca, e ela fica onde parou.`,
+    `<b>Recente</b> vem de conjurar Cifra e sai com repouso. <b>Assentada</b> vem de aprender Cifra, de sobreviver ao Labirinto e de zona de alta Distorção, e não sai com descanso comum — sai a 1 por Repouso Completo, 2 numa Árvore Prateada, ou 1 por Contato com uma Âncora. <b>Carga</b> vem dos Talentos acesos que pedem algo a alguém de fora, e só se desliga em Local Seguro.`,
   ] });
 }
 
@@ -806,27 +807,22 @@ function painelDossie(f) {
     `</div>` +
     (outraCultura ? `<div class="linha-bts naoimprime"><button class="bt bt--fino bt--fantasma" type="button" data-acao="voltaLista">voltar à lista</button></div>` : "") +
 
-    `<div class="item"><div class="item__topo"><b class="item__nome">Nível gratuito da Cultura</b>` +
-      `<span class="item__tags"><span class="tag">concessão</span></span></div>` +
-      `<p class="item__texto">A Cultura concede um nível de perícia e um traço passivo. O Capítulo 9 não saiu, então quem diz qual perícia é você e o Narrador — a ficha aplica e soma sozinha.</p>` +
-      seletor("Perícia concedida", "concessoes.cultura", f.concessoes.cultura, TODAS_PERICIAS, true) +
-    `</div>` +
+    seletor("Perícia concedida pela Cultura", "concessoes.cultura", f.concessoes.cultura, TODAS_PERICIAS, true) +
 
+    /* A habilidade do Antecedente é capacidade, não explicação: é o que este
+       personagem sabe fazer, e fica na mesa junto com Talento e Cifra. */
     (ant
       ? `<div class="item"><div class="item__topo"><b class="item__nome">${esc(ant.habilidade)}</b>` +
         `<span class="item__tags"><span class="tag tag--casa">${esc(ant.nome)}</span>` +
         `<span class="tag">${esc(ant.pericia)}</span><span class="tag">${esc(ant.conhecimento)}</span></span></div>` +
         `<p class="item__texto">${esc(ant.efeito)}</p></div>`
-      : `<p class="vazio">Sem Antecedente. Escolher um concede a perícia, o Conhecimento e a habilidade de uma vez — é o emprego que você tinha na semana em que alguém decidiu te recrutar.</p>`) +
+      : `<p class="vazio">Sem Antecedente.</p>`);
 
-    `<div class="item"><div class="item__topo"><b class="item__nome">${esc(f.linhagem)} no Limiar</b>` +
-      `<span class="item__tags"><span class="tag tag--prata">Vitalidade ${LINHAGENS[f.linhagem].vit}</span>` +
-      `<span class="tag tag--prata">Limiar ${LINHAGENS[f.linhagem].limiar}</span></span></div>` +
-      `<p class="item__texto">${esc(lin.traco)}</p></div>` +
-
-    ``;
   return painel("Dossiê", "o que pagava o seu aluguel", corpo, { ajuda: [
-    `O Antecedente não muda nunca. É a única coisa na ficha que registra que existiu uma pessoa antes do operador, junto com as Âncoras.`,
+    `<b>A Cultura</b> concede um nível de perícia e um traço passivo. O Capítulo 9 não saiu, então quem diz qual perícia é você e o Narrador — a ficha aplica e soma sozinha. O nível não é comprado e não pode ser gasto: ele mora na Cultura, e some junto se ela mudar.`,
+    `<b>O Antecedente</b> concede a perícia, o Conhecimento e a habilidade de uma vez — é o emprego que você tinha na semana em que alguém decidiu te recrutar. Ele não muda nunca: é a única coisa na ficha que registra que existiu uma pessoa antes do operador, junto com as Âncoras.`,
+    ant && ant.nota ? `<b>${esc(ant.nome)}.</b> ${esc(ant.nota)}` : "",
+    `<b>${esc(f.linhagem)} no Limiar.</b> ${esc(lin.traco)} Vitalidade ${lin.vit}, Limiar ${lin.limiar}.`,
   ] });
 }
 
@@ -841,12 +837,13 @@ function painelArquetipo(f) {
   let corpo = seletor("Arquétipo ativo", "arquetipo", f.arquetipo, DADOS.arquetipos.map(x => x.nome), true);
 
   if (!a) {
-    corpo += `<p class="vazio">Sem Arquétipo, você ainda pode tentar tudo. Só vai pagar mais caro em cada coisa — que é exatamente o que o livro diz que um Arquétipo faz: não dá poder, dá desconto.</p>`;
-    return painel("Arquétipo", "como você resolve", corpo);
+    corpo += `<p class="vazio">Nenhum Arquétipo escolhido.</p>`;
+    return painel("Arquétipo", "como você resolve", corpo, { ajuda: [
+      `<b>O Arquétipo não é uma classe.</b> Sem ele você ainda pode tentar tudo — só paga mais caro em cada coisa. Ele não dá poder: dá acesso e desconto. Destrava uma prateleira de Talentos que ninguém de fora compra, e mantém acesa uma forma de operar que não ocupa Capacidade.`,
+    ] });
   }
 
   corpo +=
-    `<p class="margem"><b>${esc(a.familia)} · ${esc((ATRIBUTOS.find(x => x.chave === a.atributo) || {}).rot)}</b> — ${esc(a.resumo)}</p>` +
     `<div class="item"><div class="item__topo"><b class="item__nome">${esc(a.forma)}</b>` +
       `<span class="item__tags"><span class="tag">forma de operar</span><span class="tag">não ocupa Capacidade</span></span></div>` +
       `<p class="item__texto"><b>Passiva.</b> ${esc(a.passiva)}</p>` +
@@ -874,8 +871,10 @@ function painelArquetipo(f) {
   }
 
   corpo += `<div class="linha-bts naoimprime"><button class="bt bt--casa" type="button" data-acao="abreComp" data-aba="talentos" data-filtro="${esc(a.nome)}">Ver a prateleira do ${esc(a.nome)}</button></div>`;
-  return painel("Arquétipo", a.nome + " · Grau " + nivel, corpo, { ajuda: [
-    `As Marcas pertencem a este Arquétipo. Trocar de jeito de resolver devolve o corpo ao que a Linhagem determinou. Um corpo se desacostuma.`,
+  return painel("Arquétipo", `${a.nome} · ${a.familia} · Grau ${nivel}`, corpo, { ajuda: [
+    `<b>${esc(a.nome)}, família ${esc(a.familia)}, atributo ${esc((ATRIBUTOS.find(x => x.chave === a.atributo) || {}).rot)}.</b> ${esc(a.resumo)}`,
+    `<b>As Marcas pertencem a este Arquétipo.</b> Trocar de jeito de resolver devolve o corpo ao que a Linhagem determinou. Um corpo se desacostuma.`,
+    `O Grau não se compra: sobe com o XP que entra enquanto este Arquétipo está aceso. Ímpar abre prateleira, par entrega Marca.`,
   ] });
 }
 
@@ -890,12 +889,12 @@ function painelTalentos(f) {
     `<div class="cap__barra"><div class="cap__usada" data-estouro="${estouro ? 1 : 0}" style="width:${Math.min(100, (peso / cap) * 100)}%"></div>` +
     `<div class="cap__num">Capacidade ${peso} / ${cap}</div></div>`;
 
-  if (estouro) corpo += `<p class="margem"><b>Passou do que cabe.</b> Você comprou um armário; agora vista só o que entra. Trocar o que está aceso só acontece em Local Seguro.</p>`;
-  else if (lista.length && !talentosAcesos(f).length) corpo += `<p class="margem">Tudo no armário e nada aceso. Dá para jogar assim. Dá também para atravessar o inverno sem casaco.</p>`;
-  else if (cap - peso >= 6 && lista.length) corpo += `<p class="margem">Sobram <b>${cap - peso}</b> de Capacidade. Não é virtude guardar espaço: ninguém devolve Capacidade não usada no fim da operação.</p>`;
+  if (estouro) corpo += `<p class="margem"><b>Passou do que cabe:</b> ${peso - cap} além da Capacidade.</p>`;
+  else if (lista.length && !talentosAcesos(f).length) corpo += `<p class="margem"><b>Tudo no armário e nada aceso.</b></p>`;
+  else if (cap - peso >= 6 && lista.length) corpo += `<p class="margem">Sobram <b>${cap - peso}</b> de Capacidade.</p>`;
 
   if (!lista.length) {
-    corpo += `<p class="vazio">Nenhum Talento comprado ainda. A prateleira do Arquétipo tem doze e a Geral tem vinte, e a Capacidade nunca deixa vestir tudo. É de propósito.</p>`;
+    corpo += `<p class="vazio">Nenhum Talento comprado ainda.</p>`;
   } else {
     corpo += `<ul class="itens itens--colunas">` + lista.map(t => {
       const i = f.talentos.indexOf(t);
@@ -919,7 +918,11 @@ function painelTalentos(f) {
     `<button class="bt bt--casa" type="button" data-acao="abreComp" data-aba="talentos">Comprar do livro</button>` +
     `<button class="bt bt--fantasma" type="button" data-acao="apagaTudo">Apagar todos</button>` +
     `</div>`;
-  return painel("Talentos", `${peso} de ${cap} aceso · ${f.talentos.length} no armário`, corpo);
+  return painel("Talentos", `${peso} de ${cap} aceso · ${f.talentos.length} no armário`, corpo, { ajuda: [
+    `<b>Um Talento comprado nunca é perdido</b>, mas você só mantém aceso o que couber na Capacidade, e cada um pesa igual ao próprio custo em XP. Trocar quais estão acesos só acontece em Local Seguro, durante um Repouso Completo. Você vai possuir mais do que consegue vestir — é de propósito.`,
+    `<b>Carga</b> é o preço de carregar, não de usar: enquanto o Talento estiver aceso, ela ocupa Corrupção. Talento comum não gera Corrupção nenhuma.`,
+    `Sobrar Capacidade não é virtude: ninguém devolve Capacidade não usada no fim da operação.`,
+  ] });
 }
 
 function painelCorrentes(f) {
@@ -947,11 +950,11 @@ function painelCifras(f) {
 
   const alf = alfabetizacaoDe(f);
   let corpo =
-    `<p class="margem"><b>${esc(alf.nome)}.</b> ${esc(alf.nota)}</p>` +
+
     (f.cultura ? `` : "");
 
   if (!lista.length) {
-    corpo += `<p class="vazio">Nenhuma Catalogada. Ninguém aprende sozinho: não existe frase endereçada a um Pilar circulando na rua. Organizações entregam, e foi isso que você comprou ao assinar.</p>`;
+    corpo += `<p class="vazio">Nenhuma Cifra Catalogada.</p>`;
   } else {
     corpo += `<ul class="itens itens--colunas">` + lista.map(c => {
       const i = f.cifras.indexOf(c);
@@ -975,7 +978,8 @@ function painelCifras(f) {
   corpo += `<div class="linha-bts naoimprime">` +
     `<button class="bt bt--casa" type="button" data-acao="abreComp" data-aba="cifras">Aprender do catálogo</button></div>` +
     ``;
-  return painel("Cifras Catalogadas", `${f.cifras.length} frases · ${alf.nome} · Domínio ${DADO_PERICIA[f.pericias["Domínio"]]}`, corpo, { prata: true, ajuda: [
+  return painel("Cifras Catalogadas", `${f.cifras.length} frases · ${alf.nome} · Domínio ${DADO_PERICIA[periciaTotal(f, "Domínio")]}`, corpo, { prata: true, ajuda: [
+    `<b>${esc(alf.nome)}.</b> ${esc(alf.nota)}`,
     `Dois portões, e os dois precisam estar abertos. A <b>Ascensão</b> mede o que cabe em você: hoje, até Vínculo <b>${esc(est.vinculo)}</b>. A <b>Confiança</b> mede o que entregam: 0 requisita Baixo, 2 requisita Médio, 4 requisita Alto.`,
     `Seu dialeto é o de <b>${esc(f.cultura)}</b>. Replicar Cifra sinalizada em outro custa 1 Face, e a penalidade some depois de uma cena inteira de convivência. Não é dificuldade técnica. É sotaque.`,
     `A Cifra sempre acontece. O teste de Domínio não decide se funcionou: decide quanta alma fica presa em você depois.`,
@@ -991,7 +995,7 @@ function painelLabirinto(f) {
 
   let corpo;
   if (quantos === 0) {
-    corpo = `<p class="vazio">O Labirinto Próprio existe desde sempre, mas só é projetável a partir do <b>Despertar</b>. Por enquanto ele é só o lugar onde você mora por dentro, e ninguém entra.</p>`;
+    corpo = `<p class="vazio">Ainda não projetável: o Labirinto abre no <b>Despertar</b>.</p>`;
   } else {
     corpo =
       `<div class="grade grade--2">` +
@@ -1014,6 +1018,7 @@ function painelLabirinto(f) {
   }
   corpo += area("Como ele é por dentro", "labNota", f.labNota, 3);
   return painel("Labirinto Próprio", est.labirinto, corpo, { prata: true, ajuda: [
+    `O Traço de Alma vem do Pilar, não se escolhe e está sempre aceso. Os Pessoais entram um por estado do Labirinto, a partir do Despertado.`,
     `Traços valem para todo mundo dentro do raio, <b>inclusive para você</b>. O Labirinto não sabe quem é o dono. E escolher é para sempre: ninguém redecora a própria cabeça duas vezes.`,
   ] });
 }
@@ -1034,7 +1039,7 @@ function painelAncoras(f) {
       `</div>`).join("") + `</div>` +
     `<div class="linha-bts naoimprime"><button class="bt bt--fantasma" type="button" data-acao="novaAncora">+ Âncora nova</button></div>` +
     `<div class="grade grade--2">` +
-      contador("Contatos neste arco", "contatos", f.contatos, 0, 9, "cada um remove 1 de Assentada") +
+      contador("Contatos neste arco", "contatos", f.contatos, 0, 9) +
       `<label class="campo"><span class="campo__rot">Âncoras de pé</span><input class="ent ent--num" value="${vivas}" disabled></label>` +
     `</div>` +
     ``;
@@ -1042,7 +1047,7 @@ function painelAncoras(f) {
   if (vivas < 1) corpo += `<p class="margem"><b>Nenhuma Âncora de pé.</b> A trilha cobra três e você começou com duas. É o desenho, não é azar: quem sobe rápido chega ao topo sem nenhuma válvula, e a partir daí só existe o Olho.</p>`;
   return painel("Âncoras", `${vivas} de pé · ${f.contatos} contato${f.contatos === 1 ? "" : "s"}`, corpo, { fita: "ne", ajuda: [
     `Ascender não apagou a sua vida anterior. Apagou o seu direito de tê-la. Quase todo mundo assina. Quase ninguém cumpre.`,
-    `Cada Contato remove <b>1 de Assentada</b> e é a única forma de fazer isso fora de um Local Seguro. No <b>terceiro</b> dentro de um arco, eles percebem — e registros viram Dívida.`,
+    `<b>Contato</b> é uma cena por sessão, presencial, olhando para a pessoa: carta não serve, lembrança não serve, vigiar de longe não serve. Remove 1 de Corrupção Assentada, e é a única forma de fazer isso fora de um Local Seguro. No terceiro dentro de um arco, eles percebem — e registros viram Dívida.`,
   ] });
 }
 
@@ -1051,18 +1056,18 @@ function painelAfiliacao(f) {
   const avulso = f.afiliacao === "Avulso";
   let corpo =
     seletor("Afiliação", "afiliacao", f.afiliacao, NOMES_AFILIACOES) +
-    `<p class="margem"><b>${esc(casa.catalogo)}</b> ${esc(casa.nota)}</p>`;
+    ``;
 
   if (avulso) {
     corpo +=
-      area("Indicação — nomes, e quantas vezes cada um ainda serve", "indicacoes", f.indicacoes, 4) +
+      area("Indicação — nomes, e quantas vezes cada um ainda serve", "indicacoes", f.indicacoes, 4);
       ``;
   } else {
     corpo +=
       `<div class="grade grade--2">` +
-        contador("Confiança — teto", "confiancaTeto", f.confiancaTeto, 0, 20, "cumprir o Chamado sobe, recusar desce") +
-        contador("Reserva", "confiancaReserva", f.confiancaReserva, 0, 20, "volta ao teto a cada operação bem-sucedida") +
-        contador("Acessos neste arco", "acessos", f.acessos, 0, 9, "no terceiro, eles cobram") +
+        contador("Confiança — teto", "confiancaTeto", f.confiancaTeto, 0, 20) +
+        contador("Reserva", "confiancaReserva", f.confiancaReserva, 0, 20) +
+        contador("Acessos neste arco", "acessos", f.acessos, 0, 9) +
         `<label class="campo"><span class="campo__rot">Requisita até</span><input class="ent" value="${f.confiancaTeto >= 4 ? "Vínculo Alto" : f.confiancaTeto >= 2 ? "Vínculo Médio" : "Vínculo Baixo"}" disabled></label>` +
       `</div>` +
       `<div class="grade grade--2">` +
@@ -1072,10 +1077,13 @@ function painelAfiliacao(f) {
       ``;
     if (f.acessos >= 3) corpo += `<p class="margem"><b>Terceiro Acesso.</b> Eles cobram. Não costuma ser punição — costuma ser um registro, e registros viram Dívida.</p>`;
   }
-  return painel("Afiliação", casa.carimbo, corpo, { ajuda: [
-    `Sem Confiança, sem catálogo, sem base e sem Dívida. Nenhum Chamado, nunca, e nenhuma segunda linha escrita por alguém que você não conhece. Sobe um nível de Patrimônio e o equipamento é seu de verdade.`,
-    `Confiança não é nível, é crédito. Um operador de teto alto com a reserva vazia tem menos poder de fogo que um novato com a reserva cheia.`,
-    `Cumprir sobe o teto em 1 e faz a Dívida crescer. Recusar gasta a Dívida: o teto desce, você perde Acesso pelo resto do arco, e uma Âncora sua entra na mira.`,
+  return painel("Afiliação", casa.catalogo, corpo, { ajuda: [
+    `<b>${esc(f.afiliacao)}.</b> ${esc(casa.nota)}`,
+    avulso
+      ? `<b>Avulso.</b> Sem Confiança, sem catálogo, sem base e sem Dívida. Nenhum Chamado, nunca, e nenhuma segunda linha escrita por alguém que você não conhece. Sobe um nível de Patrimônio e o equipamento é seu de verdade.`
+      : `<b>Confiança não é nível, é crédito.</b> O teto é o quanto eles confiam; a reserva é quanto desse crédito ainda não foi gasto neste arco, e ela volta ao teto a cada operação bem-sucedida. Um operador de teto alto com a reserva vazia tem menos poder de fogo que um novato com a reserva cheia. Confiança 0 requisita Vínculo Baixo, 2 requisita Médio, 4 requisita Alto.`,
+    avulso ? "" : `<b>O Chamado da Dívida</b> vem uma vez por arco, e é o pedido errado. Cumprir sobe o teto em 1 e faz a Dívida crescer. Recusar gasta a Dívida: o teto desce, você perde Acesso pelo resto do arco, e uma Âncora sua entra na mira.`,
+    avulso ? "" : `<b>Acesso</b> é uma vez por sessão, sem teste e sem custo, e o Narrador é obrigado a entregar algo real. No terceiro dentro de um mesmo arco, eles cobram.`,
   ] });
 }
 
@@ -1090,7 +1098,7 @@ function painelSemblante(f) {
       seletor("Pilar de Afinidade", "pilar", f.pilar, NOMES_PILARES) +
       `<label class="campo"><span class="campo__rot">Semblante</span><input class="ent" value="${esc(p.semblante)}" disabled></label>` +
     `</div>` +
-    `<p class="margem"><b>${esc(p.verbo)}</b> Na Roda, o seu Pilar desfaz <b>${esc(p.desfaz)}</b> e é desfeito por <b>${esc(p.desfeito)}</b>. Vale 1 Face contra pessoa e o desempate entre Cifras. Nada além disso — contar com ela é como um afiliado do Olho morre.</p>` +
+    `<p class="margem">Roda: desfaz <b>${esc(p.desfaz)}</b> · desfeito por <b>${esc(p.desfeito)}</b> · vale 1 Face</p>` +
     `<div class="campo"><span class="campo__rot">Ressonância</span>` +
       `<div class="trilha">` + [0, 1, 2, 3].map(n =>
         `<button class="trilha__passo naoimprime" type="button" data-acao="ress" data-n="${n}" data-feito="${f.ressonancia > n ? 1 : 0}" data-atual="${f.ressonancia === n ? 1 : 0}">${n}</button>`
@@ -1104,10 +1112,12 @@ function painelSemblante(f) {
           `<p class="item__texto">${esc(b.efeito)}</p>` +
           `<div class="item__acoes naoimprime"><button class="bt bt--fino bt--fantasma bt--perigo" type="button" data-acao="tiraBencao" data-i="${i}">retirar</button></div></li>`
         ).join("") + `</ul>`
-      : `<p class="vazio">Nenhuma Bênção. Elas não são compradas: são oferecidas dentro da ficção, em um encontro. Você pode recusar. Eles não costumam perguntar duas vezes.</p>`) +
+      : `<p class="vazio">Nenhuma Bênção.</p>`) +
     `<div class="linha-bts naoimprime"><button class="bt bt--casa" type="button" data-acao="abreComp" data-aba="bencaos">Ver as Bênçãos de referência</button></div>`;
-  return painel("Semblante", `${f.pilar} · Ressonância ${f.ressonancia}`, corpo, { prata: true, ajuda: [
-    `O jogador nunca vê este número: o Narrador anota. Está aqui porque alguém precisa anotar, e porque Ressonância decide o que você <b>consegue</b> aprender, enquanto a Afiliação decide o que alguém <b>te oferece</b>.`,
+  return painel("Semblante", `${f.pilar} · ${p.semblante} · Ressonância ${f.ressonancia}`, corpo, { prata: true, ajuda: [
+    `<b>${esc(f.pilar)}.</b> ${esc(p.verbo)} Quem fala por este conceito é ${esc(p.semblante)}.`,
+    `<b>A Roda.</b> Cada conceito desfaz o anterior. O seu desfaz ${esc(p.desfaz)} e é desfeito por ${esc(p.desfeito)}: contra alvo daquele Pilar, o teste de resistência dele sofre 1 Face a menos, e entre duas Cifras o Pilar dominante vence o empate. Não afeta dano, Corrupção, Corrente nem o teste de Domínio. É pequena de propósito — contar com ela é como um afiliado do Olho morre.`,
+    `<b>Ressonância</b> não é comprada e o jogador nunca vê o número: o Narrador anota. Está aqui porque alguém precisa anotar, e porque ela decide o que você <b>consegue</b> aprender, enquanto a Afiliação decide o que alguém <b>te oferece</b>.`,
   ] });
 }
 
@@ -1151,7 +1161,9 @@ function painelProgressao(f) {
     `</div>` +
     ``;
   return painel("Progressão", `${livre} XP livre${livre === 1 ? "" : "s"}`, corpo, { prata: true, ajuda: [
-    `Terminar a sessão dá 4. Resolver ou avançar um ponto narrativo, 2. Decisão significativa com consequência real, 2. O XP entra também no contador do Arquétipo aceso, porque é ali que o Grau mora. Não existe XP por derrotar inimigo: combate não é onde o progresso acontece, é onde ele cobra.`,
+    `<b>Terminar a sessão dá 4.</b> Resolver ou avançar um ponto narrativo, 2. Decisão significativa com consequência real, 2. O XP entra também no contador do Arquétipo aceso, porque é ali que o Grau mora. Não existe XP por derrotar inimigo: combate não é onde o progresso acontece, é onde ele cobra.`,
+    `<b>XP abre a porta do Labirinto. Não paga a travessia.</b> Cada estágio da trilha vertical queima uma Âncora — e você começa com duas para uma trilha que cobra três.`,
+    `Três coisas não se compram com XP: Vitalidade e Limiar, que vêm da Linhagem e só crescem por Marca; Capacidade, que vem da Ascensão; e Grau de Arquétipo, que é consequência e não compra.`,
   ] });
 }
 

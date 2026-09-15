@@ -211,19 +211,43 @@ function antecedentes() {
     return { nome: n, linha: i };
   }).sort((a, b) => a.linha - b.linha);
 
+  /* O bloco tem estrutura de linha, e é ela que distingue a habilidade do
+     resto: o nome da habilidade abre a última linha de conteúdo. Colapsar o
+     bloco numa string só apaga essa informação, e sem ela não há regra de
+     texto que separe "Fundamentado." de "O Narrador diz o que a fonte dizia" —
+     as duas são frase curta em maiúscula seguida de ponto. */
+  const RE_HAB = /^([A-ZÀ-ÚÂ-Û][\p{L}\p{M}'’ ]{1,40})\.\s+([\s\S]*)$/u;
+
   return marcos.map((a, k) => {
     const ate = k + 1 < marcos.length ? marcos[k + 1].linha : fim;
-    const texto = junta(a.linha + 1, ate);
-    const m = texto.match(/^(.*?)\s*Perícia:\s*([^.]+)\.\s*Conhecimento:\s*([^.]+)\.\s*(.*)$/s);
-    if (!m) { aviso(`antecedente ${a.nome} sem perícia/conhecimento`); return { nome: a.nome, resumo: texto }; }
-    const hab = m[4].match(/^([A-ZÀ-Ú][^.]{1,40})\.\s*(.*)$/s);
+    const linhasDo = cru.slice(a.linha + 1, ate).filter(util).map(limpa);
+    if (!linhasDo.length) { aviso(`antecedente ${a.nome} sem conteúdo`); return { nome: a.nome }; }
+
+    const iPericia = linhasDo.findIndex(l => /^Perícia:/.test(l));
+    if (iPericia < 0) {
+      aviso(`antecedente ${a.nome} sem linha de Perícia`);
+      return { nome: a.nome, resumo: linhasDo.join(" ") };
+    }
+
+    let iHab = -1;
+    for (let i = linhasDo.length - 1; i > iPericia; i--) {
+      if (RE_HAB.test(linhasDo[i])) { iHab = i; break; }
+    }
+    if (iHab < 0) aviso(`antecedente ${a.nome} sem habilidade`);
+
+    const meio = linhasDo.slice(iPericia, iHab < 0 ? linhasDo.length : iHab).join(" ");
+    const hab = iHab < 0 ? null : linhasDo[iHab].match(RE_HAB);
+    const resto = iHab < 0 ? "" : linhasDo.slice(iHab + 1).join(" ");
+
     return {
       nome: a.nome,
-      resumo: limpa(m[1]),
-      pericia: limpa(m[2]),
-      conhecimento: limpa(m[3]),
+      resumo: linhasDo.slice(0, iPericia).join(" "),
+      pericia: limpa((meio.match(/Perícia:\s*([^.]+)\./) || [])[1] || ""),
+      conhecimento: limpa((meio.match(/Conhecimento:\s*([^.]+)\./) || [])[1] || ""),
+      /* o que sobra na linha de Conhecimento é nota sobre ele */
+      nota: limpa(meio.replace(/Perícia:\s*[^.]+\.\s*/, "").replace(/Conhecimento:\s*[^.]+\.\s*/, "")),
       habilidade: hab ? limpa(hab[1]) : "",
-      efeito: hab ? limpa(hab[2]) : limpa(m[4]),
+      efeito: limpa((hab ? hab[2] : "") + " " + resto),
     };
   });
 }
