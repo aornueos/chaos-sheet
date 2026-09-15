@@ -354,7 +354,7 @@ body::before{
 /* a faixa de cima não entra no fluxo: é o que se toca a sessão inteira, e em
    qualquer largura fica no mesmo lugar. Contagem fixa, não auto-fit. */
 .faixa{
-  display: grid; gap: var(--gap);
+  display: grid; gap: var(--gap); align-items: start;
   grid-template-columns: repeat(3, minmax(0,1fr));
   margin-bottom: var(--gap);
 }
@@ -419,7 +419,7 @@ body::before{
 
 .painel__topo{
   position: relative;
-  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: nowrap;
   padding: 9px var(--pad) 7px;
   background: var(--tinta);
   color: var(--papel);
@@ -436,16 +436,18 @@ body::before{
   background: var(--casa);
 }
 .painel__nome{
+  flex: 0 1 auto; min-width: 0;
   margin: 0;
-  font: 400 clamp(18px, 2.1vw, 25px)/1 var(--titulo);
-  letter-spacing: .05em; text-transform: uppercase;
+  font: 400 clamp(17px, 1.9vw, 23px)/1 var(--titulo);
+  letter-spacing: .04em; text-transform: uppercase;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .painel__nota{
-  margin-left: auto;
+  flex: 0 20 auto; min-width: 0;
+  margin-left: auto; text-align: right;
   font: 400 var(--fs-mini)/1.3 var(--mono);
   letter-spacing: var(--tr); text-transform: uppercase;
   color: var(--prata-2);
-  max-width: 62%;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .painel__corpo{ padding: var(--pad-2) var(--pad) 0; }
@@ -455,7 +457,7 @@ body::before{
    ficha, não do aparelho, porque um Bastião e um Arquivista desligam
    coisas diferentes. */
 .painel__olho{
-  flex: 0 0 auto; width: 26px; height: 22px; padding: 0; border: 0; cursor: pointer;
+  flex: 0 0 auto; margin-left: auto; width: 26px; height: 22px; padding: 0; border: 0; cursor: pointer;
   background: rgba(255,255,255,.14); color: var(--papel);
   font: 400 13px/1 var(--mono);
 }
@@ -1922,7 +1924,7 @@ function painel(titulo, nota, corpo, op) {
       `<span class="rasgo rasgo--pe naoimprime"></span>` +
     `</span>` +
     (fita && !recolhido ? `<span class="fita fita--${fita} naoimprime" aria-hidden="true"></span>` : "") +
-    `<div class="painel__topo"><h3 class="painel__nome">${esc(titulo)}</h3>` +
+    `<div class="painel__topo"><h3 class="painel__nome" title="${esc(titulo)}">${esc(titulo)}</h3>` +
     (nota ? `<span class="painel__nota" title="${esc(nota)}">${esc(nota)}</span>` : "") +
     `<button class="painel__olho naoimprime" type="button" data-acao="recolhe" data-chave="${chave}"` +
     ` aria-expanded="${recolhido ? "false" : "true"}"` +

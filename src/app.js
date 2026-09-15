@@ -605,7 +605,7 @@ function painel(titulo, nota, corpo, op) {
       `<span class="rasgo rasgo--pe naoimprime"></span>` +
     `</span>` +
     (fita && !recolhido ? `<span class="fita fita--${fita} naoimprime" aria-hidden="true"></span>` : "") +
-    `<div class="painel__topo"><h3 class="painel__nome">${esc(titulo)}</h3>` +
+    `<div class="painel__topo"><h3 class="painel__nome" title="${esc(titulo)}">${esc(titulo)}</h3>` +
     (nota ? `<span class="painel__nota" title="${esc(nota)}">${esc(nota)}</span>` : "") +
     `<button class="painel__olho naoimprime" type="button" data-acao="recolhe" data-chave="${chave}"` +
     ` aria-expanded="${recolhido ? "false" : "true"}"` +

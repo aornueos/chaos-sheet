@@ -93,7 +93,13 @@ anotações.
 
 ## Recolher
 
-Toda tarja tem um **▾**. Recolhido, o painel vira só a própria tarja — serve
+Toda tarja tem um **▾**, e a tarja é uma linha só: quem encolhe quando falta
+espaço é a nota, vinte vezes mais rápido que o título — recolhido, o título é
+a única coisa que sobra do painel, e não pode ser o primeiro a ser cortado. Na
+faixa de cima o grid alinha ao topo em vez de esticar, senão o painel
+recolhido virava um retângulo de papel em branco do tamanho do vizinho.
+
+Recolhido, o painel vira só a própria tarja — serve
 para desligar o que este personagem não usa ou o que o jogador já sabe de cor.
 O estado é da ficha e não do aparelho, porque um Bastião e um Arquivista
 desligam coisas diferentes, e assim ele viaja junto no backup. Na impressão
