@@ -590,10 +590,19 @@ const chaveDe = t => t.toLowerCase()
   .normalize("NFD").replace(/[̀-ͯ]/g, "")
   .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
+/* A explicação fica atrás de um "?", não em cima da mesa. O jogador precisa
+   dela duas vezes e depois nunca mais, e enquanto isso ela ocupa metade de
+   cada painel. Aberta ou fechada é estado de sessão e não da ficha: é leitura
+   de agora, não configuração do personagem — e por isso sobrevive ao
+   redesenho, mas não a recarregar a página. */
+const ajudasAbertas = new Set();
+
 function painel(titulo, nota, corpo, op) {
   const o = op || {};
   const chave = chaveDe(titulo);
   const recolhido = (fichaAtiva() || {}).recolhidos && fichaAtiva().recolhidos.includes(chave);
+  const temAjuda = Array.isArray(o.ajuda) && o.ajuda.filter(Boolean).length > 0;
+  const aberta = temAjuda && ajudasAbertas.has(chave);
   recorte++;
   const topoRasgado = recorte % 3 === 2;
   /* fita onde a colagem pede: não em todo painel, senão vira padrão */
@@ -611,10 +620,17 @@ function painel(titulo, nota, corpo, op) {
     (fita && !recolhido ? `<span class="fita fita--${fita} naoimprime" aria-hidden="true"></span>` : "") +
     `<div class="painel__topo"><h3 class="painel__nome" title="${esc(titulo)}">${esc(titulo)}</h3>` +
     (nota ? `<span class="painel__nota" title="${esc(nota)}">${esc(nota)}</span>` : "") +
-    `<button class="painel__olho naoimprime" type="button" data-acao="recolhe" data-chave="${chave}"` +
-    ` aria-expanded="${recolhido ? "false" : "true"}"` +
-    ` title="${recolhido ? "Abrir" : "Recolher"} ${esc(titulo)}">${recolhido ? "▸" : "▾"}</button>` +
-    `</div><div class="painel__corpo">${corpo}</div></section>`;
+    `<span class="painel__botoes naoimprime">` +
+      (temAjuda ? `<button class="painel__ajuda" type="button" data-acao="ajuda" data-chave="${chave}"` +
+        ` aria-expanded="${aberta}" title="${aberta ? "Fechar" : "Abrir"} a explicação de ${esc(titulo)}">?</button>` : "") +
+      `<button class="painel__olho" type="button" data-acao="recolhe" data-chave="${chave}"` +
+      ` aria-expanded="${recolhido ? "false" : "true"}"` +
+      ` title="${recolhido ? "Abrir" : "Recolher"} ${esc(titulo)}">${recolhido ? "▸" : "▾"}</button>` +
+    `</span></div>` +
+    (temAjuda && aberta
+      ? `<div class="ajuda naoimprime">` + o.ajuda.filter(Boolean).map(t => `<p class="ajuda__linha">${t}</p>`).join("") + `</div>`
+      : "") +
+    `<div class="painel__corpo">${corpo}</div></section>`;
 }
 
 /* -------------------------------------------------------------- 7. a capa */
@@ -671,10 +687,12 @@ function faixaAtributos(f) {
         `<button class="passo" type="button" data-acao="atr" data-alvo="${a.chave}" data-d="1"${v >= teto ? " disabled" : ""} aria-label="Subir ${esc(a.rot)}">+</button>` +
       `</div></div>`;
   }).join("") + `</div>` +
-  `<p class="margem">Teto de <b>${teto}</b> no ${esc(f.ascensao)}. O D20 só existe no Iluminado, e quem chega lá não é mais exatamente uma pessoa.</p>`;
+  ``;
   const acima = ATRIBUTOS.filter(x => f.attrs[x.chave] > teto);
   if (acima.length) corpo += `<p class="margem"><b>Acima do teto:</b> ${esc(acima.map(x => x.rot).join(", "))}. A ficha não confisca nada — mas no ${esc(f.ascensao)} esse dado não deveria estar na mesa.</p>`;
-  return painel("Atributos", "1D do Atributo + 1D da Perícia", corpo);
+  return painel("Atributos", "1D do Atributo + 1D da Perícia", corpo, { ajuda: [
+    `Teto de <b>${teto}</b> no ${esc(f.ascensao)}. O D20 só existe no Iluminado, e quem chega lá não é mais exatamente uma pessoa.`,
+  ] });
 }
 
 function faixaVitalidade(f) {
@@ -692,11 +710,12 @@ function faixaVitalidade(f) {
     `<div class="slot__rot"><span>Pontos de Vitalidade</span><b>${vitPontosDe(f)} de ${max}</b></div>` +
     medidor("vitPts", max, i => i <= vitPontosDe(f) ? "cheio" : "vazio", { classe: "medidor--papel", rot: "Ponto de Vitalidade" }) +
     `<div class="linha-bts naoimprime"><button class="bt bt--fino" type="button" data-acao="vitCheia">encher tudo</button></div>` +
-    `<p class="margem">Zerou os pontos, cai um nível e a reserva volta ao máximo. Chegou ao <b>0</b>, acabou — e não é o tipo de coisa que repouso conserta.</p>` +
     (f.vitNivel === 2 ? `<p class="margem"><b>Este é o degrau que mata gente.</b> A Face você aguenta. Não poder reagir significa que o próximo golpe entra inteiro, e o combate deste jogo não perdoa golpe que entra inteiro.</p>` : "") +
     (f.vitNivel === 1 ? `<p class="margem"><b>Inconsciente.</b> Alguém vai ter que te carregar, e quem te carrega não está atirando.</p>` : "") +
     (f.vitNivel === 0 ? `<p class="margem"><b>Fora da mesa.</b> Foi bom enquanto durou. Guarde a ficha: o Narrador tem permissão de trazer essa pessoa de volta na frente de quem sobrou, e nada disso é ressurreição.</p>` : "");
-  return painel("Vitalidade", `Linhagem ${f.linhagem} · ${max} por nível`, corpo);
+  return painel("Vitalidade", `Linhagem ${f.linhagem} · ${max} por nível`, corpo, { ajuda: [
+    `Zerou os pontos, cai um nível e a reserva volta ao máximo. Chegou ao <b>0</b>, acabou — e não é o tipo de coisa que repouso conserta.`,
+  ] });
 }
 
 function faixaCorrupcao(f) {
@@ -727,8 +746,10 @@ function faixaCorrupcao(f) {
       `<button class="bt bt--fino" type="button" data-acao="repousoCompleto">Repouso completo</button>` +
       `<button class="bt bt--fino" type="button" data-acao="repousoArvore">Árvore Prateada</button>` +
     `</div>` +
-    `<p class="margem">Alma não é combustível, é acúmulo. Você não gasta: você desloca, e ela fica onde parou.</p>`;
-  return painel("Corrupção", `Limiar ${l} · ${f.linhagem}`, corpo, { prata: true });
+    ``;
+  return painel("Corrupção", `Limiar ${l} · ${f.linhagem}`, corpo, { prata: true, ajuda: [
+    `Alma não é combustível, é acúmulo. Você não gasta: você desloca, e ela fica onde parou.`,
+  ] });
 }
 
 function faixaPericias(f) {
@@ -749,12 +770,13 @@ function faixaPericias(f) {
         `</span></div>`;
     }).join("")
   ).join("") + `</div>` +
-  `<p class="margem">Perícia sem Especialização funciona com o atributo sozinho. A diferença entre tentar e saber fazer é real, e é exatamente um dado. Teto <b>${teto}</b> agora; nenhuma perícia chega ao D20, nunca.</p>` +
   (TODAS_PERICIAS.some(p => f.pericias[p] > teto)
     ? `<p class="margem"><b>Acima do teto:</b> ${esc(TODAS_PERICIAS.filter(p => f.pericias[p] > teto).join(", "))}.</p>` : "") +
   (pontosLivres(f)
     ? `<p class="margem"><b>${pontosLivres(f)} ponto${pontosLivres(f) > 1 ? "s" : ""} livre${pontosLivres(f) > 1 ? "s" : ""}.</b> Um nível gratuito caiu em perícia que você já treinou. O livro é explícito: ele não se perde e não fura o teto — vira ponto livre, e você realoca onde quiser.</p>` : "");
-  return painel("Perícias", `Conhecimento: ${f.conhecimento || "—"}`, corpo);
+  return painel("Perícias", `Conhecimento: ${f.conhecimento || "—"}`, corpo, { ajuda: [
+    `Perícia sem Especialização funciona com o atributo sozinho. A diferença entre tentar e saber fazer é real, e é exatamente um dado. Teto <b>${teto}</b> agora; nenhuma perícia chega ao D20, nunca.`,
+  ] });
 }
 
 
@@ -802,8 +824,10 @@ function painelDossie(f) {
       `<span class="tag tag--prata">Limiar ${LINHAGENS[f.linhagem].limiar}</span></span></div>` +
       `<p class="item__texto">${esc(lin.traco)}</p></div>` +
 
-    `<p class="margem">O Antecedente não muda nunca. É a única coisa na ficha que registra que existiu uma pessoa antes do operador, junto com as Âncoras.</p>`;
-  return painel("Dossiê", "o que pagava o seu aluguel", corpo);
+    ``;
+  return painel("Dossiê", "o que pagava o seu aluguel", corpo, { ajuda: [
+    `O Antecedente não muda nunca. É a única coisa na ficha que registra que existiu uma pessoa antes do operador, junto com as Âncoras.`,
+  ] });
 }
 
 function painelArquetipo(f) {
@@ -846,11 +870,13 @@ function painelArquetipo(f) {
         `<button class="bt bt--fino${marcas[i] === k ? " bt--casa" : " bt--fantasma"}" type="button" data-acao="marca" data-i="${i}" data-tipo="${k}" title="${esc(MARCAS[k].nota)}">${esc(MARCAS[k].rot)}</button>`
       ).join("") + `</div>`;
     }
-    corpo += `</div><p class="margem">As Marcas pertencem a este Arquétipo. Trocar de jeito de resolver devolve o corpo ao que a Linhagem determinou. Um corpo se desacostuma.</p>`;
+    corpo += `</div>`;
   }
 
   corpo += `<div class="linha-bts naoimprime"><button class="bt bt--casa" type="button" data-acao="abreComp" data-aba="talentos" data-filtro="${esc(a.nome)}">Ver a prateleira do ${esc(a.nome)}</button></div>`;
-  return painel("Arquétipo", a.nome + " · Grau " + nivel, corpo);
+  return painel("Arquétipo", a.nome + " · Grau " + nivel, corpo, { ajuda: [
+    `As Marcas pertencem a este Arquétipo. Trocar de jeito de resolver devolve o corpo ao que a Linhagem determinou. Um corpo se desacostuma.`,
+  ] });
 }
 
 function painelTalentos(f) {
@@ -898,7 +924,6 @@ function painelTalentos(f) {
 
 function painelCorrentes(f) {
   const corpo =
-    `<p class="margem">Não se endereçam a Pilar nenhum, então não há a quem pedir licença. Sem teste, sem Vínculo, sem Corrupção. Nenhuma serve para machucar alguém — não por proibição, é o que elas <b>são</b>.</p>` +
     `<div class="campo"><span class="campo__rot">As quatro que nunca puderam ser catalogadas</span>` +
       `<div class="item__tags" style="margin:0">` + CORRENTES_UNIVERSAIS.map(c => `<span class="tag tag--prata">${esc(c)}</span>`).join("") + `</div></div>` +
     `<div class="cartoes">` + f.correntes.map((c, i) =>
@@ -906,8 +931,11 @@ function painelCorrentes(f) {
       campo("Nome", `correntes.${i}.nome`, c.nome) +
       area("O que ela faz, em uma frase", `correntes.${i}.efeito`, c.efeito, 2) +
       `</div>`).join("") + `</div>` +
-    `<p class="margem">Isso não é privilégio seu: todo mundo em Elinia tem as suas. O padeiro de Alta Velana usa três antes das nove da manhã e não acha aquilo notável.</p>`;
-  return painel("Cifras Correntes", "a língua é livre", corpo, { prata: true });
+    ``;
+  return painel("Cifras Correntes", "a língua é livre", corpo, { prata: true, ajuda: [
+    `Não se endereçam a Pilar nenhum, então não há a quem pedir licença. Sem teste, sem Vínculo, sem Corrupção. Nenhuma serve para machucar alguém — não por proibição, é o que elas <b>são</b>.`,
+    `Isso não é privilégio seu: todo mundo em Elinia tem as suas. O padeiro de Alta Velana usa três antes das nove da manhã e não acha aquilo notável.`,
+  ] });
 }
 
 function painelCifras(f) {
@@ -919,9 +947,8 @@ function painelCifras(f) {
 
   const alf = alfabetizacaoDe(f);
   let corpo =
-    `<p class="margem">Dois portões, e os dois precisam estar abertos. A <b>Ascensão</b> mede o que cabe em você: hoje, até Vínculo <b>${esc(est.vinculo)}</b>. A <b>Confiança</b> mede o que entregam: 0 requisita Baixo, 2 requisita Médio, 4 requisita Alto.</p>` +
     `<p class="margem"><b>${esc(alf.nome)}.</b> ${esc(alf.nota)}</p>` +
-    (f.cultura ? `<p class="margem">Seu dialeto é o de <b>${esc(f.cultura)}</b>. Replicar Cifra sinalizada em outro custa 1 Face, e a penalidade some depois de uma cena inteira de convivência. Não é dificuldade técnica. É sotaque.</p>` : "");
+    (f.cultura ? `` : "");
 
   if (!lista.length) {
     corpo += `<p class="vazio">Nenhuma Catalogada. Ninguém aprende sozinho: não existe frase endereçada a um Pilar circulando na rua. Organizações entregam, e foi isso que você comprou ao assinar.</p>`;
@@ -947,8 +974,12 @@ function painelCifras(f) {
 
   corpo += `<div class="linha-bts naoimprime">` +
     `<button class="bt bt--casa" type="button" data-acao="abreComp" data-aba="cifras">Aprender do catálogo</button></div>` +
-    `<p class="margem">A Cifra sempre acontece. O teste de Domínio não decide se funcionou: decide quanta alma fica presa em você depois.</p>`;
-  return painel("Cifras Catalogadas", `${f.cifras.length} frases · ${alf.nome} · Domínio ${DADO_PERICIA[f.pericias["Domínio"]]}`, corpo, { prata: true });
+    ``;
+  return painel("Cifras Catalogadas", `${f.cifras.length} frases · ${alf.nome} · Domínio ${DADO_PERICIA[f.pericias["Domínio"]]}`, corpo, { prata: true, ajuda: [
+    `Dois portões, e os dois precisam estar abertos. A <b>Ascensão</b> mede o que cabe em você: hoje, até Vínculo <b>${esc(est.vinculo)}</b>. A <b>Confiança</b> mede o que entregam: 0 requisita Baixo, 2 requisita Médio, 4 requisita Alto.`,
+    `Seu dialeto é o de <b>${esc(f.cultura)}</b>. Replicar Cifra sinalizada em outro custa 1 Face, e a penalidade some depois de uma cena inteira de convivência. Não é dificuldade técnica. É sotaque.`,
+    `A Cifra sempre acontece. O teste de Domínio não decide se funcionou: decide quanta alma fica presa em você depois.`,
+  ] });
 }
 
 function painelLabirinto(f) {
@@ -979,16 +1010,17 @@ function painelLabirinto(f) {
         const t = DADOS.tracos.pessoais.find(x => x.nome === n);
         return t ? `<li class="item"><div class="item__topo"><b class="item__nome">${esc(t.nome)}</b></div><p class="item__texto">${esc(t.efeito)}</p></li>` : "";
       }).join("") + `</ul>` : "") +
-      `<p class="margem">Traços valem para todo mundo dentro do raio, <b>inclusive para você</b>. O Labirinto não sabe quem é o dono. E escolher é para sempre: ninguém redecora a própria cabeça duas vezes.</p>`;
+      ``;
   }
   corpo += area("Como ele é por dentro", "labNota", f.labNota, 3);
-  return painel("Labirinto Próprio", est.labirinto, corpo, { prata: true });
+  return painel("Labirinto Próprio", est.labirinto, corpo, { prata: true, ajuda: [
+    `Traços valem para todo mundo dentro do raio, <b>inclusive para você</b>. O Labirinto não sabe quem é o dono. E escolher é para sempre: ninguém redecora a própria cabeça duas vezes.`,
+  ] });
 }
 
 function painelAncoras(f) {
   const vivas = f.ancoras.filter(a => !a.queimada && a.nome).length;
   let corpo =
-    `<p class="margem">Ascender não apagou a sua vida anterior. Apagou o seu direito de tê-la. Quase todo mundo assina. Quase ninguém cumpre.</p>` +
     `<div class="cartoes">` + f.ancoras.map((a, i) =>
       `<div class="ancora" data-queimada="${a.queimada ? 1 : 0}">` +
         `<div class="slot__rot"><span>Âncora ${i + 1}</span>${a.queimada ? `<b>queimada</b>` : ""}</div>` +
@@ -1005,10 +1037,13 @@ function painelAncoras(f) {
       contador("Contatos neste arco", "contatos", f.contatos, 0, 9, "cada um remove 1 de Assentada") +
       `<label class="campo"><span class="campo__rot">Âncoras de pé</span><input class="ent ent--num" value="${vivas}" disabled></label>` +
     `</div>` +
-    `<p class="margem">Cada Contato remove <b>1 de Assentada</b> e é a única forma de fazer isso fora de um Local Seguro. No <b>terceiro</b> dentro de um arco, eles percebem — e registros viram Dívida.</p>`;
+    ``;
   if (f.contatos >= 3) corpo += `<p class="margem"><b>Terceiro Contato neste arco.</b> Eles perceberam. Raramente vira punição — vira registro, e registro tem um jeito antipático de virar Dívida mais tarde.</p>`;
   if (vivas < 1) corpo += `<p class="margem"><b>Nenhuma Âncora de pé.</b> A trilha cobra três e você começou com duas. É o desenho, não é azar: quem sobe rápido chega ao topo sem nenhuma válvula, e a partir daí só existe o Olho.</p>`;
-  return painel("Âncoras", `${vivas} de pé · ${f.contatos} contato${f.contatos === 1 ? "" : "s"}`, corpo, { fita: "ne" });
+  return painel("Âncoras", `${vivas} de pé · ${f.contatos} contato${f.contatos === 1 ? "" : "s"}`, corpo, { fita: "ne", ajuda: [
+    `Ascender não apagou a sua vida anterior. Apagou o seu direito de tê-la. Quase todo mundo assina. Quase ninguém cumpre.`,
+    `Cada Contato remove <b>1 de Assentada</b> e é a única forma de fazer isso fora de um Local Seguro. No <b>terceiro</b> dentro de um arco, eles percebem — e registros viram Dívida.`,
+  ] });
 }
 
 function painelAfiliacao(f) {
@@ -1021,7 +1056,7 @@ function painelAfiliacao(f) {
   if (avulso) {
     corpo +=
       area("Indicação — nomes, e quantas vezes cada um ainda serve", "indicacoes", f.indicacoes, 4) +
-      `<p class="margem">Sem Confiança, sem catálogo, sem base e sem Dívida. Nenhum Chamado, nunca, e nenhuma segunda linha escrita por alguém que você não conhece. Sobe um nível de Patrimônio e o equipamento é seu de verdade.</p>`;
+      ``;
   } else {
     corpo +=
       `<div class="grade grade--2">` +
@@ -1030,15 +1065,18 @@ function painelAfiliacao(f) {
         contador("Acessos neste arco", "acessos", f.acessos, 0, 9, "no terceiro, eles cobram") +
         `<label class="campo"><span class="campo__rot">Requisita até</span><input class="ent" value="${f.confiancaTeto >= 4 ? "Vínculo Alto" : f.confiancaTeto >= 2 ? "Vínculo Médio" : "Vínculo Baixo"}" disabled></label>` +
       `</div>` +
-      `<p class="margem">Confiança não é nível, é crédito. Um operador de teto alto com a reserva vazia tem menos poder de fogo que um novato com a reserva cheia.</p>` +
       `<div class="grade grade--2">` +
         area("A Dívida — o fato que eles guardaram", "divida", f.divida, 3) +
         area("Segunda linha — escrita quando você cumpriu o Chamado", "dividaSegunda", f.dividaSegunda, 3) +
       `</div>` +
-      `<p class="margem">Cumprir sobe o teto em 1 e faz a Dívida crescer. Recusar gasta a Dívida: o teto desce, você perde Acesso pelo resto do arco, e uma Âncora sua entra na mira.</p>`;
+      ``;
     if (f.acessos >= 3) corpo += `<p class="margem"><b>Terceiro Acesso.</b> Eles cobram. Não costuma ser punição — costuma ser um registro, e registros viram Dívida.</p>`;
   }
-  return painel("Afiliação", casa.carimbo, corpo);
+  return painel("Afiliação", casa.carimbo, corpo, { ajuda: [
+    `Sem Confiança, sem catálogo, sem base e sem Dívida. Nenhum Chamado, nunca, e nenhuma segunda linha escrita por alguém que você não conhece. Sobe um nível de Patrimônio e o equipamento é seu de verdade.`,
+    `Confiança não é nível, é crédito. Um operador de teto alto com a reserva vazia tem menos poder de fogo que um novato com a reserva cheia.`,
+    `Cumprir sobe o teto em 1 e faz a Dívida crescer. Recusar gasta a Dívida: o teto desce, você perde Acesso pelo resto do arco, e uma Âncora sua entra na mira.`,
+  ] });
 }
 
 function painelSemblante(f) {
@@ -1059,7 +1097,6 @@ function painelSemblante(f) {
       ).join("") + `</div></div>` +
     `<p class="margem">${esc(marcos[f.ressonancia])}</p>` +
     (f.ressonancia >= 3 ? `<p class="margem">Vale lembrar que um Semblante que repara em alguém e depois vê essa pessoa virar outra coisa não fica com raiva. Fica sem interesse, que é pior.</p>` : "") +
-    `<p class="margem">O jogador nunca vê este número: o Narrador anota. Está aqui porque alguém precisa anotar, e porque Ressonância decide o que você <b>consegue</b> aprender, enquanto a Afiliação decide o que alguém <b>te oferece</b>.</p>` +
     (f.bencaos.length
       ? `<ul class="itens itens--colunas">` + f.bencaos.map((b, i) =>
           `<li class="item"><div class="item__topo"><b class="item__nome">${esc(b.nome)}</b>` +
@@ -1069,7 +1106,9 @@ function painelSemblante(f) {
         ).join("") + `</ul>`
       : `<p class="vazio">Nenhuma Bênção. Elas não são compradas: são oferecidas dentro da ficção, em um encontro. Você pode recusar. Eles não costumam perguntar duas vezes.</p>`) +
     `<div class="linha-bts naoimprime"><button class="bt bt--casa" type="button" data-acao="abreComp" data-aba="bencaos">Ver as Bênçãos de referência</button></div>`;
-  return painel("Semblante", `${f.pilar} · Ressonância ${f.ressonancia}`, corpo, { prata: true });
+  return painel("Semblante", `${f.pilar} · Ressonância ${f.ressonancia}`, corpo, { prata: true, ajuda: [
+    `O jogador nunca vê este número: o Narrador anota. Está aqui porque alguém precisa anotar, e porque Ressonância decide o que você <b>consegue</b> aprender, enquanto a Afiliação decide o que alguém <b>te oferece</b>.`,
+  ] });
 }
 
 function painelEquipamento(f) {
@@ -1078,9 +1117,11 @@ function painelEquipamento(f) {
       `<div><div class="slot__rot"><span>${esc(s.rot)}</span><b title="${esc(s.longa || s.nota)}">${esc(s.nota)}</b></div>` +
       `<textarea class="ent" rows="3" data-campo="equip.${s.chave}">${esc(f.equip[s.chave])}</textarea></div>`
     ).join("") + `</div>` +
-    `<p class="margem">A distribuição é decidida <b>antes</b> da operação, não durante. O que estiver nas Costas exige uma Ação Padrão para sacar, e uma Ação Padrão em combate é a coisa mais cara que existe.</p>` +
-    `<p class="margem">Zona de Distorção alta tira até <b>2 Faces</b> de qualquer coisa com circuito: arma de fogo, rádio, lanterna, mira, veículo. É por isso que um operador experiente leva a lâmina. A lâmina nunca hesitou.</p>`;
-  return painel("Equipamento", `Patrimônio ${f.patrimonio}`, corpo);
+    ``;
+  return painel("Equipamento", `Patrimônio ${f.patrimonio}`, corpo, { ajuda: [
+    `A distribuição é decidida <b>antes</b> da operação, não durante. O que estiver nas Costas exige uma Ação Padrão para sacar, e uma Ação Padrão em combate é a coisa mais cara que existe.`,
+    `Zona de Distorção alta tira até <b>2 Faces</b> de qualquer coisa com circuito: arma de fogo, rádio, lanterna, mira, veículo. É por isso que um operador experiente leva a lâmina. A lâmina nunca hesitou.`,
+  ] });
 }
 
 function painelProgressao(f) {
@@ -1108,8 +1149,10 @@ function painelProgressao(f) {
       `<button class="bt bt--fantasma" type="button" data-acao="sessao" data-xp="4">+4</button>` +
       `<button class="bt bt--fantasma" type="button" data-acao="sessao" data-xp="2">+2</button>` +
     `</div>` +
-    `<p class="margem">Terminar a sessão dá 4. Resolver ou avançar um ponto narrativo, 2. Decisão significativa com consequência real, 2. O XP entra também no contador do Arquétipo aceso, porque é ali que o Grau mora. Não existe XP por derrotar inimigo: combate não é onde o progresso acontece, é onde ele cobra.</p>`;
-  return painel("Progressão", `${livre} XP livre${livre === 1 ? "" : "s"}`, corpo, { prata: true });
+    ``;
+  return painel("Progressão", `${livre} XP livre${livre === 1 ? "" : "s"}`, corpo, { prata: true, ajuda: [
+    `Terminar a sessão dá 4. Resolver ou avançar um ponto narrativo, 2. Decisão significativa com consequência real, 2. O XP entra também no contador do Arquétipo aceso, porque é ali que o Grau mora. Não existe XP por derrotar inimigo: combate não é onde o progresso acontece, é onde ele cobra.`,
+  ] });
 }
 
 const painelNota = (t, n, c) => painel(t, n, c, { fita: "no" });
@@ -1547,6 +1590,10 @@ const ACOES = {
     avisa("Aceita. Bênção não custa XP, não ocupa Capacidade — e pode ser retirada.");
   },
 
+  ajuda(f, d) {
+    if (ajudasAbertas.has(d.chave)) ajudasAbertas.delete(d.chave);
+    else ajudasAbertas.add(d.chave);
+  },
   recolhe(f, d) {
     const i = f.recolhidos.indexOf(d.chave);
     if (i >= 0) f.recolhidos.splice(i, 1); else f.recolhidos.push(d.chave);
@@ -1689,6 +1736,15 @@ function ligaGaveta() {
     avisa("Ficha nova. Comece pela Linhagem: ela responde as duas perguntas que nada mais responde.");
   };
   $("#btDuplica").onclick = () => comFicha(f => ACOES.duplica(f));
+  $("#btAjudas").onclick = () => {
+    const chaves = $$("[data-acao='ajuda']").map(b => b.dataset.chave);
+    const abrir = chaves.some(k => !ajudasAbertas.has(k));
+    chaves.forEach(k => abrir ? ajudasAbertas.add(k) : ajudasAbertas.delete(k));
+    desenha();
+    avisa(abrir
+      ? "Explicações à vista. O ? de cada tarja abre e fecha a dele."
+      : "Explicações recolhidas.");
+  };
   $("#btAbreTudo").onclick = () => comFicha(f => {
     if (!f.recolhidos.length) { avisa("Nenhum bloco recolhido. O ▾ na tarja de cada um recolhe."); return; }
     f.recolhidos = [];

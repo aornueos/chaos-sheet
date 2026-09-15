@@ -498,7 +498,7 @@ body::before{
 .painel__topo{
   position: relative;
   display: flex; align-items: baseline; gap: 3px 12px; flex-wrap: wrap;
-  padding: 9px calc(var(--pad) + 30px) 7px var(--pad);
+  padding: 9px calc(var(--pad) + 62px) 7px var(--pad);
   background: var(--tinta);
   color: var(--papel);
   clip-path: polygon(0 9%, 14% 0, 41% 7%, 69% 1%, 100% 6%, 100% 600%, 0 600%);
@@ -532,14 +532,40 @@ body::before{
    este personagem não usa ou o jogador já sabe de cor — e o estado é da
    ficha, não do aparelho, porque um Bastião e um Arquivista desligam
    coisas diferentes. */
-.painel__olho{
+.painel__botoes{
   position: absolute; right: 7px; top: 7px;
+  display: flex; gap: 4px;
+}
+.painel__olho,
+.painel__ajuda{
   width: 26px; height: 22px; padding: 0; border: 0; cursor: pointer;
   background: rgba(255,255,255,.14); color: var(--papel);
   font: 400 13px/1 var(--mono);
 }
-.painel__olho:hover{ background: var(--casa); color: #fff; }
-.painel--prata .painel__olho{ background: rgba(0,0,0,.3); color: var(--prata-3); }
+.painel__olho:hover,
+.painel__ajuda:hover{ background: var(--casa); color: #fff; }
+.painel__ajuda[aria-expanded="true"]{ background: var(--casa); color: #fff; }
+.painel--prata .painel__olho,
+.painel--prata .painel__ajuda{ background: rgba(0,0,0,.3); color: var(--prata-3); }
+
+/* A explicação sai de cima da mesa e fica atrás do "?". Quando abre, ela é
+   nota de rodapé colada no alto do painel: fundo próprio, para ninguém
+   confundir o que é regra deste personagem com o que é regra do livro. */
+.ajuda{
+  position: relative; z-index: 2;
+  margin: 0 var(--pad);
+  padding: var(--pad-2) var(--pad);
+  background: rgba(22,19,15,.07);
+  box-shadow: inset 0 0 0 1.5px var(--casa-esc);
+  clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 9px 100%, 0 calc(100% - 9px));
+}
+.ajuda__linha{
+  margin: 0 0 7px;
+  font: 400 var(--fs)/1.5 var(--leitura);
+  color: var(--tinta-2);
+}
+.ajuda__linha:last-child{ margin-bottom: 0; }
+.ajuda__linha b{ color: var(--tinta); }
 .painel[data-recolhido="1"] .painel__corpo{ display: none; }
 .painel[data-recolhido="1"]{ padding-bottom: 9px; }
 .painel[data-recolhido="1"] .painel__nome{ opacity: .72; }
@@ -1177,8 +1203,11 @@ body[data-gaveta="fechada"] .palco{ margin-left: 54px; }
 [data-casa="Mysteria"] .medidor--papel .medidor__casa[data-tipo="cheio"],
 [data-casa="Mysteria"] .trilha__passo[data-atual="1"]{ background: #2aa462; color: #04140a; }
 /* o botão de recolher precisa existir contra tela preta */
-[data-casa="Mysteria"] .painel__olho{ background: rgba(62,220,134,.18); color: var(--tinta); }
-[data-casa="Mysteria"] .painel__olho:hover{ background: var(--casa); color: #04140a; }
+[data-casa="Mysteria"] .painel__olho,
+[data-casa="Mysteria"] .painel__ajuda{ background: rgba(62,220,134,.18); color: var(--tinta); }
+[data-casa="Mysteria"] .painel__olho:hover,
+[data-casa="Mysteria"] .painel__ajuda:hover,
+[data-casa="Mysteria"] .painel__ajuda[aria-expanded="true"]{ background: var(--casa); color: #04140a; }
 [data-casa="Mysteria"] .corr__estado{ background: #0d3f24; color: #8ef8bb; }
 [data-casa="Mysteria"] .tag{ box-shadow: inset 0 0 0 1px var(--tinta-2); color: var(--tinta-2); background: rgba(62,220,134,.06); }
 

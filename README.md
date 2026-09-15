@@ -99,6 +99,26 @@ Vitalidade, Confiança, Acessos, Contatos e XP seguem o mesmo princípio. Sobra
 digitação onde ela é mesmo o gesto certo: nome, Estre, Dívida, Âncoras,
 anotações.
 
+## O "?" de cada tarja
+
+A explicação fica **atrás de um "?"**, não em cima da mesa. O jogador precisa
+dela duas vezes e depois nunca mais, e enquanto isso ela ocupava metade de
+cada painel.
+
+O corte é por natureza do texto, não por tamanho. **Sai** o que explica a
+regra do livro: como o teto de atributo funciona, por que alma é acúmulo, o
+que a Cultura concede, os dois portões do Vínculo, o que acontece com uma
+Âncora. **Fica** o que muda com o estado desta ficha: o efeito do estado de
+Corrupção agora, a penalidade do nível de Vitalidade agora, "passou do que
+cabe", "terceiro Contato neste arco", "você gastou o que não tinha". Regra do
+livro se consulta; estado do personagem se lê de relance.
+
+Aberta ou fechada é **estado de sessão**, não da ficha: é leitura de agora e
+não configuração do personagem, então sobrevive ao redesenho — clicar num
+stepper com a ajuda aberta não fecha a ajuda — mas não a recarregar a página.
+Na gaveta há um botão que abre todas de uma vez. Na impressão não sai nenhuma:
+a folha impressa é o registro do personagem, e a regra está no livro.
+
 ## Recolher
 
 Toda tarja tem um **▾**, e a tarja é uma linha só: quem encolhe quando falta
