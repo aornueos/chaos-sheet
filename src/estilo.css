@@ -1,0 +1,1145 @@
+/* ============================================================================
+   DEVANEIO — ficha do Ascendido
+   Direção de arte: fanzine gótico ocultista. Três materiais, e só três.
+
+   PAPEL   o mundo ordinário. Atributos, perícias, equipamento, dinheiro.
+           Tinta preta sobre papel osso. É o que qualquer pessoa de Elinia
+           entenderia se olhasse por cima do seu ombro.
+   PRATA   o mundo espiritual. Corrupção, Cifras, Labirinto, Ascensão,
+           Ressonância. Tudo que passa pela Tessera sai metálico, e a prata
+           nunca é fundo de texto de leitura: ela é trilho, moldura e brilho.
+   CASA    a tinta da Afiliação. Uma por dossiê. Preenche, carimba e sublinha.
+           Trocar de Afiliação reimprime a ficha inteira.
+
+   A mesa é preta. Os painéis são recortes de papel colados sobre ela, tortos,
+   rasgados à mão e presos com fita. O excesso é o ponto: este mundo trata
+   perda com piada, e a página tem que rir junto. A sujeira toda mora
+   embaixo do conteúdo — o papel é fotocópia velha, o que está escrito nele
+   saiu da máquina hoje.
+   ============================================================================ */
+
+/* ---------------------------------------------------------------- 1. tokens */
+
+:root{
+  /* materiais */
+  --mesa:      #0a090c;
+  --mesa-2:    #131217;
+  --papel:     #ece6da;
+  --papel-2:   #e4ddcf;
+  --papel-3:   #d9d1bf;
+  --tinta:     #16130f;
+  --tinta-2:   #443d31;
+  --tinta-3:   #5f5849;   /* piso: estado vazio é texto de leitura e mede 5,3:1 */
+
+  /* prata: a rampa é sempre a mesma, o que muda é onde ela é aplicada */
+  --prata-0:   #43474d;
+  --prata-1:   #8b9198;
+  --prata-2:   #c3c8ce;
+  --prata-3:   #f3f5f7;
+  --capa-tinta: #f3f5f7;   /* texto sobre a capa, que é preta nas nove casas */
+  --prata-trilho: linear-gradient(180deg,
+      #3c4046 0%, #9aa0a7 14%, #f3f5f7 30%, #767c83 48%,
+      #d9dde1 66%, #5b6066 84%, #2f3339 100%);
+  --prata-chapa: linear-gradient(145deg,
+      #2b2e33 0%, #6e747b 22%, #cfd4d9 42%, #585e65 60%, #a8aeb5 78%, #33363b 100%);
+
+  /* casa: o bloco de cada Afiliação sobrescreve isto */
+  --casa:      #6d8496;
+  --casa-esc:  #3c4b57;
+  --casa-clr:  #a9bfcd;
+
+  /* trama de fundo da capa. A força é um número só, e vale para as nove
+     casas: o alfa interno de cada gradiente está normalizado em 1. */
+  --trama-op:  .26;
+  --trama: repeating-linear-gradient(135deg,
+      rgba(255,255,255,1) 0 6px, rgba(255,255,255,0) 6px 14px);
+
+  /* arranjo: o botão da gaveta troca um atributo na raiz e todo o resto lê daqui */
+  --gap:       14px;
+  --pad:       15px;
+  --pad-2:     11px;
+  --fs:        15px;
+  --fs-mini:   12px;   /* piso absoluto de rótulo, em qualquer arranjo */
+  --tr:        .08em;  /* rastreamento das caps miúdas */
+  --col-min:   310px;
+  --col-per:   220px;
+
+  --som:       0 2px 0 rgba(0,0,0,.55), 0 10px 26px -12px rgba(0,0,0,.9);
+
+  --mono: "Courier Prime", "Courier New", ui-monospace, monospace;
+  --titulo: "Haettenschweiler", "Arial Narrow Bold", "Impact", "Franklin Gothic Medium",
+            "Arial Narrow", "Oswald", sans-serif;
+  --serifa: "Iowan Old Style", "Palatino Linotype", "Georgia", "Times New Roman", serif;
+  --leitura: "Charter", "Bitstream Charter", "Iowan Old Style", Georgia,
+             "Palatino Linotype", "Times New Roman", serif;
+
+  color-scheme: dark;
+}
+
+[data-arranjo="apertado"]{
+  --gap: 9px; --pad: 10px; --pad-2: 7px; --fs: 14px; --fs-mini: 12px;
+  --col-min: 268px; --col-per: 184px;
+}
+[data-arranjo="espacoso"]{
+  --gap: 20px; --pad: 21px; --pad-2: 15px; --fs: 16px; --fs-mini: 12px;
+  --col-min: 360px; --col-per: 250px;
+}
+
+*{ box-sizing: border-box; }
+
+html{ background: var(--mesa); }
+
+body{
+  margin: 0;
+  padding: 0;
+  font: 400 var(--fs)/1.5 var(--mono);
+  color: var(--papel);
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(195,200,206,.10), transparent 60%),
+    radial-gradient(90% 60% at 50% 110%, rgba(0,0,0,.6), transparent 60%),
+    var(--mesa);
+  background-attachment: fixed;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* fiapo de luz na mesa: só se nota quando se procura */
+body::before{
+  content:""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.022) 0 1px, transparent 1px 3px);
+  opacity: .8;
+}
+
+/* ---------------------------------------------------------- 1b. a sujeira
+
+   Um zine de verdade não é impresso, é fotocopiado — e fotocópia de
+   fotocópia. Três camadas dão isso sem tocar no texto, porque todas moram
+   embaixo do conteúdo:
+
+   GRÃO     ruído fino de toner, a poeira que o vidro da máquina junta.
+   MANCHA   nuvem larga e lenta: a folha não pega tinta por igual.
+   RISCO    faixas verticais, o rolo que arrasta e some.
+
+   O ruído é feTurbulence num SVG embutido. Não é enfeite caro: é a única
+   forma de ter grão irregular sem um PNG de textura no arquivo.            */
+
+:root{
+  --grao: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
+  --mancha: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='440' height='440'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.011' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='440' height='440' filter='url(%23m)'/%3E%3C/svg%3E");
+  --risco: repeating-linear-gradient(90deg,
+    rgba(0,0,0,.34) 0 1px, rgba(127,127,127,0) 1px 23px,
+    rgba(0,0,0,.24) 23px 25px, rgba(127,127,127,0) 25px 91px,
+    rgba(0,0,0,.44) 91px 92px, rgba(127,127,127,0) 92px 137px);
+}
+
+/* ------------------------------------------------------- 2. peças genéricas */
+
+.oculto,
+[hidden]{ display: none !important; }   /* display:flex num painel escondido vence o [hidden] do navegador */
+
+/* Rasgo de mão, não serrilha de régua: mordidas largas e desiguais, com
+   fibra sobrando em alguns pontos e o papel indo embora em outros. Duas
+   formas diferentes, para a base e para o topo não rimarem. */
+.rasgo{
+  position: absolute; left: -3px; right: -3px; height: 15px;
+  z-index: 3; background: var(--mesa); pointer-events: none;
+}
+.rasgo--pe{
+  bottom: -1px;
+  clip-path: polygon(0 100%,0 34%,3% 71%,5% 18%,11% 55%,13% 88%,16% 40%,
+    21% 62%,24% 12%,29% 49%,31% 80%,36% 33%,39% 66%,44% 22%,47% 58%,
+    52% 91%,55% 38%,58% 70%,63% 15%,67% 52%,70% 84%,74% 30%,78% 63%,
+    82% 20%,86% 57%,89% 87%,93% 35%,96% 68%,100% 26%,100% 100%);
+}
+.rasgo--topo{
+  top: -1px;
+  clip-path: polygon(0 0,100% 0,100% 74%,97% 32%,93% 65%,89% 13%,85% 50%,
+    81% 82%,77% 28%,73% 61%,68% 18%,64% 55%,60% 86%,56% 37%,51% 69%,
+    47% 22%,43% 58%,38% 90%,34% 41%,30% 72%,25% 25%,21% 62%,17% 14%,
+    12% 51%,9% 83%,5% 36%,2% 67%,0 24%);
+}
+
+/* fita crepe */
+.fita{
+  position: absolute; z-index: 6; width: 76px; height: 22px;
+  background:
+    repeating-linear-gradient(90deg, rgba(0,0,0,.05) 0 2px, transparent 2px 5px),
+    linear-gradient(180deg, rgba(228,214,178,.92), rgba(206,190,152,.86));
+  box-shadow: 0 1px 4px rgba(0,0,0,.45);
+  opacity: .9;
+}
+.fita--ne{ top: -9px; right: 8px; transform: rotate(26deg); }
+.fita--no{ top: -10px; left: 10px; transform: rotate(-21deg); }
+.fita--se{ bottom: -8px; right: 14px; transform: rotate(-14deg); }
+.fita--so{ bottom: -9px; left: 16px; transform: rotate(9deg); }
+/* ponta rasgada: fita de verdade não sai da mão com corte reto */
+.fita{
+  clip-path: polygon(0 12%, 4% 0, 96% 4%, 100% 26%, 95% 52%, 100% 78%, 96% 100%,
+    4% 96%, 0 74%, 5% 50%, 0 34%);
+}
+.painel{ overflow: visible; }
+
+/* prata: o material do lado de lá */
+/* carimbo de borracha */
+.carimbo{
+  display: inline-block;
+  font: 700 var(--fs-mini)/1.2 var(--titulo);
+  letter-spacing: var(--tr); text-transform: uppercase;
+  padding: 4px 9px 3px;
+  color: var(--casa-esc);
+  border: 2px solid var(--casa-esc);
+  outline: 1px solid var(--casa-esc); outline-offset: 2px;
+  transform: rotate(-3.5deg);
+  opacity: .82;
+  mix-blend-mode: multiply;
+  white-space: nowrap;
+}
+.carimbo--riscado{ text-decoration: line-through; text-decoration-thickness: 2px; }
+
+/* ------------------------------------------------------------- 3. a capa */
+
+.capa{
+  position: relative;
+  margin: 0 0 var(--gap);
+  padding: 0;
+  background: var(--mesa-2);
+  overflow: hidden;
+}
+/* a chapa da casa embaixo da capa também sai deslocada */
+.capa::after{
+  content:""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px;
+  background: var(--casa-esc); z-index: 4;
+  clip-path: polygon(0 0, 100% 34%, 100% 100%, 0 100%);
+}
+.capa__grao{
+  position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  background-image: var(--grao), var(--mancha);
+  background-size: 180px 180px, 440px 440px;
+  opacity: .5; mix-blend-mode: overlay;
+}
+.capa__trama{
+  position: absolute; inset: 0;
+  background-image: var(--trama);
+  opacity: var(--trama-op);
+  pointer-events: none;
+}
+.capa__selo{
+  position: absolute; right: 2%; top: 50%; transform: translateY(-50%);
+  width: 220px; height: 220px; opacity: .28; pointer-events: none;
+  color: var(--casa-clr);
+}
+.capa__selo svg{ width: 100%; height: 100%; display: block; }
+.capa__corpo{
+  position: relative; z-index: 2;
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--gap);
+  padding: calc(var(--pad) + 6px) var(--pad) var(--pad);
+}
+
+/* a marca: DEVANEIO cortado por uma cruz */
+.marca{ position: relative; flex: 1 1 auto; min-width: 0; padding: 16px 26px 12px 18px; }
+
+/* A manchete não flutua no preto: ela é um retalho de papel rasgado, colado
+   torto na capa, com a marca impressa em cima. O retalho veste a marca — se
+   ele for uma fração da altura do bloco, corta a linha da casa no meio e
+   deixa cinza em cima de branco. É também o lugar exato onde um arquivo de
+   logotipo entra, quando existir: papel embaixo, tinta preta em cima. */
+.marca__chapa{
+  position: relative; display: inline-block; max-width: 100%;
+  padding: 12px 30px 14px 22px;
+  transform: rotate(-1.1deg);
+}
+.marca__retalho{
+  position: absolute; inset: 0;
+  background: var(--papel); z-index: 0;
+  box-shadow: 3px 5px 0 rgba(0,0,0,.5);
+  clip-path: polygon(0 6%, 9% 0, 27% 5%, 48% 1%, 66% 6%, 83% 0, 100% 5%,
+    97% 28%, 100% 52%, 96% 74%, 100% 94%, 81% 100%, 62% 95%, 41% 100%,
+    22% 94%, 6% 100%, 2% 76%, 0 54%, 3% 30%);
+}
+.marca__retalho::after{
+  content:""; position: absolute; inset: 0;
+  background-image: var(--grao), var(--mancha);
+  background-size: 180px 180px, 440px 440px;
+  opacity: .6; mix-blend-mode: overlay;
+}
+.marca__palavra{
+  position: relative; z-index: 2;
+  margin: 0;
+  font: 400 clamp(40px, 7.8vw, 86px)/.82 var(--titulo);
+  letter-spacing: .01em;
+  text-transform: uppercase;
+  color: var(--tinta);
+}
+.marca__palavra em{ font-style: normal; color: var(--casa-esc); }
+
+/* Quando existe arquivo de marca, o retalho de papel vira a moldura dele e
+   a cruz desenhada some: a arte já traz a própria. O SVG herda a cor da
+   tinta, então a marca continua sendo preto sobre papel nas nove casas. */
+.marca__palavra--arte{ line-height: 0; margin: 0; }
+.marca__chapa--arte{ padding: 10px 18px 12px 16px; }
+.marca__palavra--arte svg,
+.marca__arte{
+  display: block;
+  width: clamp(230px, 42vw, 470px); height: auto;
+  max-width: 100%;
+}
+.marca__palavra--arte svg{ fill: currentColor; }
+.marca__chapa--arte::before,
+.marca__chapa--arte::after{ display: none; }
+/* a cruz é impressa no papel: onde o papel acaba, a linha acaba junto */
+.marca__chapa::before{
+  content:""; position: absolute; left: 4px; right: 4px; top: 52%;
+  height: 1.5px; background: var(--tinta); z-index: 3;
+}
+.marca__chapa::after{
+  content:""; position: absolute; left: 40px; top: 2px; bottom: 2px;
+  width: 1.5px; background: var(--tinta); z-index: 3;
+}
+.marca__linha{
+  position: relative; z-index: 2;
+  margin: 8px 0 0;
+  font: 400 var(--fs-mini)/1.4 var(--mono);
+  letter-spacing: .2em; text-transform: uppercase;
+  color: var(--casa-clr);
+  overflow-wrap: anywhere;
+}
+
+.capa__id{ flex: 1 1 320px; min-width: 240px; }
+.capa__nome{
+  width: 100%;
+  font: 400 clamp(20px, 3.4vw, 34px)/1.1 var(--titulo);
+  letter-spacing: .03em; text-transform: uppercase;
+  color: var(--capa-tinta);
+  background: transparent;
+  border: 0; border-bottom: 2px solid var(--casa);
+  padding: 2px 0 4px;
+}
+.capa__nome::placeholder{ color: var(--prata-1); opacity: 1; }
+.capa__nome:focus{ outline: none; border-bottom-color: var(--prata-3); }
+.capa__abaixo{
+  display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center;
+  margin-top: 8px;
+  font: 400 var(--fs-mini)/1.4 var(--mono);
+  letter-spacing: var(--tr); text-transform: uppercase;
+  color: var(--prata-2);
+}
+.capa__abaixo b{ color: var(--casa-clr); font-weight: 400; }
+.capa__carimbos{ display: flex; gap: 12px; align-items: center; flex: 0 0 auto; }
+.capa__carimbos .carimbo{ color: var(--casa-clr); border-color: var(--casa-clr); outline-color: var(--casa-clr); mix-blend-mode: normal; }
+
+/* redação: a barra preta que o Olho adora */
+.redigido{
+  background: #000; color: transparent; padding: 0 .35em;
+  user-select: none;
+}
+
+/* ------------------------------------------------------------ 4. estrutura */
+
+.folha{ padding: 0 var(--gap) calc(var(--gap) * 3); }
+
+/* a faixa de cima não entra no fluxo: é o que se toca a sessão inteira, e em
+   qualquer largura fica no mesmo lugar. Contagem fixa, não auto-fit. */
+.faixa{
+  display: grid; gap: var(--gap);
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  margin-bottom: var(--gap);
+}
+.faixa > .painel--largo{ grid-column: 1 / -1; }
+@media (max-width: 900px){ .faixa{ grid-template-columns: 1fr; } }
+
+/* o resto desce em colunas de fluxo: o navegador corta pela altura */
+.fluxo{ column-width: var(--col-min); column-gap: var(--gap); }
+.fluxo > .painel{ break-inside: avoid; margin: 0 0 var(--gap); display: inline-block; width: 100%; }
+
+/* --------------------------------------------------------------- 5. painel */
+
+.painel{
+  position: relative;
+  padding: 0 0 12px;
+  background:
+    linear-gradient(174deg, var(--papel) 0%, var(--papel-2) 70%, var(--papel-3) 100%);
+  background-size: 100% 620px;
+  color: var(--tinta);
+  box-shadow: var(--som);
+}
+/* A sujeira mora embaixo do conteúdo, nunca em cima: o papel é fotocópia
+   velha, mas o que está escrito nele sai da máquina hoje. */
+.painel::before{
+  content:""; position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  background-image:
+    var(--mancha),
+    var(--grao),
+    var(--risco),
+    radial-gradient(circle at 1px 1px, rgba(20,18,14,1) .5px, transparent .8px);
+  background-size: 440px 440px, 180px 180px, auto, 4px 4px;
+  opacity: .44;
+  mix-blend-mode: overlay;
+}
+/* escurecimento de borda: o vidro da copiadora nunca encosta até o fim */
+.painel > .painel__topo ~ *{ position: relative; }
+.painel{ box-shadow: var(--som), inset 0 0 22px -6px rgba(30,24,14,.42); }
+.painel > *{ position: relative; z-index: 2; }
+.painel > .fita{ position: absolute; z-index: 6; }
+
+/* Recorte de tesoura, não de guilhotina. O ângulo muda de painel para painel
+   e não segue régua nenhuma — é isso que separa colagem de diagramação. */
+.painel:nth-of-type(7n+1){ transform: rotate(-.7deg); }
+.painel:nth-of-type(7n+2){ transform: rotate(.5deg); }
+.painel:nth-of-type(7n+3){ transform: rotate(-.3deg); }
+.painel:nth-of-type(7n+4){ transform: rotate(.85deg); }
+.painel:nth-of-type(7n+5){ transform: rotate(-.55deg); }
+.painel:nth-of-type(7n+6){ transform: rotate(.28deg); }
+.painel:nth-of-type(7n+7){ transform: rotate(-.9deg); }
+
+.painel__topo{
+  position: relative;
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  padding: 9px var(--pad) 7px;
+  background: var(--tinta);
+  color: var(--papel);
+  clip-path: polygon(0 9%, 14% 0, 41% 7%, 69% 1%, 100% 6%, 100% 600%, 0 600%);
+}
+.painel:nth-of-type(2n) .painel__topo{
+  clip-path: polygon(0 2%, 23% 8%, 52% 0, 78% 6%, 100% 0, 100% 600%, 0 600%);
+}
+/* Duas tintas, uma passada cada, e a segunda nunca cai onde deveria.
+   A chapa da casa sai por baixo e por fora do preto: é o erro de registro
+   que qualquer gráfica de esquina comete, e é a assinatura do zine. */
+.painel__topo::before{
+  content:""; position: absolute; left: 3px; right: -4px; bottom: -3px; height: 3px;
+  background: var(--casa);
+}
+.painel__nome{
+  margin: 0;
+  font: 400 clamp(18px, 2.1vw, 25px)/1 var(--titulo);
+  letter-spacing: .05em; text-transform: uppercase;
+}
+.painel__nota{
+  margin-left: auto;
+  font: 400 var(--fs-mini)/1.3 var(--mono);
+  letter-spacing: var(--tr); text-transform: uppercase;
+  color: var(--prata-2);
+  max-width: 62%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.painel__corpo{ padding: var(--pad-2) var(--pad) 0; }
+
+.painel--prata .painel__nome::before{
+  content: "◆"; margin-right: 7px; font-size: .7em; vertical-align: .12em; opacity: .8;
+}
+
+/* painel do lado de lá: o topo vira chapa de prata e ganha arco */
+.painel--prata .painel__topo{
+  background: var(--prata-chapa);
+  color: var(--prata-3);
+}
+.painel--prata .painel__topo::before{ background: var(--prata-0); }
+.painel--prata .painel__nome{ color: #0d0f11; text-shadow: 0 1px 0 rgba(255,255,255,.35); }
+.painel--prata .painel__nota{ color: #1a1d20; }
+.painel--prata::after{
+  content:""; position: absolute; left: 0; right: 0; top: 0; height: 3px;
+  background: var(--prata-trilho); z-index: 3;
+}
+
+/* ---------------------------------------------------------------- 6. campos */
+
+.campo{ display: block; margin: 0 0 var(--pad-2); }
+.campo__rot{
+  display: block;
+  font: 400 var(--fs-mini)/1.3 var(--mono);
+  letter-spacing: var(--tr); text-transform: uppercase;
+  color: var(--tinta-2);
+  margin-bottom: 3px;
+}
+input, select, textarea, button{ font: inherit; color: inherit; }
+.ent{
+  width: 100%;
+  padding: 5px 7px;
+  background: rgba(255,255,255,.42);
+  color: var(--tinta);
+  border: 0; border-bottom: 1.5px solid var(--tinta-2);
+  border-radius: 0;
+  font: 400 var(--fs)/1.4 var(--mono);
+}
+.ent:focus{ outline: 2px solid var(--casa-esc); outline-offset: -2px; background: rgba(255,255,255,.72); }
+textarea.ent{ resize: vertical; min-height: 68px; line-height: 1.55; }
+select.ent{ cursor: pointer; }
+.ent--num{ text-align: center; font-variant-numeric: tabular-nums; }
+
+.grade{ display: grid; gap: var(--pad-2) 10px; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); }
+.grade--2{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+
+/* botões */
+.bt{
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px;
+  font: 400 var(--fs-mini)/1.3 var(--mono);
+  letter-spacing: var(--tr); text-transform: uppercase;
+  color: var(--papel); background: var(--tinta);
+  border: 0; cursor: pointer;
+  transition: background .12s;
+}
+.bt:hover{ background: var(--casa-esc); }
+.bt:focus-visible{ outline: 2px solid var(--casa); outline-offset: 2px; }
+.bt--casa{ background: var(--casa-esc); color: #fff; }
+.bt--casa:hover{ background: var(--tinta); }
+.bt--fino{ padding: 3px 7px; }
+.bt--fantasma{
+  background: transparent; color: var(--tinta);
+  box-shadow: inset 0 0 0 1.5px var(--tinta-2);
+}
+.bt--fantasma:hover{ background: var(--tinta); color: var(--papel); }
+.bt--perigo:hover{ background: #7d1d1d; }
+.linha-bts{ display: flex; flex-wrap: wrap; gap: 6px; margin: var(--pad-2) 0 var(--pad-2); }
+
+/* marginália: a piada que o zine escreve na beirada */
+.margem{
+  position: relative;
+  margin: 7px 0 var(--pad-2);
+  padding-left: 13px;
+  font: 400 calc(var(--fs) + 1px)/1.5 var(--leitura);
+  color: var(--tinta-2);
+}
+/* traço na margem, do jeito que sai de uma caneta apoiada na folha:
+   grosso no começo, fino no meio, e nunca reto */
+.margem::before{
+  content:""; position: absolute; left: 0; top: 1px; bottom: 1px; width: 5px;
+  background: var(--casa);
+  clip-path: polygon(10% 0, 100% 3%, 92% 30%, 62% 55%, 88% 78%, 74% 100%,
+    0 97%, 14% 72%, 38% 48%, 6% 24%);
+}
+.margem b{ color: var(--tinta); font-weight: 700; }
+.vazio{
+  padding: 10px 0 var(--pad-2);
+  font: 400 calc(var(--fs) + 1px)/1.55 var(--leitura);
+  color: var(--tinta-3);
+}
+
+/* ----------------------------------------------------- 7. dados e medidores */
+
+/* o valor do atributo é o tamanho do dado. É o dado que vai para a mesa. */
+.atrs{ display: grid; gap: 10px; grid-template-columns: repeat(4, minmax(0,1fr)); }
+@container painel (max-width: 380px){ .atrs{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
+.painel__corpo{ container-type: inline-size; container-name: painel; }
+
+.atr{
+  position: relative; text-align: center;
+  padding: 7px 4px 8px;
+  background: rgba(255,255,255,.34);
+  box-shadow: inset 0 0 0 1.5px var(--tinta), 2px 3px 0 rgba(0,0,0,.16);
+}
+.atr:nth-child(1){ transform: rotate(-.9deg); }
+.atr:nth-child(2){ transform: rotate(.7deg); }
+.atr:nth-child(3){ transform: rotate(-.5deg); }
+.atr:nth-child(4){ transform: rotate(1.1deg); }
+.atr__rot{
+  font: 400 var(--fs-mini)/1.2 var(--mono);
+  letter-spacing: var(--tr); text-transform: uppercase; color: var(--tinta-2);
+}
+.atr__dado{
+  display: block; margin: 2px 0 1px;
+  font: 400 clamp(21px, 2.6vw, 30px)/1 var(--titulo);
+  letter-spacing: .02em; color: var(--tinta);
+}
+.atr__passos{ display: flex; justify-content: center; gap: 4px; margin-top: 4px; }
+.passo{
+  width: 22px; height: 20px; padding: 0;
+  font: 400 13px/1 var(--mono);
+  background: var(--tinta); color: var(--papel); border: 0; cursor: pointer;
+}
+.passo:disabled{ opacity: .28; cursor: default; }
+.passo:hover:not(:disabled){ background: var(--casa-esc); }
+
+/* vitalidade: cinco degraus e a reserva dentro do degrau */
+.vit__degraus{ display: flex; gap: 4px; margin-bottom: 8px; }
+.degrau{
+  position: relative; flex: 1 1 0; min-width: 0; height: 30px; padding: 0; border: 0; cursor: pointer;
+  background: rgba(0,0,0,.08);
+  box-shadow: inset 0 0 0 1.5px var(--tinta);
+  font: 400 var(--fs)/1 var(--mono); color: var(--tinta-3);
+}
+.degrau[data-cheio="1"]{ background: var(--tinta); color: var(--papel); }
+/* a zona que mata gente fica marcada sempre, cheia ou vazia: o jogador
+   precisa ver o degrau chegando antes de pisar nele */
+.degrau[data-risco="1"]::after{
+  content:""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px;
+  /* currentColor: em degrau cheio a marca sai clara sobre a tinta, em
+     degrau vazio sai escura sobre o papel. Uma regra, os dois casos. */
+  background-image: repeating-linear-gradient(45deg,
+    currentColor 0 2px, transparent 2px 5px);
+  opacity: .75;
+}
+.degrau[data-atual="1"]{
+  background: var(--casa-esc); color: #fff; font-weight: 700;
+  box-shadow: inset 0 0 0 1.5px var(--tinta), 0 0 0 2px var(--casa);
+}
+.degrau:hover{ outline: 2px solid var(--casa); outline-offset: 1px; }
+.vit__estado{ display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.vit__nome{ font: 400 clamp(16px,2vw,22px)/1 var(--titulo); letter-spacing: .06em; text-transform: uppercase; }
+.vit__pen{ font: 400 var(--fs)/1.4 var(--leitura); color: var(--tinta-2); }
+.vit__pts{ display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
+.vit__pts .ent{ width: 62px; }
+
+/* corrupção: a barra é prata porque alma é do lado de lá */
+.corr{ margin-bottom: 8px; }
+.corr__barra{
+  position: relative; height: 30px;
+  background: #0f1113;
+  box-shadow: inset 0 0 0 1.5px var(--prata-0), inset 0 2px 6px rgba(0,0,0,.8);
+  overflow: hidden;
+}
+.corr__seg{ position: absolute; top: 0; bottom: 0; }
+.corr__seg--rec{ background: linear-gradient(180deg, #d6dade, #7e848b); }
+.corr__seg--ass{ background: linear-gradient(180deg, #8e949b, #3f444a); }
+.corr__seg--car{
+  background-image: repeating-linear-gradient(45deg,
+    rgba(214,218,222,1) 0 3px, rgba(30,33,36,1) 3px 7px);
+}
+.corr__marca{ position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,.5); }
+.corr__num{
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font: 400 var(--fs-mini)/1 var(--mono); letter-spacing: var(--tr);
+  color: #fff; text-shadow: 0 1px 3px #000;
+  pointer-events: none;
+}
+.corr__legenda{
+  display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 7px;
+  font: 400 var(--fs-mini)/1.4 var(--mono); letter-spacing: var(--tr); text-transform: uppercase;
+  color: var(--tinta-2);
+}
+.corr__legenda i{ display: inline-block; width: 11px; height: 11px; margin-right: 4px; vertical-align: -1px; box-shadow: inset 0 0 0 1px var(--tinta); }
+.corr__estado{
+  display: inline-block; margin-top: 7px; padding: 3px 9px;
+  font: 400 var(--fs-mini)/1.4 var(--mono); letter-spacing: var(--tr); text-transform: uppercase;
+  background: var(--tinta); color: var(--papel);
+}
+.corr__estado[data-grave="1"]{ background: #7d1d1d; color: #fff; }
+.corr__campos{ display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; margin-top: 9px; }
+
+/* capacidade: o armário e a roupa */
+.cap__barra{
+  position: relative; height: 22px; margin-bottom: 7px;
+  background: rgba(0,0,0,.14);
+  box-shadow: inset 0 0 0 1.5px var(--tinta);
+}
+.cap__usada{ position: absolute; inset: 0 auto 0 0; background: var(--tinta); }
+.cap__usada[data-estouro="1"]{ background: #7d1d1d; }
+.cap__num{
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font: 400 var(--fs-mini)/1 var(--mono); letter-spacing: var(--tr); color: var(--papel);
+  mix-blend-mode: difference; pointer-events: none;
+}
+
+/* ------------------------------------------------------------- 8. perícias */
+
+.pers{ display: grid; gap: var(--pad-2) var(--gap); grid-template-columns: repeat(auto-fit, minmax(var(--col-per), 1fr)); }
+.pers__grupo > h4{
+  margin: 0 0 6px;
+  padding-bottom: 3px;
+  border-bottom: 1.5px solid var(--tinta);
+  font: 400 var(--fs-mini)/1.3 var(--titulo);
+  letter-spacing: var(--tr); text-transform: uppercase;
+}
+.per{
+  display: flex; align-items: center; gap: 7px;
+  padding: 2px 0;
+  border-bottom: 1px dotted rgba(22,19,15,.3);
+}
+.per__nome{
+  flex: 1 1 auto; min-width: 0;
+  font: 400 var(--fs)/1.45 var(--mono);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* o nível que veio de graça precisa se anunciar: sem isso o jogador não
+   entende por que o "−" parou antes de zerar a perícia */
+.per__gratis{
+  display: inline-block; margin-left: 5px; padding: 1px 4px;
+  font: 400 11px/1.3 var(--mono); font-style: normal;
+  letter-spacing: var(--tr); text-transform: uppercase;
+  background: var(--casa-esc); color: #fff;
+  vertical-align: 1px;
+}
+.per__dado{
+  flex: 0 0 auto; width: 42px; text-align: right;
+  font: 400 var(--fs)/1.45 var(--mono);
+  color: var(--tinta-2); font-variant-numeric: tabular-nums;
+}
+.per__dado[data-tem="1"]{ color: var(--tinta); font-weight: 700; }
+.per__passos{ display: flex; gap: 3px; flex: 0 0 auto; }
+.per__passos .passo{ width: 18px; height: 17px; font-size: 11px; }
+
+/* ---------------------------------------------------------------- 9. listas */
+
+.itens{ list-style: none; margin: 0; padding: 0; }
+.item{
+  position: relative;
+  padding: 8px 0 9px;
+  border-top: 1.5px solid rgba(22,19,15,.34);
+}
+.item:first-child{ border-top: 0; }
+.item__topo{ display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.item__nome{
+  font: 700 var(--fs)/1.3 var(--mono);
+  letter-spacing: .01em;
+}
+.item__tags{ display: flex; gap: 5px; flex-wrap: wrap; margin-left: auto; }
+.tag{
+  padding: 1px 6px;
+  font: 400 var(--fs-mini)/1.5 var(--mono);
+  letter-spacing: var(--tr); text-transform: uppercase;
+  background: rgba(22,19,15,.1);
+  box-shadow: inset 0 0 0 1px var(--tinta-2);
+  color: var(--tinta-2);
+  white-space: nowrap;
+}
+.tag--casa{ background: var(--casa-esc); color: #fff; box-shadow: none; }
+.tag--prata{ background: var(--prata-chapa); color: #0d0f11; box-shadow: none; text-shadow: 0 1px 0 rgba(255,255,255,.3); }
+.tag--alerta{ background: #7d1d1d; color: #fff; box-shadow: none; }
+.item__texto{
+  margin: 5px 0 0;
+  font: 400 calc(var(--fs) + 1px)/1.5 var(--leitura);
+  color: var(--tinta-2);
+}
+.item__texto b{ color: var(--tinta); }
+.item__acoes{ display: flex; gap: 5px; margin-top: 6px; flex-wrap: wrap; }
+.item[data-apagado="1"] .item__nome,
+.item[data-apagado="1"] .item__texto{ opacity: .48; }
+.item[data-apagado="1"] .item__nome{ text-decoration: line-through; }
+
+/* interruptor de talento aceso */
+.acende{
+  flex: 0 0 auto; width: 34px; height: 19px; padding: 0; border: 0; cursor: pointer;
+  background: rgba(0,0,0,.2); box-shadow: inset 0 0 0 1.5px var(--tinta);
+  position: relative;
+}
+.acende::after{
+  content:""; position: absolute; top: 2px; left: 2px; width: 13px; height: 13px;
+  background: var(--tinta-2); transition: transform .13s, background .13s;
+}
+.acende[aria-pressed="true"]{ background: var(--tinta); }
+.acende[aria-pressed="true"]::after{ transform: translateX(15px); background: var(--prata-3); }
+
+/* âncora: ficha de papel dentro do papel */
+.ancora{
+  position: relative;
+  margin: 0 0 calc(var(--pad-2) + 4px);
+  padding: var(--pad-2);
+  background: rgba(255,255,255,.4);
+  box-shadow: inset 0 0 0 1.5px var(--tinta-2), 3px 4px 0 rgba(0,0,0,.14);
+}
+.ancora:nth-of-type(odd){ transform: rotate(-.45deg); }
+.ancora:nth-of-type(even){ transform: rotate(.35deg); }
+.ancora[data-queimada="1"]{ background: rgba(0,0,0,.08); }
+.ancora[data-queimada="1"] .ent{ text-decoration: line-through; opacity: .6; }
+.ancora__fim{ display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+
+/* slots do corpo */
+.slots{ display: grid; gap: var(--pad-2); grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); }
+.slot__rot{
+  display: flex; justify-content: space-between; align-items: baseline;
+  font: 400 var(--fs-mini)/1.3 var(--mono); letter-spacing: var(--tr); text-transform: uppercase;
+  color: var(--tinta-2); margin-bottom: 3px;
+}
+.slot__rot b{ color: var(--casa-esc); font-weight: 400; }
+
+/* trilha de ascensão */
+.trilha{ display: flex; gap: 3px; margin-bottom: 8px; }
+.trilha__passo{
+  flex: 1 1 0; min-width: 0; overflow-wrap: anywhere;
+  padding: 5px 3px; text-align: center; border: 0; cursor: pointer;
+  background: rgba(0,0,0,.1); box-shadow: inset 0 0 0 1.5px var(--tinta);
+  font: 400 var(--fs-mini)/1.25 var(--mono); letter-spacing: .06em; text-transform: uppercase;
+  color: var(--tinta-2);
+}
+.trilha__passo[data-feito="1"]{ background: var(--prata-chapa); color: #0d0f11; box-shadow: none; }
+.trilha__passo[data-atual="1"]{ background: var(--tinta); color: var(--papel); box-shadow: none; }
+
+/* grau do arquétipo */
+.grau{ display: flex; gap: 3px; margin: 6px 0 8px; }
+.grau__casa{
+  flex: 1 1 0; min-width: 0; height: 17px;
+  background: rgba(0,0,0,.1); box-shadow: inset 0 0 0 1.5px var(--tinta);
+  font: 400 10px/16px var(--mono); text-align: center; color: var(--tinta-3);
+}
+.grau__casa[data-feito="1"]{ background: var(--tinta); color: var(--papel); }
+.grau__casa[data-marca="1"][data-feito="1"]{ background: var(--casa-esc); color: #fff; }
+
+/* --------------------------------------------------------------- 10. gaveta */
+
+.gaveta{
+  position: fixed; left: 0; top: 0; bottom: 0; z-index: 40;
+  width: 264px;
+  display: flex; flex-direction: column;
+  background: var(--mesa-2);
+  border-right: 2px solid var(--casa-esc);
+  box-shadow: 8px 0 30px -12px rgba(0,0,0,.9);
+  transition: transform .18s ease;
+}
+.gaveta__puxador{
+  position: absolute; right: -1px; top: 0; bottom: 0; width: 0;
+}
+.gaveta__cabeca{
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px var(--pad-2);
+  border-bottom: 1px solid rgba(195,200,206,.2);
+}
+.gaveta__titulo{
+  margin: 0; flex: 1;
+  font: 400 15px/1.1 var(--titulo); letter-spacing: var(--tr); text-transform: uppercase;
+  color: var(--prata-2);
+}
+.gaveta__miolo{ flex: 1; overflow-y: auto; padding: var(--pad-2); }
+.gaveta__pe{ padding: var(--pad-2); border-top: 1px solid rgba(195,200,206,.2); }
+
+body[data-gaveta="fechada"] .gaveta{ transform: translateX(-210px); }
+body[data-gaveta="fechada"] .gaveta__miolo,
+body[data-gaveta="fechada"] .gaveta__pe,
+body[data-gaveta="fechada"] .gaveta__titulo{ opacity: 0; pointer-events: none; }
+body[data-gaveta="fechada"] .gaveta{ width: 264px; }
+body[data-gaveta="fechada"] .lombada{ display: flex; }
+.lombada{
+  display: none;
+  position: absolute; right: 0; top: 0; bottom: 0; width: 54px;
+  align-items: center; justify-content: center;
+  background: var(--mesa-2); cursor: pointer; border: 0;
+  border-left: 1px solid rgba(195,200,206,.16);
+}
+.lombada span{
+  writing-mode: vertical-rl; text-orientation: mixed;
+  font: 400 13px/1 var(--titulo); letter-spacing: .3em; text-transform: uppercase;
+  color: var(--prata-2);
+}
+.lombada:hover{ background: var(--casa-esc); }
+
+.palco{ margin-left: 264px; }
+body[data-gaveta="fechada"] .palco{ margin-left: 54px; }
+
+.ficha-par{ display: flex; gap: 3px; margin-bottom: 4px; }
+.ficha-x{
+  flex: 0 0 auto; width: 26px; border: 0; cursor: pointer;
+  background: rgba(255,255,255,.05); color: var(--prata-1);
+  font: 400 13px/1 var(--mono);
+}
+.ficha-x:hover{ background: #7d1d1d; color: #fff; }
+.ficha-linha{
+  display: flex; align-items: center; gap: 6px;
+  flex: 1 1 auto; min-width: 0; padding: 7px 8px;
+  text-align: left; border: 0; cursor: pointer;
+  background: rgba(255,255,255,.05); color: var(--papel);
+  font: 400 var(--fs)/1.35 var(--mono);
+}
+.ficha-linha:hover{ background: rgba(255,255,255,.12); }
+.ficha-linha[aria-current="true"]{ background: var(--casa-esc); color: #fff; }
+.ficha-linha span{ min-width: 0; overflow: hidden; }
+.ficha-linha small{ display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--fs-mini); opacity: .75; letter-spacing: .08em; text-transform: uppercase; }
+.gaveta .bt{ background: rgba(255,255,255,.1); color: var(--papel); }
+.gaveta .bt:hover{ background: var(--casa-esc); }
+.gaveta__grupo{ margin-bottom: var(--pad-2); }
+.gaveta__rot{
+  font: 400 var(--fs-mini)/1.4 var(--mono); letter-spacing: var(--tr); text-transform: uppercase;
+  color: var(--prata-1); margin-bottom: 5px;
+}
+
+.estado{
+  display: block; margin-top: 6px;
+  font: 400 var(--fs-mini)/1.4 var(--mono); letter-spacing: var(--tr); text-transform: uppercase;
+  color: var(--prata-1);
+}
+.estado[data-erro="1"]{ color: #ff9a9a; }
+
+/* ------------------------------------------------------------ 11. compêndio */
+
+.compendio{
+  position: fixed; inset: 0; z-index: 60;
+  display: flex; flex-direction: column;
+  background: rgba(6,5,8,.96);
+}
+.comp__cabeca{
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 10px var(--gap);
+  background: var(--mesa-2); border-bottom: 2px solid var(--casa-esc);
+}
+.comp__titulo{ margin: 0; font: 400 20px/1.1 var(--titulo); letter-spacing: var(--tr); text-transform: uppercase; color: var(--prata-2); }
+.comp__abas{ display: flex; gap: 4px; flex-wrap: wrap; }
+.comp__aba{
+  padding: 5px 10px; border: 0; cursor: pointer;
+  background: rgba(255,255,255,.07); color: var(--papel);
+  font: 400 var(--fs-mini)/1.3 var(--mono); letter-spacing: var(--tr); text-transform: uppercase;
+}
+.comp__aba[aria-selected="true"]{ background: var(--casa-esc); color: #fff; }
+.comp__busca{ margin-left: auto; display: flex; gap: 6px; align-items: center; }
+.comp__busca .ent{ width: 220px; background: rgba(255,255,255,.1); color: var(--papel); border-bottom-color: var(--prata-1); }
+.comp__busca .ent::placeholder{ color: var(--prata-1); }
+.comp__miolo{ flex: 1; overflow-y: auto; padding: var(--gap); }
+.comp__grade{ column-width: 330px; column-gap: var(--gap); }
+.comp__ficha{
+  break-inside: avoid; display: inline-block; width: 100%;
+  margin: 0 0 var(--gap); padding: var(--pad-2) var(--pad);
+  background: linear-gradient(174deg, var(--papel), var(--papel-2));
+  color: var(--tinta);
+  box-shadow: var(--som);
+}
+.comp__filtros{ display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: var(--gap); }
+.chip{
+  padding: 3px 9px; border: 0; cursor: pointer;
+  background: rgba(255,255,255,.07); color: var(--prata-2);
+  font: 400 var(--fs-mini)/1.4 var(--mono); letter-spacing: var(--tr); text-transform: uppercase;
+}
+.chip[aria-pressed="true"]{ background: var(--casa-esc); color: #fff; }
+
+/* ---------------------------------------------------------------- 12. aviso */
+
+.aviso{
+  position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 90;
+  display: flex; align-items: center; gap: 12px;
+  max-width: min(92vw, 560px);
+  padding: 10px 14px;
+  background: var(--papel); color: var(--tinta);
+  box-shadow: var(--som);
+  font: 400 var(--fs)/1.5 var(--leitura);
+}
+.aviso .bt{ flex: 0 0 auto; }
+
+/* -------------------------------------------------- 13. as nove casas */
+
+/* O OLHO — noir. Preto e branco de filme, chevron de Twin Peaks, tarja preta.
+   A tinta é prata fria: esta casa é a que menos admite cor. */
+[data-casa="O Olho"]{
+  --casa: #7d94a6; --casa-esc: #37454f; --casa-clr: #b7cbd8;
+  --papel: #efede7; --papel-2: #e7e4dc; --papel-3: #dcd8ce;
+  --trama: repeating-linear-gradient(135deg,
+    rgba(255,255,255,1) 0 14px, rgba(255,255,255,0) 14px 28px),
+    repeating-linear-gradient(45deg,
+    rgba(255,255,255,1) 0 14px, rgba(255,255,255,0) 14px 28px);
+  --trama-op: .1;
+}
+
+/* A PENUMBRA — gótico tribal. Ausência de cor, rabisco pesado, coroa escondida. */
+[data-casa="A Penumbra"]{
+  --casa: #6b6b70; --casa-esc: #232327; --casa-clr: #a8a8ae;
+  --papel: #e4e0d7; --papel-2: #dad5ca; --papel-3: #cec8bb;
+  --trama: repeating-linear-gradient(72deg,
+    rgba(255,255,255,1) 0 1px, rgba(255,255,255,0) 1px 5px),
+    repeating-linear-gradient(-63deg,
+    rgba(255,255,255,1) 0 1px, rgba(255,255,255,0) 1px 7px);
+  --trama-op: .16;
+}
+
+/* OS ACORRENTADOS — oração. Ouro velho, vellum, raios de mandorla, letra bonita. */
+[data-casa="Os Acorrentados"]{
+  --casa: #c39b46; --casa-esc: #6e5115; --casa-clr: #e3c37c;
+  --papel: #f3ecd8; --papel-2: #eae1c9; --papel-3: #ded3b8;
+  --trama: repeating-conic-gradient(from 0deg at 80% 50%,
+    rgba(255,255,255,1) 0deg 3deg, rgba(255,255,255,0) 3deg 11deg);
+  --trama-op: .2;
+}
+[data-casa="Os Acorrentados"] .painel__nome,
+[data-casa="Os Acorrentados"] .marca__palavra,
+[data-casa="Os Acorrentados"] .comp__titulo{
+  font-family: var(--serifa); font-weight: 700; letter-spacing: .04em;
+}
+[data-casa="Os Acorrentados"] .item__nome{ font-family: var(--serifa); font-size: calc(var(--fs) + 2px); }
+
+/* GUARDIÕES DA ÁRVORE — herbário élfico. A casa que pode ter cor de verdade. */
+[data-casa="Guardiões da Árvore"]{
+  --casa: #3f9a63; --casa-esc: #1d5735; --casa-clr: #8fd6a9;
+  --papel: #ecf0e5; --papel-2: #e2e8d9; --papel-3: #d6dcca;
+  --trama: repeating-radial-gradient(circle at 20% 80%,
+    rgba(255,255,255,1) 0 1px, rgba(255,255,255,0) 1px 16px),
+    repeating-linear-gradient(105deg,
+    rgba(255,255,255,1) 0 1px, rgba(255,255,255,0) 1px 22px);
+  --trama-op: .22;
+}
+[data-casa="Guardiões da Árvore"] .painel__topo::before{ background: #a8296b; }
+
+/* O COLETIVO DO ECO — zine de última hora. Papel-jornal, retícula, vermelho berrante. */
+[data-casa="O Coletivo do Eco"]{
+  --casa: #e0342c; --casa-esc: #9c1b16; --casa-clr: #ff7f78;
+  --papel: #edE9da; --papel-2: #e3decb; --papel-3: #d7d0ba;
+  --trama: radial-gradient(circle at 1px 1px, rgba(255,255,255,1) 1.2px, rgba(255,255,255,0) 1.3px);
+  --trama-op: .3;
+}
+[data-casa="O Coletivo do Eco"] .capa__trama{ background-size: 5px 5px; }
+[data-casa="O Coletivo do Eco"] .marca__palavra em{
+  background: var(--casa-esc); color: #fff; padding: 0 .08em;
+  -webkit-text-fill-color: #fff;
+}
+[data-casa="O Coletivo do Eco"] .painel__nome{ font-style: italic; }
+
+/* A FRENTE — estêncil militar. Verde-oliva, grade de chapa, tarja de censura. */
+[data-casa="A Frente"]{
+  --casa: #7f8f4e; --casa-esc: #414b24; --casa-clr: #bacb85;
+  --papel: #ebe5d4; --papel-2: #e1dbc7; --papel-3: #d4cdb6;
+  --trama: repeating-linear-gradient(0deg,
+    rgba(255,255,255,1) 0 1px, rgba(255,255,255,0) 1px 18px),
+    repeating-linear-gradient(90deg,
+    rgba(255,255,255,1) 0 1px, rgba(255,255,255,0) 1px 18px);
+  --trama-op: .17;
+}
+[data-casa="A Frente"] .painel__nome,
+[data-casa="A Frente"] .marca__palavra{ letter-spacing: var(--tr); }
+
+/* MYSTERIA — CRT de MS-DOS. Aqui o papel é tela, e a tinta é fósforo.
+   É a única casa que inverte o material, e ela inverte de propósito. */
+[data-casa="Mysteria"]{
+  --casa: #3ddc86; --casa-esc: #0d3f24; --casa-clr: #8ef8bb; --capa-tinta: #a6f8c6;
+  --papel: #0d1410; --papel-2: #0a100c; --papel-3: #070b08;
+  --tinta: #a6f8c6; --tinta-2: #6fca92; --tinta-3: #468f64;
+  --trama: repeating-linear-gradient(0deg,
+    rgba(255,255,255,1) 0 1px, rgba(255,255,255,0) 1px 3px);
+  --trama-op: .13;
+}
+[data-casa="Mysteria"] .painel::before,
+[data-casa="Mysteria"] .papel::before{ mix-blend-mode: screen; opacity: .07; }
+[data-casa="Mysteria"] .painel:not(.painel--prata) .painel__topo{ background: #061009; color: var(--tinta); }
+[data-casa="Mysteria"] .ent{ background: rgba(62,220,134,.07); }
+[data-casa="Mysteria"] .ent:focus{ background: rgba(62,220,134,.14); }
+[data-casa="Mysteria"] .bt{ background: #0d3f24; color: #a6f8c6; }
+[data-casa="Mysteria"] .bt--fantasma{ background: transparent; color: var(--tinta); box-shadow: inset 0 0 0 1.5px var(--tinta-2); }
+[data-casa="Mysteria"] .atr, [data-casa="Mysteria"] .ancora{ background: rgba(62,220,134,.05); }
+[data-casa="Mysteria"] .degrau[data-cheio="1"],
+[data-casa="Mysteria"] .cap__usada,
+[data-casa="Mysteria"] .grau__casa[data-feito="1"],
+[data-casa="Mysteria"] .trilha__passo[data-atual="1"]{ background: #3ddc86; color: #04140a; }
+[data-casa="Mysteria"] .corr__estado{ background: #0d3f24; color: #8ef8bb; }
+[data-casa="Mysteria"] .tag{ box-shadow: inset 0 0 0 1px var(--tinta-2); color: var(--tinta-2); background: rgba(62,220,134,.06); }
+
+/* SOCIEDADE DOS CEIFADORES — corvos. Preto de pena com brilho de óleo. */
+[data-casa="Sociedade dos Ceifadores"]{
+  --casa: #7b6a92; --casa-esc: #322843; --casa-clr: #b7a8cd;
+  --papel: #eae7e2; --papel-2: #e0dcd6; --papel-3: #d3cfc8;
+  --trama: repeating-linear-gradient(80deg,
+    rgba(255,255,255,1) 0 1px, rgba(255,255,255,0) 1px 4px),
+    repeating-linear-gradient(-80deg,
+    rgba(255,255,255,1) 0 1px, rgba(255,255,255,0) 1px 4px);
+  --trama-op: .13;
+}
+
+/* AVULSO — nenhuma gráfica cuida deste. O zine cru, mais sujo e mais torto. */
+[data-casa="Avulso"]{
+  --casa: #9a9186; --casa-esc: #3a352c; --casa-clr: #cdc4b6;
+  --papel: #e4ddcd; --papel-2: #d9d1be; --papel-3: #ccc3ad;
+  --trama: repeating-linear-gradient(17deg,
+    rgba(255,255,255,1) 0 2px, rgba(255,255,255,0) 2px 9px);
+  --trama-op: .12;
+}
+[data-casa="Avulso"] .painel:nth-of-type(3n+1){ transform: rotate(-.6deg); }
+[data-casa="Avulso"] .painel:nth-of-type(3n+2){ transform: rotate(.55deg); }
+[data-casa="Avulso"] .painel:nth-of-type(5n+3){ transform: rotate(-.8deg); }
+
+/* ------------------------------------------------------------ 14. telinha */
+
+@media (max-width: 760px){
+  .folha{ padding: 0 12px calc(var(--gap) * 3); }
+  .marca{ padding-right: 10px; }
+  .marca__linha{ letter-spacing: var(--tr); }
+  .capa__selo{ width: 150px; opacity: .2; }
+  .gaveta{ position: static; width: auto; border-right: 0; border-bottom: 2px solid var(--casa-esc); }
+  .gaveta__cabeca{ padding: 8px var(--pad-2); }
+  .palco, body[data-gaveta="fechada"] .palco{ margin-left: 0; }
+  body[data-gaveta="fechada"] .gaveta{ transform: none; }
+  body[data-gaveta="fechada"] .gaveta__miolo, body[data-gaveta="fechada"] .gaveta__pe{ display: none; }
+  body[data-gaveta="fechada"] .gaveta__titulo{ opacity: 1; }
+  .lombada{ display: none !important; }
+  .corr__campos{ grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .comp__busca{ margin-left: 0; width: 100%; }
+  .comp__busca .ent{ width: 100%; }
+}
+
+/* ------------------------------------------------------------ 15. impressão
+
+   No papel a ficha volta a ser inteiramente datilografada e em preto:
+   um documento que sai diferente em cada impressora não serve como
+   documento. A cor da casa vira contorno, a prata vira linha preta.       */
+
+@media print{
+  @page{ size: A4 landscape; margin: 9mm; }
+
+  /* As variáveis da casa moram em [data-casa="…"], que é mais específico que
+     :root — sem casar essa especificidade, a ficha saía da impressora com a
+     tinta da Afiliação em cinza chapado. Aqui a casa é desligada de verdade. */
+  :root, body[data-casa]{
+    --papel: #fff; --papel-2: #fff; --papel-3: #fff;
+    --tinta: #000; --tinta-2: #1f1f1f; --tinta-3: #4a4a4a;
+    --casa: #000; --casa-esc: #000; --casa-clr: #000; --capa-tinta: #000;
+    --prata-0: #000; --prata-1: #3a3a3a; --prata-2: #e8e8e8; --prata-3: #000;
+    --mesa: #fff; --mesa-2: #fff;
+    --gap: 6px; --pad: 7px; --pad-2: 5px; --fs: 9.4px; --fs-mini: 8px;
+    --col-min: 250px; --col-per: 150px;
+    --som: none;
+  }
+  html, body{ background: #fff !important; color: #000 !important; }
+  body::before, .painel::before, .capa__trama, .capa__selo,
+  .fita, .rasgo, .gaveta, .compendio, .aviso, .naoimprime{ display: none !important; }
+  .palco{ margin-left: 0 !important; }
+  .folha{ padding: 0; }
+
+  .painel, .capa{
+    box-shadow: none !important; transform: none !important;
+    border: 1px solid #000; background: #fff !important; break-inside: avoid;
+  }
+  .atr, .ancora, .marca__chapa, .marca__palavra{ transform: none !important; }
+  .marca__retalho{ box-shadow: none !important; clip-path: none !important; background: #fff !important; }
+  .marca__retalho::after, .capa__grao, .capa::after{ display: none !important; }
+  .painel__topo{ clip-path: none !important; border-bottom: 2px solid #000; }
+  .painel__topo::before{ display: none !important; }
+  .painel__nome{ font-size: 13px; }
+  .margem::before{ clip-path: none !important; width: 2px; background: #000; }
+  .capa{ border-width: 0 0 2px; }
+  .painel__topo{ background: #000 !important; color: #fff !important; }
+  .painel__topo::after{ display: none; }
+  .painel--prata .painel__topo{
+    background: #fff !important; color: #000 !important; border-bottom: 2px solid #000;
+  }
+  .painel--prata .painel__nome, .painel--prata .painel__nota{ color: #000 !important; text-shadow: none; }
+  .painel--prata::after{ background: #000; }
+
+  /* A marca volta a ser tipografia, não metal: cromado vira cinza na chapa. */
+  .marca__palavra{
+    color: #000 !important; -webkit-text-fill-color: #000 !important;
+    background: none !important; text-shadow: none !important; filter: none !important;
+  }
+  .marca__palavra em{ color: #000 !important; -webkit-text-fill-color: #000 !important; background: none !important; }
+  .marca__linha, .capa__abaixo, .capa__abaixo b, .capa__nome{ color: #000 !important; }
+  .carimbo{ color: #000; border-color: #000; outline-color: #000; mix-blend-mode: normal; opacity: 1; }
+
+  .ent{ background: transparent !important; border-bottom: 1px solid #000; }
+  .ent:disabled{ color: #000; }
+  textarea.ent{ min-height: 0; }
+
+  /* Medidores: no papel, cheio é trama e vazio é branco. Nada de cinza. */
+  .degrau, .grau__casa, .trilha__passo, .cap__barra, .corr__barra{
+    background: #fff !important; box-shadow: inset 0 0 0 1px #000 !important; color: #000 !important;
+  }
+  .degrau[data-cheio="1"], .grau__casa[data-feito="1"], .trilha__passo[data-atual="1"]{
+    background: #000 !important; color: #fff !important;
+  }
+  .trilha__passo[data-feito="1"]{
+    background-image: repeating-linear-gradient(45deg, #000 0 2px, #fff 2px 5px) !important;
+  }
+  .degrau[data-atual="1"]{ outline: 2px solid #000; outline-offset: -4px; }
+  .degrau[data-risco="1"]::after{ background-image: repeating-linear-gradient(45deg, #000 0 2px, transparent 2px 5px); }
+  .corr__seg--rec{ background: #fff; box-shadow: inset 0 0 0 1px #000; }
+  .corr__seg--ass{ background-image: repeating-linear-gradient(45deg, #000 0 3px, #fff 3px 4px); }
+  .corr__seg--car{ background-image: repeating-linear-gradient(-45deg, #000 0 1px, #fff 1px 5px); }
+  .corr__num, .cap__num{
+    color: #000; mix-blend-mode: normal;
+    text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 3px #fff, 1px 1px 0 #fff, -1px -1px 0 #fff;
+  }
+  .corr__estado{ background: #000 !important; color: #fff !important; }
+  .corr__legenda i{ box-shadow: inset 0 0 0 1px #000; }
+  .cap__usada{
+    background: transparent;
+    background-image: repeating-linear-gradient(45deg, #000 0 2px, #fff 2px 5px) !important;
+  }
+
+  .tag, .tag--casa, .tag--prata, .tag--alerta{
+    background: #fff !important; color: #000 !important;
+    box-shadow: inset 0 0 0 1px #000 !important; text-shadow: none !important;
+  }
+  .bt, .passo, .acende{ display: none !important; }
+  .item__texto, .margem{ color: #1f1f1f !important; }
+  .margem{ border-left-color: #000; }
+  .atr, .ancora{ background: #fff !important; box-shadow: inset 0 0 0 1px #000 !important; }
+  .fluxo{ column-width: 250px; }
+}

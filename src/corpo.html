@@ -1,0 +1,73 @@
+<!-- A casca. Tudo que é ficha é desenhado pelo script, porque tudo que é ficha
+     muda com a Afiliação, com o Arquétipo e com o que o jogador comprou. -->
+
+<aside class="gaveta naoimprime" id="gaveta">
+  <button class="lombada" id="btLombada" type="button" title="Abrir a gaveta">
+    <span>Devaneio · fichas</span>
+  </button>
+
+  <div class="gaveta__cabeca">
+    <h2 class="gaveta__titulo">Fichas</h2>
+    <button class="bt bt--fino" id="btRecolhe" type="button" title="Recolher a gaveta">‹‹</button>
+  </div>
+
+  <div class="gaveta__miolo">
+    <div class="gaveta__grupo">
+      <div class="gaveta__rot">No armário</div>
+      <div id="listaFichas"></div>
+      <button class="bt" id="btNova" type="button">+ Nova ficha</button>
+      <button class="bt" id="btDuplica" type="button">Duplicar esta</button>
+    </div>
+
+    <div class="gaveta__grupo">
+      <div class="gaveta__rot">Arranjo</div>
+      <button class="bt" id="btArranjo" type="button">Arranjo: normal</button>
+    </div>
+
+    <div class="gaveta__grupo">
+      <div class="gaveta__rot">Levar daqui</div>
+      <button class="bt" id="btPdf" type="button">Exportar em PDF</button>
+      <button class="bt" id="btBackup" type="button">Backup completo</button>
+      <button class="bt" id="btImporta" type="button">Importar arquivo</button>
+      <input type="file" id="arquivoImporta" accept="application/json,.json" hidden>
+    </div>
+
+    <div class="gaveta__grupo" id="grupoLixeira" hidden>
+      <div class="gaveta__rot">Lixeira</div>
+      <div id="listaLixeira"></div>
+    </div>
+  </div>
+
+  <div class="gaveta__pe">
+    <button class="bt" id="btCompendio" type="button">Compêndio do livro</button>
+    <span class="estado" id="estadoGravacao">gravado</span>
+  </div>
+</aside>
+
+<main class="palco" id="palco">
+
+  <header class="capa" id="capa"></header>
+
+  <div class="folha">
+    <section class="faixa" id="faixa" aria-label="O que se toca a sessão inteira"></section>
+    <section class="fluxo" id="fluxo" aria-label="O dossiê"></section>
+  </div>
+
+</main>
+
+<div class="compendio naoimprime" id="compendio" hidden>
+  <div class="comp__cabeca">
+    <h2 class="comp__titulo">Compêndio</h2>
+    <nav class="comp__abas" id="compAbas" role="tablist"></nav>
+    <div class="comp__busca">
+      <input class="ent" id="compBusca" type="search" placeholder="procurar pelo nome ou pelo efeito" aria-label="Procurar no compêndio">
+      <button class="bt" id="btFechaComp" type="button">Fechar</button>
+    </div>
+  </div>
+  <div class="comp__miolo" id="compMiolo"></div>
+</div>
+
+<div class="aviso naoimprime" id="aviso" hidden>
+  <span id="avisoTexto"></span>
+  <button class="bt bt--fino" id="avisoAcao" type="button" hidden></button>
+</div>

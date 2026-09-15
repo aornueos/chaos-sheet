@@ -1,8 +1,11 @@
+# O texto do livro e o PDF não moram aqui: são do autor, e o catálogo que a
+# ficha usa já vai extraído em dados_livro.json.
+devaneio073.txt
 caos05.txt
-sheet-body.html
+caos05_flow.txt
 *.pdf
 *.docx
-caos05_flow.txt
-dados_livro.json
+
+# Restos da revisão anterior
+sheet-body.html
 decol.js
-extrai_dados.js

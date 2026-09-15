@@ -1,114 +1,170 @@
 # Devaneio — Ficha do Ascendido
 
-Ficha de personagem para o RPG **Devaneio**, na revisão de sistema que
-trouxe Linhagem, Corrupção, Arquétipos e Capacidade.
+Ficha de personagem para o RPG **Devaneio**, na revisão **0.73** do livro.
 
-Arquivo único, sem servidor e sem dependências. As fichas ficam salvas
-no navegador de quem abre a página (localStorage), então cada jogador
-tem as suas. Use **Backup Completo** para levar as fichas de um
-navegador ou endereço para outro.
+Arquivo único, sem servidor e sem dependências. As fichas ficam salvas no
+navegador de quem abre a página (`localStorage`), então cada jogador tem as
+suas. Use **Backup completo** para levar as fichas de um navegador ou endereço
+para outro.
 
-## Recursos
+## O que mudou da revisão anterior
 
-- Múltiplas fichas, com Vitalidade e Limiar vindos da Linhagem
-- Corrupção como recurso único — Assentada e Carga somadas contra o Limiar
-- Capacidade por estágio de Ascensão — cinco degraus, de Vislumbre a Iluminado — com Talentos que se acendem e apagam
-- XP com gasto automático: cada Talento e cada Cifra desconta o próprio custo
-- Compêndio dos doze Arquétipos, das prateleiras de Talentos de cada um e da
-  prateleira aberta dos Talentos Gerais, que qualquer Ascendido compra
-- Cifras Correntes separadas das Catalogadas: sem Vínculo, sem XP e sem Corrupção
-- Compêndio das noventa Cifras por Pilar — quinze em cada, sete de Vínculo Baixo,
-  cinco de Médio e três de Alto — com Sigilos, gatilho e o efeito por inteiro
-- Exportação em PDF preto e branco, A4 paisagem
-- Lixeira com desfazer, backup completo e importação que nunca substitui
+O sistema inteiro. Não é exagero de changelog.
 
-## Fichas da versão anterior
+Especializações viraram **Arquétipos**, doze deles, com prateleira própria de
+doze Talentos cada e um **Grau** que não se compra: sobe sozinho conforme o XP
+entra enquanto aquele Arquétipo está aceso. Entrou **Cultura**, entrou
+**Patrimônio**, entrou **Antecedente** com Conhecimento e habilidade. A
+Corrupção deixou de ser um número e virou três — **Recente**, **Assentada** e
+**Carga** —, que contam igual contra o Limiar e saem de formas diferentes. As
+Cifras passaram de noventa para **cento e vinte**, e agora trazem Sigilos,
+gatilho sensorial e tipo. Apareceram o **Labirinto Próprio** com Traços, a
+**Ressonância**, as **Bênçãos**, a **Confiança**, a **Dívida** e as **Âncoras**
+com as três perguntas que o livro manda registrar.
 
-Abrem normalmente. A Especialização escolhida vira o Arquétipo de mesmo nome,
-a Corrupção que existia entra como Assentada, e os Talentos que ainda constam
-no livro recuperam Peso e Carga sozinhos. As Cifras herdam o custo em XP do
-próprio Vínculo. Essência, Resistência Física e Resistência Espiritual não são
-convertidas: saíram do sistema.
+As quinze perícias são outras quinze. Vinte viraram quinze, Resistência virou
+**Fortitude**, e Consciência, Estabilidade, Intuição, Adestramento e Carisma
+saíram do sistema.
 
-O jogo se chamava **Caos Eminente**, e as fichas gravadas sob aquele nome mudam
-de lugar sozinhas na primeira vez que a página abre. Nada precisa ser
-reimportado, e nada é apagado antes de a cópia nova existir.
+### Fichas da versão anterior
 
-## Ativa ou Passiva
+Abrem normalmente, e nada é apagado antes de a cópia nova existir. Sobrevivem
+nome, Linhagem, atributos, perícias que ainda constam no livro, Corrupção
+Assentada, XP, Âncoras, Dívida, inventário (que entra no slot de Bolsos) e
+anotações. **O Coletivo** virou **O Coletivo do Eco** sozinho.
 
-Uma Cifra **Ativa** resolve no momento em que é conjurada e acaba. Uma **Passiva**
-se instala e continua funcionando sozinha pelo tempo indicado. As duas custam Ação
-Padrão, as duas exigem teste de Domínio e as duas retêm Corrupção conforme o
-Vínculo: a diferença é só quanto tempo a Cifra fica de pé.
+Não sobrevivem as perícias que saíram do sistema, e Talentos e Cifras da
+revisão velha que o livro 0.73 não lista mais. Eles continuam gravados no
+arquivo de backup; simplesmente não têm onde encaixar.
 
-Cifra gravada antes deste capítulo abre com o campo em branco, para o jogador
-dizer qual é, em vez de a ficha chutar por ele.
+## Como a ficha é montada
 
-## Custo das Cifras em XP
+O arquivo que se abre precisa ser um só — é isso que faz ela funcionar num
+pendrive, num anexo de e-mail e num celular sem sinal no meio de uma sessão.
+Mas meio megabyte numa linha só não é manutenção, então as partes moram
+separadas e a montagem é um comando:
 
-Correntes não custam nada: não são endereçadas a Pilar nenhum, então não há
-interlocutor a convencer. Catalogadas custam pelo Vínculo: **Baixo 2, Médio 4, Alto 8**. O campo é editável
-linha a linha para os casos fora da tabela. Para mudar o padrão, ajuste `xp`
-em `VINCULOS`, no topo do script.
+```bash
+node extrai_dados.js devaneio073.txt dados_livro.json && node monta.js
+```
+
+`extrai_dados.js` lê o texto do livro em ordem de leitura — `pdftotext -enc
+UTF-8`, sem `-layout` — e monta os catálogos: doze Arquétipos, cento e
+quarenta e quatro Talentos de prateleira, vinte Talentos Gerais, cento e vinte
+Cifras, dez Antecedentes, catorze Traços e seis Bênçãos. Ele só extrai: o que
+não casar com o formato é reportado em voz alta, nunca transformado em
+silêncio. Rodar sem nenhum aviso é o estado normal.
+
+`monta.js` junta `fontes.css`, `src/estilo.css`, `src/corpo.html`,
+`src/app.js`, `dados_livro.json` e a marca em `index.html`. O texto do livro
+e o PDF não estão no repositório.
+
+A marca é `logo_dev.png`. O build procura `src/marca.svg` primeiro (para
+quando ela virar vetor), depois `src/marca.png`, depois o arquivo da raiz;
+embute em base64 e pronto. Sem nenhum deles, a ficha cai numa manchete
+datilografada e continua de pé.
+
+### Uma discrepância do livro, anotada
+
+O Capítulo 4 diz que cada Arquétipo tem **oito** Talentos, dois por patamar, e
+que a prateleira inteira custa 40 XP. As listas abaixo desse parágrafo trazem
+**doze**, três por patamar, o que dá 60 XP. A ficha segue as listas, porque é
+delas que os jogadores compram. Se a intenção era oito, o parágrafo está certo
+e sobram quatro entradas em cada prateleira.
 
 ## Disposição
 
 **Atributos, Vitalidade, Corrupção e Perícias ficam sempre no alto**, numa
 grade própria acima do resto. É o que se toca a sessão inteira, e não entra no
 fluxo: em qualquer largura e em qualquer arranjo está no mesmo lugar. Perícias
-toma a linha inteira e reparte os quatro grupos em colunas, em vez de virar uma
-tira alta e estreita.
+toma a linha inteira e reparte os quatro grupos em colunas.
 
 O resto desce em colunas de fluxo, onde o navegador escolhe o corte pela
-altura para que nenhuma coluna fique com 4500px ao lado de outra com 900px.
-Ali um painel muda mesmo de coluna conforme a ficha cresce; o que é garantido
-é a ordem de leitura: o que você gasta, o que você pode e o que te prende.
+altura. Ali um painel muda mesmo de coluna conforme a ficha cresce; o que é
+garantido é a ordem de leitura — quem você é, como você resolve, o que você
+gasta, o que te prende.
+
+A faixa de cima abre por **contagem** (são exatamente três medidores), e o
+fluxo e as Perícias abrem por **largura mínima**. Os quatro Atributos querem
+quatro colunas ou duas, nunca três, e quem decide é a largura do próprio
+recorte, por `@container`, não a da janela: recorte estreito em janela larga
+acontece o tempo todo aqui.
 
 ## Gaveta
 
 Recolhida por padrão, em qualquer largura. No desktop vira uma lombada de 54px
 com o nome descendo na vertical; no celular, uma linha só no alto. A lista de
-fichas se consulta uma vez por sessão e não vale 242px de folha o tempo todo.
+fichas se consulta uma vez por sessão e não vale 264px de folha o tempo todo.
 O estado fica gravado por aparelho, e o aviso de gravação continua à vista
 mesmo recolhida — esconder o erro junto com os botões seria esconder o erro.
+
+Descartar manda para a lixeira com desfazer. Importar nunca substitui: entra do
+lado, com id novo.
 
 ## Arranjo
 
 Botão na gaveta, três posições: **normal**, **mais na tela** e **menos na
-tela**. Muda espaçamento, corpo de texto e quantas colunas abrem — em tudo,
-inclusive nas Perícias e na faixa de cima. A escolha fica gravada por aparelho.
+tela**. Muda espaçamento, corpo de texto e quantas colunas abrem. A escolha
+fica gravada por aparelho.
 
 Nenhum componente sabe que isso existe: o botão troca um atributo na raiz, e
 todo o resto lê `--gap`, `--pad-*` e as larguras mínimas de coluna.
 
-O fluxo e as Perícias abrem por **largura mínima**, não por contagem: o
-navegador cabe quantas couberem. Onde o número de itens é fixo, porém, contar é
-o certo — a faixa de cima tem exatamente três medidores, e `auto-fit` abria
-cinco trilhas numa tela larga porque Perícias ocupa a linha inteira e nenhuma
-trilha ficava vazia para recolher. E os quatro Atributos querem quatro colunas
-ou duas, nunca três: quem decide é a largura do próprio recorte, por
-`@container`, e não a da janela — recorte estreito em janela larga acontece o
-tempo todo aqui.
-
 ## Direção de arte
 
-Fanzine gótico ocultista. A regra é a do zine de verdade: **duas tintas**.
-Papel osso e tinta preta, mais **uma tinta especial** que muda conforme a
-Afiliação. Nada além disso entra — o que parece cor é trama, meio-tom ou
-impressão fora de registro.
+Fanzine gótico ocultista, e a estética é protagonista. A regra é de três
+materiais, e só três.
 
-A mesa é preta. Os painéis são recortes de papel colados sobre ela, tortos,
-rasgados na base e presos com fita crepe. O cabeçalho é a capa: fundo preto,
-manchete chapada em condensada, selo da casa por trás e carimbo de borracha
-por cima.
+**Papel** é o mundo ordinário: atributos, perícias, equipamento, dinheiro.
+Tinta preta sobre papel osso, o que qualquer pessoa de Elinia entenderia se
+olhasse por cima do seu ombro.
 
-Texto de leitura é sempre tinta sobre papel, ou papel sobre preto. A tinta
-especial preenche, sublinha e carimba, mas nunca vira corpo de texto — é
-assim que as nove casas trocam de cor sem que nenhuma perca contraste.
+**Prata** é o mundo espiritual. Corrupção, Cifras, Labirinto, Ascensão,
+Ressonância — tudo que passa pela Tessera sai metálico, e a prata é a única
+coisa na página que não pertence a Afiliação nenhuma. Ela é trilho, moldura e
+brilho, e nunca vira fundo de texto de leitura. A marca `DEVANEIO` é cromada
+pelo mesmo motivo: é o nome das duas metades.
 
-Todo texto da ficha passa de 4,5:1 nas nove casas; o pior caso mede 5,6:1.
-Onde a caixa aperta e o texto corta — a nota do título, o nome da perícia no
-arranjo apertado — o conteúdo inteiro fica no `title`, para não se perder.
+**A tinta da casa** é a Afiliação. Uma por dossiê. Preenche, sublinha e
+carimba, mas também nunca vira corpo de texto — é assim que as nove casas
+trocam de cor sem que nenhuma perca contraste.
+
+A mesa é preta. Os painéis são recortes de papel colados sobre ela — tortos,
+rasgados à mão, alguns presos com fita, e nenhum no mesmo ângulo do vizinho.
+
+### A sujeira
+
+Um zine não é impresso, é fotocopiado, e normalmente é fotocópia de
+fotocópia. Três camadas dão isso, e todas moram **embaixo** do conteúdo: o
+papel é xerox velha, o que está escrito nele saiu da máquina hoje.
+
+**Grão**, ruído fino de toner. **Mancha**, a nuvem lenta que faz duas folhas
+nunca saírem com o mesmo tom. **Risco**, as faixas verticais que o rolo
+arrasta. As duas primeiras são `feTurbulence` num SVG embutido — é a única
+forma de ter ruído irregular sem carregar um PNG de textura.
+
+A mistura é `overlay`, não `multiply`. Multiply só escurece, e a folha
+inteira virava concreto; overlay é neutro no cinza médio do ruído, então
+escurece onde o toner pegou e clareia onde faltou, que é literalmente o que
+uma copiadora ruim faz com o papel.
+
+**Duas tintas, uma passada cada, e a segunda nunca cai onde deveria.** A
+chapa da casa sai por baixo e por fora do preto, deslocada três pixels. É o
+erro de registro de qualquer gráfica de esquina, e é a assinatura do zine.
+
+As manchetes são tarja de papel preto cortada com tesoura, não retângulo de
+diagramação, e o recorte muda de painel para painel. O rasgo da base é
+elemento de verdade e não pseudo-elemento, porque `::before` e `::after` são
+dois e havia três candidatos brigando por eles.
+
+Nada disso sobrevive à impressão: no papel a encenação inteira desliga.
+
+O tom mudou junto. O núcleo do mundo continua sendo perda, mas a página trata
+perda como a vida trata: com piada do lado. O texto de apoio responde ao
+estado da ficha, e responde falando — no degrau 2 de Vitalidade, no terceiro
+Contato do arco, quando a Capacidade estoura, quando sobra XP demais parado.
+
+Todo texto de leitura passa de 4,5:1 nas nove casas; o pior caso mede 4,78:1.
 
 ## As nove casas
 
@@ -117,39 +173,102 @@ carimbo e as palavras do cabeçalho.
 
 | Afiliação | Gráfica |
 | --- | --- |
-| O Olho | Noir: preto e branco de filme, luz de persiana, prata fria, sombra dura |
-| A Penumbra | Tribal: ocre de terra queimada, galões, zigue-zague e fileira de pontos |
-| Os Acorrentados | Ferro e elo: bronze oxidado, malha de corrente, braçadeira rebitada |
-| O Coletivo | Jornalística: papel-jornal, filete de coluna, retícula, vermelho de última hora |
-| A Frente | Militar: verde-oliva, estêncil com as pontes da chapa, tarja de censura |
-| Mysteria | CRT de MS-DOS: só fósforo verde, varredura, barra de sincronia e cursor piscando |
+| O Olho | Noir: preto e branco de filme, chevron, tarja de censura, prata fria |
+| A Penumbra | Gótico tribal: ausência de cor, rabisco pesado, a coroa escondida |
+| Os Acorrentados | Oração: ouro velho sobre vellum, raios de mandorla, serifa e letra bonita |
+| Guardiões da Árvore | Herbário quase élfico: verde de folha, magenta de orquídea, linha fina |
+| O Coletivo do Eco | Zine de última hora: papel-jornal, retícula grossa, vermelho berrante, letra recortada |
+| A Frente | Estêncil militar: verde-oliva, grade de chapa, caixa-alta espaçada |
+| Mysteria | CRT de MS-DOS: aqui o papel é tela e a tinta é fósforo. É a única casa que inverte o material, e inverte de propósito |
 | Sociedade dos Ceifadores | Corvos: preto de pena com brilho de óleo, hachura de barbas |
-| Guardiões da Árvore | Herbário: magenta de orquídea, desenho botânico a bico de pena |
 | Avulso | Nenhuma gráfica cuida deste: o zine cru, mais sujo e mais torto |
 
-Toda a gráfica vive no CSS, em `[data-afiliacao="…"]`. O script só escreve o
-atributo na raiz e escolhe as palavras do cabeçalho, então acrescentar uma
-casa é escrever um bloco de variáveis — não um componente novo.
+Toda a gráfica vive no CSS, em `[data-casa="…"]`. O script só escreve o
+atributo na raiz, escolhe as palavras do cabeçalho e desenha o selo, então
+acrescentar uma casa é escrever um bloco de variáveis — não um componente
+novo.
 
-A trama de fundo da capa é fundo de fundo: só se nota quando se procura.
-A força dela é **um número no `:root`**, `--fac-tex-op`, e vale para as nove
-casas — o alfa de dentro de cada gradiente está normalizado em 1 justamente
-para que esse número signifique a mesma coisa em todas.
+A trama de fundo da capa é fundo de fundo: só se nota quando se procura. A
+força dela é **um número**, `--trama-op`, e vale para as nove casas — o alfa
+de dentro de cada gradiente está normalizado em 1 justamente para que esse
+número signifique a mesma coisa em todas.
+
+## A marca
+
+A manchete da capa não flutua no preto: é um **retalho de papel rasgado**,
+colado torto, com a marca impressa em cima dele. O PNG do logotipo já vem com
+fundo transparente, então ele cai direto sobre o papel e o grão da fotocópia
+aparece através dele — que é o que aconteceria se alguém tivesse mesmo
+xerocado a folha. Quando existe arquivo, a cruz desenhada some: a arte traz a
+própria.
 
 ## Tipografia
 
-Courier Prime embutida no arquivo sob a
-[SIL Open Font License 1.1](https://scripts.sil.org/OFL),
-para que a ficha tenha a mesma aparência em qualquer máquina.
+**Duas vozes, e cada uma no seu lugar.**
 
-Rótulo nenhum desce de **11px**, em qualquer arranjo, e o rastreamento das
-caps miúdas para em **.14em**: passando disso a palavra se desmancha em letras
-soltas e o olho perde o contorno dela. A retícula de meio-tom que cobre a
-página fica em 16% — acima disso ela deixa de ser grão de fotocópia e passa a
-comer os finos da letra.
+Datilografada é a voz certa para um dossiê e é péssima para ler parágrafo:
+Courier tem haste fina, largura fixa e conta pouca letra por linha. Em cima de
+papel com grão, o efeito de uma Cifra vira esforço. Então **mono** ficou com o
+que é dado — rótulo, número, dado, campo, etiqueta, carimbo, nome de Talento —
+e uma **serifa de leitura** ficou com o que é frase: efeito de Talento, efeito
+de Cifra, marginália, estado vazio. Zine mistura fonte; ficha de mesa precisa
+ser lida.
+
+Courier Prime vai embutida no arquivo sob a
+[SIL Open Font License 1.1](https://scripts.sil.org/OFL), para que a parte
+datilografada tenha a mesma aparência em qualquer máquina. A serifa e a
+condensada das manchetes são de sistema, com pilha de substitutas.
+
+Rótulo nenhum desce de **12px**, em qualquer arranjo, e o rastreamento das
+caps miúdas é um número só, `--tr`, parado em **.08em**: passando disso a
+palavra se desmancha em letras soltas e o olho perde o contorno dela. A
+retícula de meio-tom que cobre o papel fica em **11%** — acima disso ela deixa
+de ser grão de fotocópia, passa a comer os finos da letra e, numa folha
+inteira, acinzenta a página vista de longe.
 
 Nas manchetes entra uma condensada pesada de sistema (Impact e seus
-substitutos). Ela não vai embutida: onde não existir, a pilha cai para outra
-condensada e o zine continua de pé. No PDF a ficha volta a ser inteiramente
-datilografada, porque um documento que sai diferente em cada computador não
-serve como documento.
+substitutos); os Acorrentados trocam ela por uma serifa, também de sistema.
+Nenhuma das duas vai embutida: onde não existirem, a pilha cai para a
+substituta e o zine continua de pé.
+
+## Impressão
+
+`Exportar em PDF` chama a impressão do navegador. No papel a ficha volta a ser
+inteiramente datilografada e em preto — um documento que sai diferente em cada
+impressora não serve como documento. A cor da casa vira contorno, a prata vira
+linha preta, e cheio vira trama em vez de chapado, para o número dentro da
+barra de Corrupção continuar legível numa fotocópia.
+
+As variáveis da casa moram em `[data-casa="…"]`, que é mais específico que
+`:root`; sem casar essa especificidade, a folha saía da impressora com a tinta
+da Afiliação em cinza chapado. O bloco de impressão desliga a casa em
+`:root, body[data-casa]`.
+
+## O que a escolha concede
+
+Escolher não é preencher duas vezes. **Antecedente** concede a perícia, o
+Conhecimento e a habilidade de uma vez só, no instante em que é escolhido — e
+trocar de Antecedente devolve a concessão antiga antes de aplicar a nova,
+senão o personagem acumula perícia de emprego que nunca teve. **Cultura**
+concede um nível de perícia, mas o Capítulo 9 não saiu e o livro não diz qual:
+quem diz é o jogador, num campo ao lado, e a ficha soma sozinha.
+
+O nível gratuito não é comprado e não pode ser gasto. `pericias` guarda só o
+que foi comprado; o total é calculado, e por isso o nível some junto com a
+fonte quando ela muda. Ele soma no dado, ocupa lugar no teto do estágio (o
+botão de comprar para antes) e aparece marcado como **livre** ao lado do nome
+da perícia. Caindo numa perícia que já tinha sido treinada, o livro é
+explícito: não se perde e não fura o teto — vira ponto livre, e a ficha avisa
+que ele existe para o jogador realocar.
+
+## O que a ficha não faz
+
+Não é juíza. Ela avisa quando um atributo passou do teto do estágio, quando um
+Talento não cabe na Capacidade, quando uma Cifra está acima do que a sua
+Ascensão aguenta e quando o XP livre ficou negativo — e em nenhum desses casos
+ela impede. Quem impede é o Narrador.
+
+Os Capítulos 8 e 9 do livro (Patrimônio por 1D12, equipamento, Culturas e as
+fichas de cada Afiliação) ainda não existem. Cultura é campo livre com sugestão
+dos lugares que o livro cita, Patrimônio é uma escolha entre os cinco degraus, e
+os quatro slots do corpo vêm do Capítulo 6.
