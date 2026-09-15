@@ -72,7 +72,38 @@ que a prateleira inteira custa 40 XP. As listas abaixo desse parágrafo trazem
 delas que os jogadores compram. Se a intenção era oito, o parágrafo está certo
 e sobram quatro entradas em cada prateleira.
 
+## Clicar, não digitar
+
+Em mesa, marcar um ponto é um gesto por turno. Digitar é abrir o teclado,
+apagar o que estava e conferir se ficou certo — três gestos, e o último
+ninguém faz. Então todo número pequeno virou casa que se clica, e clicar na
+última casa cheia volta uma.
+
+A **Corrupção** é uma trilha do tamanho do Limiar, e as casas se pintam na
+ordem em que a alma entrou: Assentada no começo, Carga em cima dela, Recente
+por último. É a Recente que sobe e desce toda cena, então é ela que o clique
+move; Carga não se clica, porque quem manda nela é o painel de Talentos; e
+Assentada tem contador próprio, porque quase não se mexe. As três se
+distinguem por preenchimento, trama e brilho — e continuam distintas numa
+fotocópia preto e branco, que é o pior caso real.
+
+Vitalidade, Confiança, Acessos, Contatos e XP seguem o mesmo princípio. Sobra
+digitação onde ela é mesmo o gesto certo: nome, Estre, Dívida, Âncoras,
+anotações.
+
+## Recolher
+
+Toda tarja tem um **▾**. Recolhido, o painel vira só a própria tarja — serve
+para desligar o que este personagem não usa ou o que o jogador já sabe de cor.
+O estado é da ficha e não do aparelho, porque um Bastião e um Arquivista
+desligam coisas diferentes, e assim ele viaja junto no backup. Na impressão
+tudo volta a aparecer: recolher é gesto de mesa, e quem guarda a ficha depois
+não sabe o que estava escondido.
+
 ## Disposição
+
+**Afiliação e Dossiê abrem o fluxo.** É a casa que reimprime a ficha inteira, e
+é o dossiê que diz de quem ela é.
 
 **Atributos, Vitalidade, Corrupção e Perícias ficam sempre no alto**, numa
 grade própria acima do resto. É o que se toca a sessão inteira, e não entra no
@@ -131,6 +162,15 @@ trocam de cor sem que nenhuma perca contraste.
 
 A mesa é preta. Os painéis são recortes de papel colados sobre ela — tortos,
 rasgados à mão, alguns presos com fita, e nenhum no mesmo ângulo do vizinho.
+
+**Quem entorta é o papel, não o texto.** A folha é um elemento próprio por
+baixo do painel: é ela que gira, pega grão e rasga, e o conteúdo fica reto em
+cima dela. Texto dentro de uma camada rotacionada perde o encaixe na grade de
+pixels e sai borrado — em Courier, que já tem haste fina, sai ilegível. A
+mesma isolação vale para a mistura da sujeira: `isolation: isolate` na folha
+impede que o `overlay` arraste o painel inteiro para uma camada composta e
+leve junto o antisserrilhado subpixel do texto. E uma tarja impressa reta
+sobre papel cortado torto é mais zine que o contrário.
 
 ### A sujeira
 

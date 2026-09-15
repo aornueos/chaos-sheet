@@ -353,18 +353,29 @@ body::before{
 
 /* --------------------------------------------------------------- 5. painel */
 
+/* O painel não tem pintura: quem é papel é a folha, e é só ela que entorta.
+   Texto dentro de camada rotacionada perde o encaixe na grade de pixels e
+   sai borrado — em Courier, que já tem haste fina, sai ilegível. Tarja
+   impressa reta sobre papel cortado torto também é mais zine que o inverso. */
 .painel{
   position: relative;
   padding: 0 0 12px;
+  color: var(--tinta);
+}
+.painel__folha{
+  position: absolute; inset: 0; z-index: 0;
   background:
     linear-gradient(174deg, var(--papel) 0%, var(--papel-2) 70%, var(--papel-3) 100%);
   background-size: 100% 620px;
-  color: var(--tinta);
-  box-shadow: var(--som);
+  box-shadow: var(--som), inset 0 0 22px -6px rgba(30,24,14,.42);
+  /* prende a mistura da sujeira aqui dentro: sem isso o overlay arrasta o
+     painel inteiro para uma camada composta e o texto perde o
+     antisserrilhado subpixel junto */
+  isolation: isolate;
 }
 /* A sujeira mora embaixo do conteúdo, nunca em cima: o papel é fotocópia
    velha, mas o que está escrito nele sai da máquina hoje. */
-.painel::before{
+.painel__folha::before{
   content:""; position: absolute; inset: 0; pointer-events: none; z-index: 1;
   background-image:
     var(--mancha),
@@ -378,18 +389,19 @@ body::before{
 /* escurecimento de borda: o vidro da copiadora nunca encosta até o fim */
 .painel > .painel__topo ~ *{ position: relative; }
 .painel{ box-shadow: var(--som), inset 0 0 22px -6px rgba(30,24,14,.42); }
-.painel > *{ position: relative; z-index: 2; }
+.painel > .painel__topo,
+.painel > .painel__corpo{ position: relative; z-index: 2; }
 .painel > .fita{ position: absolute; z-index: 6; }
 
 /* Recorte de tesoura, não de guilhotina. O ângulo muda de painel para painel
    e não segue régua nenhuma — é isso que separa colagem de diagramação. */
-.painel:nth-of-type(7n+1){ transform: rotate(-.7deg); }
-.painel:nth-of-type(7n+2){ transform: rotate(.5deg); }
-.painel:nth-of-type(7n+3){ transform: rotate(-.3deg); }
-.painel:nth-of-type(7n+4){ transform: rotate(.85deg); }
-.painel:nth-of-type(7n+5){ transform: rotate(-.55deg); }
-.painel:nth-of-type(7n+6){ transform: rotate(.28deg); }
-.painel:nth-of-type(7n+7){ transform: rotate(-.9deg); }
+.painel:nth-of-type(7n+1) .painel__folha{ transform: rotate(-.7deg); }
+.painel:nth-of-type(7n+2) .painel__folha{ transform: rotate(.5deg); }
+.painel:nth-of-type(7n+3) .painel__folha{ transform: rotate(-.3deg); }
+.painel:nth-of-type(7n+4) .painel__folha{ transform: rotate(.85deg); }
+.painel:nth-of-type(7n+5) .painel__folha{ transform: rotate(-.55deg); }
+.painel:nth-of-type(7n+6) .painel__folha{ transform: rotate(.28deg); }
+.painel:nth-of-type(7n+7) .painel__folha{ transform: rotate(-.9deg); }
 
 .painel__topo{
   position: relative;
@@ -424,6 +436,21 @@ body::before{
 }
 .painel__corpo{ padding: var(--pad-2) var(--pad) 0; }
 
+/* Recolhido, o painel vira só a própria tarja. Serve para desligar o que
+   este personagem não usa ou o jogador já sabe de cor — e o estado é da
+   ficha, não do aparelho, porque um Bastião e um Arquivista desligam
+   coisas diferentes. */
+.painel__olho{
+  flex: 0 0 auto; width: 26px; height: 22px; padding: 0; border: 0; cursor: pointer;
+  background: rgba(255,255,255,.14); color: var(--papel);
+  font: 400 13px/1 var(--mono);
+}
+.painel__olho:hover{ background: var(--casa); color: #fff; }
+.painel--prata .painel__olho{ background: rgba(0,0,0,.3); color: var(--prata-3); }
+.painel[data-recolhido="1"] .painel__corpo{ display: none; }
+.painel[data-recolhido="1"]{ padding-bottom: 9px; }
+.painel[data-recolhido="1"] .painel__nome{ opacity: .72; }
+
 .painel--prata .painel__nome::before{
   content: "◆"; margin-right: 7px; font-size: .7em; vertical-align: .12em; opacity: .8;
 }
@@ -436,10 +463,7 @@ body::before{
 .painel--prata .painel__topo::before{ background: var(--prata-0); }
 .painel--prata .painel__nome{ color: #0d0f11; text-shadow: 0 1px 0 rgba(255,255,255,.35); }
 .painel--prata .painel__nota{ color: #1a1d20; }
-.painel--prata::after{
-  content:""; position: absolute; left: 0; right: 0; top: 0; height: 3px;
-  background: var(--prata-trilho); z-index: 3;
-}
+
 
 /* ---------------------------------------------------------------- 6. campos */
 
@@ -528,10 +552,8 @@ select.ent{ cursor: pointer; }
   background: rgba(255,255,255,.34);
   box-shadow: inset 0 0 0 1.5px var(--tinta), 2px 3px 0 rgba(0,0,0,.16);
 }
-.atr:nth-child(1){ transform: rotate(-.9deg); }
-.atr:nth-child(2){ transform: rotate(.7deg); }
-.atr:nth-child(3){ transform: rotate(-.5deg); }
-.atr:nth-child(4){ transform: rotate(1.1deg); }
+/* cartão pequeno não gira: a sombra dura já cola ele, e girar só borrava
+   o número, que é a coisa que mais se lê na ficha */
 .atr__rot{
   font: 400 var(--fs-mini)/1.2 var(--mono);
   letter-spacing: var(--tr); text-transform: uppercase; color: var(--tinta-2);
@@ -577,44 +599,83 @@ select.ent{ cursor: pointer; }
 .vit__estado{ display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 .vit__nome{ font: 400 clamp(16px,2vw,22px)/1 var(--titulo); letter-spacing: .06em; text-transform: uppercase; }
 .vit__pen{ font: 400 var(--fs)/1.4 var(--leitura); color: var(--tinta-2); }
-.vit__pts{ display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
-.vit__pts .ent{ width: 62px; }
 
-/* corrupção: a barra é prata porque alma é do lado de lá */
-.corr{ margin-bottom: 8px; }
-.corr__barra{
-  position: relative; height: 30px;
-  background: #0f1113;
-  box-shadow: inset 0 0 0 1.5px var(--prata-0), inset 0 2px 6px rgba(0,0,0,.8);
-  overflow: hidden;
+/* ---- Corrupção: trilha de casas, não campo de digitar ----
+
+   A alma entra em ordem e a trilha mostra isso: Assentada no começo, Carga
+   em cima dela, Recente por último. As três precisam se distinguir numa
+   olhada, então são preenchimento cheio, trama e brilho — e continuam
+   distintas numa fotocópia preto e branco, que é o pior caso real.        */
+
+.medidor{ display: flex; gap: 2px; margin-bottom: 9px; }
+.medidor__casa{
+  flex: 1 1 0; min-width: 0; height: 32px; padding: 0; border: 0; cursor: pointer;
+  background: #14161a;
+  box-shadow: inset 0 0 0 1.5px var(--prata-0);
+  font: 400 11px/1 var(--mono); color: var(--prata-1);
+  transition: background .1s;
 }
-.corr__seg{ position: absolute; top: 0; bottom: 0; }
-.corr__seg--rec{ background: linear-gradient(180deg, #d6dade, #7e848b); }
-.corr__seg--ass{ background: linear-gradient(180deg, #8e949b, #3f444a); }
-.corr__seg--car{
-  background-image: repeating-linear-gradient(45deg,
-    rgba(214,218,222,1) 0 3px, rgba(30,33,36,1) 3px 7px);
+.medidor__casa[data-tipo="ass"]{ background: linear-gradient(180deg, #6a7077, #24272b); }
+.medidor__casa[data-tipo="car"]{
+  background-image: repeating-linear-gradient(45deg, #d6dade 0 3px, #1e2124 3px 7px);
 }
-.corr__marca{ position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,.5); }
+.medidor__casa[data-tipo="rec"]{ background: linear-gradient(180deg, #f1f3f5, #939aa1); }
+.medidor__casa[data-terco="1"]{ box-shadow: inset 0 0 0 1.5px var(--prata-0), inset -2px 0 0 rgba(255,255,255,.6); }
+.medidor__casa:hover{ outline: 2px solid var(--casa); outline-offset: 1px; z-index: 1; position: relative; }
+.medidor__casa[data-tipo="car"]{ cursor: default; }
+
+/* mesma trilha, no papel: serve para a reserva de Vitalidade */
+.medidor--papel .medidor__casa{
+  height: 26px; background: rgba(0,0,0,.08);
+  box-shadow: inset 0 0 0 1.5px var(--tinta); color: var(--tinta-3);
+}
+.medidor--papel .medidor__casa[data-tipo="cheio"]{ background: var(--tinta); }
+
+.corr__resumo{ display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
 .corr__num{
-  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  font: 400 var(--fs-mini)/1 var(--mono); letter-spacing: var(--tr);
-  color: #fff; text-shadow: 0 1px 3px #000;
-  pointer-events: none;
+  font: 400 clamp(22px, 2.6vw, 30px)/1 var(--titulo);
+  letter-spacing: .04em; color: var(--tinta);
 }
+.corr__num span{ font-size: .5em; letter-spacing: var(--tr); color: var(--tinta-2); }
 .corr__legenda{
-  display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 7px;
+  display: flex; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 7px;
   font: 400 var(--fs-mini)/1.4 var(--mono); letter-spacing: var(--tr); text-transform: uppercase;
   color: var(--tinta-2);
 }
-.corr__legenda i{ display: inline-block; width: 11px; height: 11px; margin-right: 4px; vertical-align: -1px; box-shadow: inset 0 0 0 1px var(--tinta); }
+.corr__legenda i{
+  display: inline-block; width: 12px; height: 12px; margin-right: 5px; vertical-align: -1px;
+  box-shadow: inset 0 0 0 1px var(--tinta);
+}
+.corr__legenda i[data-tipo="ass"]{ background: linear-gradient(180deg, #6a7077, #24272b); }
+.corr__legenda i[data-tipo="car"]{ background-image: repeating-linear-gradient(45deg, #d6dade 0 2px, #1e2124 2px 4px); }
+.corr__legenda i[data-tipo="rec"]{ background: linear-gradient(180deg, #f1f3f5, #939aa1); }
 .corr__estado{
-  display: inline-block; margin-top: 7px; padding: 3px 9px;
+  display: inline-block; padding: 3px 9px;
   font: 400 var(--fs-mini)/1.4 var(--mono); letter-spacing: var(--tr); text-transform: uppercase;
   background: var(--tinta); color: var(--papel);
 }
 .corr__estado[data-grave="1"]{ background: #7d1d1d; color: #fff; }
-.corr__campos{ display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; margin-top: 9px; }
+
+/* − n + : o contador de quem não cabe numa trilha */
+.contador{
+  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+  margin: 0 0 var(--pad-2);
+}
+.contador__rot{
+  flex: 1 1 120px; min-width: 0;
+  font: 400 var(--fs-mini)/1.3 var(--mono);
+  letter-spacing: var(--tr); text-transform: uppercase; color: var(--tinta-2);
+}
+.contador__valor{
+  min-width: 2.2em; text-align: center;
+  font: 400 clamp(17px, 1.8vw, 21px)/1 var(--titulo); letter-spacing: .03em;
+  font-variant-numeric: tabular-nums;
+}
+.contador__nota{
+  flex: 1 1 100%;
+  font: 400 var(--fs-mini)/1.35 var(--mono); color: var(--tinta-3);
+}
+.contador .passo{ width: 26px; height: 24px; font-size: 15px; }
 
 /* capacidade: o armário e a roupa */
 .cap__barra{
@@ -727,8 +788,7 @@ select.ent{ cursor: pointer; }
   background: rgba(255,255,255,.4);
   box-shadow: inset 0 0 0 1.5px var(--tinta-2), 3px 4px 0 rgba(0,0,0,.14);
 }
-.ancora:nth-of-type(odd){ transform: rotate(-.45deg); }
-.ancora:nth-of-type(even){ transform: rotate(.35deg); }
+
 .ancora[data-queimada="1"]{ background: rgba(0,0,0,.08); }
 .ancora[data-queimada="1"] .ent{ text-decoration: line-through; opacity: .6; }
 .ancora__fim{ display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
@@ -1023,9 +1083,9 @@ body[data-gaveta="fechada"] .palco{ margin-left: 54px; }
     rgba(255,255,255,1) 0 2px, rgba(255,255,255,0) 2px 9px);
   --trama-op: .12;
 }
-[data-casa="Avulso"] .painel:nth-of-type(3n+1){ transform: rotate(-.6deg); }
-[data-casa="Avulso"] .painel:nth-of-type(3n+2){ transform: rotate(.55deg); }
-[data-casa="Avulso"] .painel:nth-of-type(5n+3){ transform: rotate(-.8deg); }
+[data-casa="Avulso"] .painel:nth-of-type(3n+1) .painel__folha{ transform: rotate(-1.1deg); }
+[data-casa="Avulso"] .painel:nth-of-type(3n+2) .painel__folha{ transform: rotate(.95deg); }
+[data-casa="Avulso"] .painel:nth-of-type(5n+3) .painel__folha{ transform: rotate(-1.4deg); }
 
 /* ------------------------------------------------------------ 14. telinha */
 
@@ -1041,7 +1101,6 @@ body[data-gaveta="fechada"] .palco{ margin-left: 54px; }
   body[data-gaveta="fechada"] .gaveta__miolo, body[data-gaveta="fechada"] .gaveta__pe{ display: none; }
   body[data-gaveta="fechada"] .gaveta__titulo{ opacity: 1; }
   .lombada{ display: none !important; }
-  .corr__campos{ grid-template-columns: repeat(3, minmax(0,1fr)); }
   .comp__busca{ margin-left: 0; width: 100%; }
   .comp__busca .ent{ width: 100%; }
 }
@@ -1069,7 +1128,7 @@ body[data-gaveta="fechada"] .palco{ margin-left: 54px; }
     --som: none;
   }
   html, body{ background: #fff !important; color: #000 !important; }
-  body::before, .painel::before, .capa__trama, .capa__selo,
+  body::before, .painel__folha::before, .capa__trama, .capa__selo,
   .fita, .rasgo, .gaveta, .compendio, .aviso, .naoimprime{ display: none !important; }
   .palco{ margin-left: 0 !important; }
   .folha{ padding: 0; }
@@ -1078,6 +1137,14 @@ body[data-gaveta="fechada"] .palco{ margin-left: 54px; }
     box-shadow: none !important; transform: none !important;
     border: 1px solid #000; background: #fff !important; break-inside: avoid;
   }
+  /* no papel a folha para de entortar e vira só o fundo branco do painel */
+  .painel__folha{
+    transform: none !important; box-shadow: none !important;
+    background: #fff !important; isolation: auto;
+  }
+  /* recolher é gesto de mesa. Documento impresso mostra tudo: quem guarda
+     a ficha depois não sabe o que estava escondido. */
+  .painel[data-recolhido="1"] .painel__corpo{ display: block !important; }
   .atr, .ancora, .marca__chapa, .marca__palavra{ transform: none !important; }
   .marca__retalho{ box-shadow: none !important; clip-path: none !important; background: #fff !important; }
   .marca__retalho::after, .capa__grao, .capa::after{ display: none !important; }
@@ -1108,9 +1175,18 @@ body[data-gaveta="fechada"] .palco{ margin-left: 54px; }
   textarea.ent{ min-height: 0; }
 
   /* Medidores: no papel, cheio é trama e vazio é branco. Nada de cinza. */
-  .degrau, .grau__casa, .trilha__passo, .cap__barra, .corr__barra{
+  .degrau, .grau__casa, .trilha__passo, .cap__barra, .medidor__casa{
     background: #fff !important; box-shadow: inset 0 0 0 1px #000 !important; color: #000 !important;
   }
+  .medidor__casa[data-tipo="ass"]{ background-image: repeating-linear-gradient(45deg, #000 0 3px, #fff 3px 4px) !important; }
+  .medidor__casa[data-tipo="car"]{ background-image: repeating-linear-gradient(-45deg, #000 0 1px, #fff 1px 5px) !important; }
+  .medidor__casa[data-tipo="rec"],
+  .medidor__casa[data-tipo="cheio"]{ background: #000 !important; }
+  .corr__legenda i{ box-shadow: inset 0 0 0 1px #000 !important; background: #fff !important; }
+  .corr__legenda i[data-tipo="ass"]{ background-image: repeating-linear-gradient(45deg, #000 0 2px, #fff 2px 3px) !important; }
+  .corr__legenda i[data-tipo="car"]{ background-image: repeating-linear-gradient(-45deg, #000 0 1px, #fff 1px 4px) !important; }
+  .corr__legenda i[data-tipo="rec"]{ background: #000 !important; }
+  .contador__valor{ font-size: 13px; }
   .degrau[data-cheio="1"], .grau__casa[data-feito="1"], .trilha__passo[data-atual="1"]{
     background: #000 !important; color: #fff !important;
   }
@@ -1119,15 +1195,11 @@ body[data-gaveta="fechada"] .palco{ margin-left: 54px; }
   }
   .degrau[data-atual="1"]{ outline: 2px solid #000; outline-offset: -4px; }
   .degrau[data-risco="1"]::after{ background-image: repeating-linear-gradient(45deg, #000 0 2px, transparent 2px 5px); }
-  .corr__seg--rec{ background: #fff; box-shadow: inset 0 0 0 1px #000; }
-  .corr__seg--ass{ background-image: repeating-linear-gradient(45deg, #000 0 3px, #fff 3px 4px); }
-  .corr__seg--car{ background-image: repeating-linear-gradient(-45deg, #000 0 1px, #fff 1px 5px); }
   .corr__num, .cap__num{
     color: #000; mix-blend-mode: normal;
     text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 3px #fff, 1px 1px 0 #fff, -1px -1px 0 #fff;
   }
   .corr__estado{ background: #000 !important; color: #fff !important; }
-  .corr__legenda i{ box-shadow: inset 0 0 0 1px #000; }
   .cap__usada{
     background: transparent;
     background-image: repeating-linear-gradient(45deg, #000 0 2px, #fff 2px 5px) !important;

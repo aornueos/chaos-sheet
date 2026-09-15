@@ -217,6 +217,7 @@ function fichaEmBranco() {
     ],
     cifras: [],                   /* {nome, pilar, vinculo, tipo, sigilos, gatilho, efeito} */
     labTracos: [], labNota: "",
+    recolhidos: [],               /* painéis que este personagem não precisa ver */
     ancoras: [
       { nome: "", acredita: "", faria: "", queimada: false },
       { nome: "", acredita: "", faria: "", queimada: false },
@@ -313,6 +314,7 @@ function normaliza(bruta) {
   })).filter(c => c.nome);
 
   f.labTracos = (Array.isArray(f.labTracos) ? f.labTracos : []).filter(t => typeof t === "string");
+  f.recolhidos = (Array.isArray(f.recolhidos) ? f.recolhidos : []).filter(t => typeof t === "string");
   f.ancoras = (Array.isArray(f.ancoras) ? f.ancoras : base.ancoras).map(a => ({
     nome: String(a.nome || ""),
     acredita: String(a.acredita != null ? a.acredita : (a.cre || "")),
@@ -535,12 +537,6 @@ function campo(rot, caminho, valor, tipo, extra) {
   return `<label class="campo"><span class="campo__rot">${esc(rot)}</span>` +
     `<input class="ent${t === "number" ? " ent--num" : ""}" type="${t}" data-campo="${caminho}" value="${esc(valor)}" ${extra || ""}></label>`;
 }
-function campoLista(rot, caminho, valor, opcoes, id) {
-  const ops = opcoes.map(o => `<option value="${esc(o)}"></option>`).join("");
-  return `<label class="campo"><span class="campo__rot">${esc(rot)}</span>` +
-    `<input class="ent" type="text" list="${id}" data-campo="${caminho}" value="${esc(valor)}">` +
-    `<datalist id="${id}">${ops}</datalist></label>`;
-}
 function seletor(rot, caminho, valor, opcoes, vazio) {
   const ops = (vazio ? [""] : []).concat(opcoes)
     .map(o => `<option value="${esc(o)}"${o === valor ? " selected" : ""}>${esc(o || "—")}</option>`).join("");
@@ -555,17 +551,65 @@ function area(rot, caminho, valor, linhas) {
    papel à mão não rasga duas folhas igual, e metade delas sai torta no topo
    também. É decoração, e por isso sai inteira na impressão. */
 let recorte = 0;
-function painel(titulo, nota, corpo, prata, fita) {
+/* Em mesa, marcar um ponto é um gesto por turno. Digitar é abrir o teclado,
+   apagar o que estava e conferir se ficou certo — três gestos, e o último
+   ninguém faz. Então todo número pequeno vira casa que se clica, e clicar na
+   última casa cheia volta uma. */
+function medidor(acao, total, tipoDe, extras) {
+  const o = extras || {};
+  let h = `<div class="medidor${o.classe ? " " + o.classe : ""}">`;
+  for (let i = 1; i <= total; i++) {
+    const terco = o.tercos && (i === Math.round(total / 3) || i === Math.round(total * 2 / 3));
+    h += `<button class="medidor__casa naoimprime" type="button" data-acao="${acao}" data-n="${i}"` +
+      ` data-tipo="${tipoDe(i)}" data-terco="${terco ? 1 : 0}"` +
+      (o.campo ? ` data-campo="${o.campo}"` : "") +
+      ` aria-label="${esc(o.rot || "marcar")} ${i}">${o.numerar ? i : ""}</button>`;
+  }
+  return h + `</div>`;
+}
+
+/* − n + para o que não cabe numa trilha: XP e contadores longos */
+function contador(rot, campo, valor, min, max, nota) {
+  return `<div class="contador">` +
+    `<span class="contador__rot">${esc(rot)}</span>` +
+    `<button class="passo naoimprime" type="button" data-acao="passoNum" data-campo="${campo}" data-d="-1" data-min="${min}" data-max="${max}" aria-label="Baixar ${esc(rot)}">−</button>` +
+    `<b class="contador__valor">${valor}</b>` +
+    `<button class="passo naoimprime" type="button" data-acao="passoNum" data-campo="${campo}" data-d="1" data-min="${min}" data-max="${max}" aria-label="Subir ${esc(rot)}">+</button>` +
+    (nota ? `<span class="contador__nota">${esc(nota)}</span>` : "") +
+  `</div>`;
+}
+
+/* A chave de recolhimento sai do próprio título. Renomear um painel perde o
+   estado dele uma vez e ele volta aberto, que é um preço barato por não ter
+   uma segunda lista de nomes para manter em dia. */
+const chaveDe = t => t.toLowerCase()
+  .normalize("NFD").replace(/[̀-ͯ]/g, "")
+  .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+function painel(titulo, nota, corpo, op) {
+  const o = op || {};
+  const chave = chaveDe(titulo);
+  const recolhido = (fichaAtiva() || {}).recolhidos && fichaAtiva().recolhidos.includes(chave);
   recorte++;
   const topoRasgado = recorte % 3 === 2;
   /* fita onde a colagem pede: não em todo painel, senão vira padrão */
-  if (!fita) fita = ["", "", "so", "", "ne", "", "", "se", "", "", "no", ""][recorte % 12] || "";
-  return `<section class="painel${prata ? " painel--prata" : ""}">` +
-    (topoRasgado ? `<span class="rasgo rasgo--topo naoimprime" aria-hidden="true"></span>` : "") +
-    `<span class="rasgo rasgo--pe naoimprime" aria-hidden="true"></span>` +
-    (fita ? `<span class="fita fita--${fita} naoimprime" aria-hidden="true"></span>` : "") +
+  const fita = o.fita || ["", "", "so", "", "ne", "", "", "se", "", "", "no", ""][recorte % 12] || "";
+  /* A folha é o papel: é ela que entorta, que pega grão e que rasga.
+     O conteúdo fica reto em cima dela, porque texto em camada rotacionada
+     perde o encaixe na grade de pixels e sai borrado — e uma tarja impressa
+     reta sobre papel cortado torto é o que um zine é de verdade. */
+  return `<section class="painel${o.prata ? " painel--prata" : ""}${o.largo ? " painel--largo" : ""}"` +
+    ` data-recolhido="${recolhido ? 1 : 0}">` +
+    `<span class="painel__folha" aria-hidden="true">` +
+      (topoRasgado ? `<span class="rasgo rasgo--topo naoimprime"></span>` : "") +
+      `<span class="rasgo rasgo--pe naoimprime"></span>` +
+    `</span>` +
+    (fita && !recolhido ? `<span class="fita fita--${fita} naoimprime" aria-hidden="true"></span>` : "") +
     `<div class="painel__topo"><h3 class="painel__nome">${esc(titulo)}</h3>` +
     (nota ? `<span class="painel__nota" title="${esc(nota)}">${esc(nota)}</span>` : "") +
+    `<button class="painel__olho naoimprime" type="button" data-acao="recolhe" data-chave="${chave}"` +
+    ` aria-expanded="${recolhido ? "false" : "true"}"` +
+    ` title="${recolhido ? "Abrir" : "Recolher"} ${esc(titulo)}">${recolhido ? "▸" : "▾"}</button>` +
     `</div><div class="painel__corpo">${corpo}</div></section>`;
 }
 
@@ -641,12 +685,9 @@ function faixaVitalidade(f) {
     }).join("") + `</div>` +
     `<div class="vit__estado"><b class="vit__nome">${esc(est.nome)}</b>` +
       `<span class="vit__pen">${esc(est.pen)}</span></div>` +
-    `<div class="vit__pts">` +
-      `<span class="campo__rot" style="margin:0">Pontos</span>` +
-      `<input class="ent ent--num" type="number" data-campo="vitPontos" value="${f.vitPontos}" min="0" max="${max}">` +
-      `<span class="campo__rot" style="margin:0">de ${max}</span>` +
-      `<button class="bt bt--fino naoimprime" type="button" data-acao="vitCheia">encher</button>` +
-    `</div>` +
+    `<div class="slot__rot"><span>Pontos de Vitalidade</span><b>${f.vitPontos} de ${max}</b></div>` +
+    medidor("vitPts", max, i => i <= f.vitPontos ? "cheio" : "vazio", { classe: "medidor--papel", rot: "Ponto de Vitalidade" }) +
+    `<div class="linha-bts naoimprime"><button class="bt bt--fino" type="button" data-acao="vitCheia">encher tudo</button></div>` +
     `<p class="margem">Zerou os pontos, cai um nível e a reserva volta ao máximo. Chegou ao <b>0</b>, acabou — e não é o tipo de coisa que repouso conserta.</p>` +
     (f.vitNivel === 2 ? `<p class="margem"><b>Este é o degrau que mata gente.</b> A Face você aguenta. Não poder reagir significa que o próximo golpe entra inteiro, e o combate deste jogo não perdoa golpe que entra inteiro.</p>` : "") +
     (f.vitNivel === 1 ? `<p class="margem"><b>Inconsciente.</b> Alguém vai ter que te carregar, e quem te carrega não está atirando.</p>` : "") +
@@ -657,35 +698,33 @@ function faixaVitalidade(f) {
 function faixaCorrupcao(f) {
   const l = limiarDe(f), rec = f.corrRecente, ass = f.corrAssentada, car = cargaAcesa(f);
   const t = rec + ass + car;
-  const pc = v => Math.min(100, (v / Math.max(1, l)) * 100);
   const est = estadoCorrupcao(f);
+  /* A trilha mede o Limiar inteiro, e as casas se pintam na ordem em que a
+     alma entrou: Assentada no começo, Carga em cima dela, Recente por
+     último. É a Recente que sobe e desce toda cena, então é ela que o
+     clique move. Carga não se clica: quem manda nela é o painel de
+     Talentos, e Assentada tem o próprio contador porque quase não se mexe. */
+  const tipoDe = i => i <= ass ? "ass" : i <= ass + car ? "car" : i <= t ? "rec" : "vazio";
   const corpo =
-    `<div class="corr"><div class="corr__barra">` +
-      `<div class="corr__seg corr__seg--ass" style="left:0;width:${pc(ass)}%"></div>` +
-      `<div class="corr__seg corr__seg--car" style="left:${pc(ass)}%;width:${pc(car)}%"></div>` +
-      `<div class="corr__seg corr__seg--rec" style="left:${pc(ass + car)}%;width:${pc(rec)}%"></div>` +
-      `<div class="corr__marca" style="left:33.3%"></div><div class="corr__marca" style="left:66.6%"></div>` +
-      `<div class="corr__num">${t} / ${l}</div>` +
+    medidor("corr", l, tipoDe, { tercos: true, rot: "Corrupção" }) +
+    `<div class="corr__resumo">` +
+      `<b class="corr__num">${t} <span>de ${l}</span></b>` +
+      `<span class="corr__estado" data-grave="${est.grave ? 1 : 0}">${esc(est.nome)}</span>` +
     `</div>` +
     `<div class="corr__legenda">` +
-      `<span><i style="background:linear-gradient(180deg,#8e949b,#3f444a)"></i>Assentada ${ass}</span>` +
-      `<span><i style="background-image:repeating-linear-gradient(45deg,#d6dade 0 2px,#1e2124 2px 4px)"></i>Carga ${car}</span>` +
-      `<span><i style="background:linear-gradient(180deg,#d6dade,#7e848b)"></i>Recente ${rec}</span>` +
+      `<span><i data-tipo="ass"></i>Assentada ${ass}</span>` +
+      `<span><i data-tipo="car"></i>Carga ${car}</span>` +
+      `<span><i data-tipo="rec"></i>Recente ${rec}</span>` +
     `</div>` +
-    `<span class="corr__estado" data-grave="${est.grave ? 1 : 0}">${esc(est.nome)}</span>` +
     `<p class="margem">${esc(est.efeito)}</p>` +
-    `<div class="corr__campos">` +
-      `<label class="campo" style="margin:0"><span class="campo__rot">Recente</span><input class="ent ent--num" type="number" min="0" data-campo="corrRecente" value="${rec}"></label>` +
-      `<label class="campo" style="margin:0"><span class="campo__rot">Assentada</span><input class="ent ent--num" type="number" min="0" data-campo="corrAssentada" value="${ass}"></label>` +
-      `<label class="campo" style="margin:0"><span class="campo__rot">Carga</span><input class="ent ent--num" type="number" value="${car}" disabled title="Vem dos Talentos acesos"></label>` +
-    `</div>` +
+    contador("Assentada", "corrAssentada", ass, 0, 99, "não sai com descanso comum") +
     `<div class="linha-bts naoimprime">` +
       `<button class="bt bt--fino" type="button" data-acao="repousoRapido">Repouso rápido</button>` +
       `<button class="bt bt--fino" type="button" data-acao="repousoCompleto">Repouso completo</button>` +
       `<button class="bt bt--fino" type="button" data-acao="repousoArvore">Árvore Prateada</button>` +
     `</div>` +
     `<p class="margem">Alma não é combustível, é acúmulo. Você não gasta: você desloca, e ela fica onde parou.</p>`;
-  return painel("Corrupção", `Limiar ${l} · ${f.linhagem}`, corpo, true);
+  return painel("Corrupção", `Limiar ${l} · ${f.linhagem}`, corpo, { prata: true });
 }
 
 function faixaPericias(f) {
@@ -711,11 +750,7 @@ function faixaPericias(f) {
     ? `<p class="margem"><b>Acima do teto:</b> ${esc(TODAS_PERICIAS.filter(p => f.pericias[p] > teto).join(", "))}.</p>` : "") +
   (pontosLivres(f)
     ? `<p class="margem"><b>${pontosLivres(f)} ponto${pontosLivres(f) > 1 ? "s" : ""} livre${pontosLivres(f) > 1 ? "s" : ""}.</b> Um nível gratuito caiu em perícia que você já treinou. O livro é explícito: ele não se perde e não fura o teto — vira ponto livre, e você realoca onde quiser.</p>` : "");
-  return `<section class="painel painel--largo">` +
-    `<span class="rasgo rasgo--pe naoimprime" aria-hidden="true"></span>` +
-    `<div class="painel__topo">` +
-    `<h3 class="painel__nome">Perícias</h3><span class="painel__nota" title="Conhecimento: ${esc(f.conhecimento || "nenhum")}">Conhecimento: ${esc(f.conhecimento || "—")}</span>` +
-    `</div><div class="painel__corpo">${corpo}</div></section>`;
+  return painel("Perícias", `Conhecimento: ${f.conhecimento || "—"}`, corpo, { largo: true });
 }
 
 function desenhaFaixa() {
@@ -797,7 +832,7 @@ function painelArquetipo(f) {
       `<span class="grau__casa" data-feito="${nivel >= n ? 1 : 0}" data-marca="${n % 2 === 0 ? 1 : 0}" title="Grau ${n} — ${n % 2 ? "abre o patamar " + PATAMAR_DO_GRAU[n] : "Marca"} · ${GRAU_XP[n - 1]} XP">${n}</span>`
     ).join("") + `</div>` +
     `<div class="grade grade--2">` +
-      campo("XP acumulado como " + a.nome, `graus.${a.nome}.xp`, g.xp, "number", 'min="0"') +
+      contador("XP como " + a.nome, `graus.${a.nome}.xp`, g.xp, 0, 9999) +
       `<label class="campo"><span class="campo__rot">Grau</span><input class="ent ent--num" value="${nivel}" disabled></label>` +
     `</div>` +
     `<p class="margem">Patamares abertos: <b>${[1, 3, 5, 7].filter(n => nivel >= n).map(n => PATAMAR_DO_GRAU[n]).join(", ") || "nenhum"}</b>.` +
@@ -871,7 +906,7 @@ function painelCorrentes(f) {
       area("O que ela faz, em uma frase", `correntes.${i}.efeito`, c.efeito, 2) +
       `</div>`).join("") +
     `<p class="margem">Isso não é privilégio seu: todo mundo em Elinia tem as suas. O padeiro de Alta Velana usa três antes das nove da manhã e não acha aquilo notável.</p>`;
-  return painel("Cifras Correntes", "a língua é livre", corpo, true);
+  return painel("Cifras Correntes", "a língua é livre", corpo, { prata: true });
 }
 
 function painelCifras(f) {
@@ -912,7 +947,7 @@ function painelCifras(f) {
   corpo += `<div class="linha-bts naoimprime">` +
     `<button class="bt bt--casa" type="button" data-acao="abreComp" data-aba="cifras">Aprender do catálogo</button></div>` +
     `<p class="margem">A Cifra sempre acontece. O teste de Domínio não decide se funcionou: decide quanta alma fica presa em você depois.</p>`;
-  return painel("Cifras Catalogadas", `${f.cifras.length} frases · ${alf.nome} · Domínio ${DADO_PERICIA[f.pericias["Domínio"]]}`, corpo, true);
+  return painel("Cifras Catalogadas", `${f.cifras.length} frases · ${alf.nome} · Domínio ${DADO_PERICIA[f.pericias["Domínio"]]}`, corpo, { prata: true });
 }
 
 function painelLabirinto(f) {
@@ -946,7 +981,7 @@ function painelLabirinto(f) {
       `<p class="margem">Traços valem para todo mundo dentro do raio, <b>inclusive para você</b>. O Labirinto não sabe quem é o dono. E escolher é para sempre: ninguém redecora a própria cabeça duas vezes.</p>`;
   }
   corpo += area("Como ele é por dentro", "labNota", f.labNota, 3);
-  return painel("Labirinto Próprio", est.labirinto, corpo, true);
+  return painel("Labirinto Próprio", est.labirinto, corpo, { prata: true });
 }
 
 function painelAncoras(f) {
@@ -966,13 +1001,13 @@ function painelAncoras(f) {
       `</div>`).join("") +
     `<div class="linha-bts naoimprime"><button class="bt bt--fantasma" type="button" data-acao="novaAncora">+ Âncora nova</button></div>` +
     `<div class="grade grade--2">` +
-      campo("Contatos neste arco", "contatos", f.contatos, "number", 'min="0"') +
+      contador("Contatos neste arco", "contatos", f.contatos, 0, 9, "cada um remove 1 de Assentada") +
       `<label class="campo"><span class="campo__rot">Âncoras de pé</span><input class="ent ent--num" value="${vivas}" disabled></label>` +
     `</div>` +
     `<p class="margem">Cada Contato remove <b>1 de Assentada</b> e é a única forma de fazer isso fora de um Local Seguro. No <b>terceiro</b> dentro de um arco, eles percebem — e registros viram Dívida.</p>`;
   if (f.contatos >= 3) corpo += `<p class="margem"><b>Terceiro Contato neste arco.</b> Eles perceberam. Raramente vira punição — vira registro, e registro tem um jeito antipático de virar Dívida mais tarde.</p>`;
   if (vivas < 1) corpo += `<p class="margem"><b>Nenhuma Âncora de pé.</b> A trilha cobra três e você começou com duas. É o desenho, não é azar: quem sobe rápido chega ao topo sem nenhuma válvula, e a partir daí só existe o Olho.</p>`;
-  return painel("Âncoras", `${vivas} de pé · ${f.contatos} contato${f.contatos === 1 ? "" : "s"}`, corpo, false, "ne");
+  return painel("Âncoras", `${vivas} de pé · ${f.contatos} contato${f.contatos === 1 ? "" : "s"}`, corpo, { fita: "ne" });
 }
 
 function painelAfiliacao(f) {
@@ -989,9 +1024,9 @@ function painelAfiliacao(f) {
   } else {
     corpo +=
       `<div class="grade grade--2">` +
-        campo("Confiança — teto", "confiancaTeto", f.confiancaTeto, "number", 'min="0"') +
-        campo("Confiança — reserva", "confiancaReserva", f.confiancaReserva, "number", 'min="0"') +
-        campo("Acessos neste arco", "acessos", f.acessos, "number", 'min="0"') +
+        contador("Confiança — teto", "confiancaTeto", f.confiancaTeto, 0, 20, "cumprir o Chamado sobe, recusar desce") +
+        contador("Reserva", "confiancaReserva", f.confiancaReserva, 0, 20, "volta ao teto a cada operação bem-sucedida") +
+        contador("Acessos neste arco", "acessos", f.acessos, 0, 9, "no terceiro, eles cobram") +
         `<label class="campo"><span class="campo__rot">Requisita até</span><input class="ent" value="${f.confiancaTeto >= 4 ? "Vínculo Alto" : f.confiancaTeto >= 2 ? "Vínculo Médio" : "Vínculo Baixo"}" disabled></label>` +
       `</div>` +
       `<p class="margem">Confiança não é nível, é crédito. Um operador de teto alto com a reserva vazia tem menos poder de fogo que um novato com a reserva cheia.</p>` +
@@ -1031,7 +1066,7 @@ function painelSemblante(f) {
         ).join("") + `</ul>`
       : `<p class="vazio">Nenhuma Bênção. Elas não são compradas: são oferecidas dentro da ficção, em um encontro. Você pode recusar. Eles não costumam perguntar duas vezes.</p>`) +
     `<div class="linha-bts naoimprime"><button class="bt bt--casa" type="button" data-acao="abreComp" data-aba="bencaos">Ver as Bênçãos de referência</button></div>`;
-  return painel("Semblante", `${f.pilar} · Ressonância ${f.ressonancia}`, corpo, true);
+  return painel("Semblante", `${f.pilar} · Ressonância ${f.ressonancia}`, corpo, { prata: true });
 }
 
 function painelEquipamento(f) {
@@ -1059,9 +1094,9 @@ function painelProgressao(f) {
       ? `<p class="margem">Para o <b>${esc(prox.nome)}</b>: <b>${prox.xp} XP</b>, ${prox.ancora ? "<b>uma Âncora</b>" : "nenhuma Âncora"}, e o Labirinto ${prox.nome === "Aclarado" ? "<b>Maior</b>" : prox.nome === "Iluminado" ? "não é comprado — é concedido" : "<b>Menor</b>"}. XP abre a porta. Não paga a travessia.</p>`
       : `<p class="margem">Fim da trilha. A morte, para você, é uma porta e não uma parede — o que é reconfortante até a primeira vez que alguém precisa te explicar onde você esteve.</p>`) +
     `<div class="grade grade--2">` +
-      campo("XP total ganho", "xpTotal", f.xpTotal, "number", 'min="0"') +
+      contador("XP total ganho", "xpTotal", f.xpTotal, 0, 99999) +
       `<label class="campo"><span class="campo__rot">Gasto em Talentos e Cifras</span><input class="ent ent--num" value="${auto}" disabled></label>` +
-      campo("Gasto em atributos, perícias e Ascensão", "xpOutros", f.xpOutros, "number", 'min="0"') +
+      contador("Gasto fora de Talento e Cifra", "xpOutros", f.xpOutros, 0, 99999, "atributos, perícias, Ascensão") +
       `<label class="campo"><span class="campo__rot">Livre</span><input class="ent ent--num" value="${livre}" disabled></label>` +
     `</div>` +
     (livre < 0 ? `<p class="margem"><b>Você gastou o que não tinha.</b> A ficha não impede. O Narrador impede.</p>` : "") +
@@ -1071,10 +1106,10 @@ function painelProgressao(f) {
       `<button class="bt bt--fantasma" type="button" data-acao="sessao" data-xp="2">+2</button>` +
     `</div>` +
     `<p class="margem">Terminar a sessão dá 4. Resolver ou avançar um ponto narrativo, 2. Decisão significativa com consequência real, 2. O XP entra também no contador do Arquétipo aceso, porque é ali que o Grau mora. Não existe XP por derrotar inimigo: combate não é onde o progresso acontece, é onde ele cobra.</p>`;
-  return painel("Progressão", `${livre} XP livre${livre === 1 ? "" : "s"}`, corpo, true);
+  return painel("Progressão", `${livre} XP livre${livre === 1 ? "" : "s"}`, corpo, { prata: true });
 }
 
-const painelNota = (t, n, c) => painel(t, n, c, false, "no");
+const painelNota = (t, n, c) => painel(t, n, c, { fita: "no" });
 function painelNotas(f) {
   return painelNota("Anotações", "o que não cabe em campo nenhum",
     area("", "notas", f.notas, 8) +
@@ -1083,10 +1118,13 @@ function painelNotas(f) {
 
 function desenhaFluxo() {
   const f = fichaAtiva();
+  /* Afiliação e Dossiê abrem o fluxo: é a casa que reimprime a ficha
+     inteira, e é o dossiê que diz de quem ela é. O resto desce depois. */
   $("#fluxo").innerHTML =
-    painelDossie(f) + painelArquetipo(f) + painelTalentos(f) +
+    painelAfiliacao(f) + painelDossie(f) +
+    painelArquetipo(f) + painelTalentos(f) +
     painelCorrentes(f) + painelCifras(f) + painelLabirinto(f) +
-    painelAncoras(f) + painelAfiliacao(f) + painelSemblante(f) +
+    painelAncoras(f) + painelSemblante(f) +
     painelEquipamento(f) + painelProgressao(f) + painelNotas(f);
 }
 
@@ -1325,6 +1363,26 @@ const ACOES = {
     f.vitPontos = vitMax(f);
   },
   vitCheia(f) { f.vitNivel = 5; f.vitPontos = vitMax(f); },
+  vitPts(f, d) {
+    const alvo = Number(d.n);
+    f.vitPontos = num(f.vitPontos === alvo ? alvo - 1 : alvo, 0, vitMax(f), 0);
+  },
+
+  /* Clicar numa casa diz onde o total deve parar; quem se mexe para chegar
+     lá é a Recente, porque Assentada e Carga não são dela. Clicar na última
+     casa cheia volta uma, que é como se desconta uma Cifra que não pegou. */
+  corr(f, d) {
+    const alvo = Number(d.n);
+    const piso = f.corrAssentada + cargaAcesa(f);
+    const total = corrTotal(f);
+    const querido = total === alvo ? alvo - 1 : alvo;
+    f.corrRecente = Math.max(0, querido - piso);
+  },
+
+  passoNum(f, d) {
+    const atual = Number(leCaminho(f, d.campo)) || 0;
+    escreveCaminho(f, d.campo, num(atual + Number(d.d), Number(d.min), Number(d.max), 0));
+  },
 
   repousoRapido(f) {
     f.vitPontos = Math.min(vitMax(f), f.vitPontos + Math.max(1, Math.floor(vitMax(f) / 4)));
@@ -1453,6 +1511,11 @@ const ACOES = {
     avisa("Aceita. Bênção não custa XP, não ocupa Capacidade — e pode ser retirada.");
   },
 
+  recolhe(f, d) {
+    const i = f.recolhidos.indexOf(d.chave);
+    if (i >= 0) f.recolhidos.splice(i, 1); else f.recolhidos.push(d.chave);
+  },
+  abreTudo(f) { f.recolhidos = []; },
   abreComp(f, d) { abreCompendio(d.aba, d.filtro); },
   abreFicha(f, d) { db.ativa = d.id; },
   duplica(f) {
@@ -1591,6 +1654,10 @@ function ligaGaveta() {
     avisa("Ficha nova. Comece pela Linhagem: ela responde as duas perguntas que nada mais responde.");
   };
   $("#btDuplica").onclick = () => comFicha(f => ACOES.duplica(f));
+  $("#btAbreTudo").onclick = () => comFicha(f => {
+    if (!f.recolhidos.length) { avisa("Nenhum bloco recolhido. O ▾ na tarja de cada um recolhe."); return; }
+    f.recolhidos = [];
+  });
   $("#btArranjo").onclick = () => {
     const i = ARRANJOS.indexOf(document.documentElement.dataset.arranjo || "normal");
     aplicaArranjo(ARRANJOS[(i + 1) % ARRANJOS.length]);
