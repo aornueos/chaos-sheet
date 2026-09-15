@@ -145,6 +145,34 @@ não sabe o que estava escondido.
 
 ## Disposição
 
+### A medida da página
+
+A ficha trava numa largura e se centra no que sobra da gaveta; o resto é mesa.
+Sem esse limite, num monitor de 1920px ou mais a capa terminava com a marca
+num extremo e os carimbos no outro, e a faixa de Perícias virava uma régua de
+oito colunas que o olho não acompanha de ponta a ponta.
+
+O limite é visível: o **mesmo filete triplo da régua dos tópicos, de pé**, nas
+duas margens da folha. Ele é um pseudo-elemento só, com os dois lados no mesmo
+`background` — em `::before` e `::after` separados eles pintariam em ordens
+diferentes, um atrás do conteúdo e outro na frente, e a fita de um painel
+passaria por baixo de um filete e por cima do outro. O esmaecido das pontas
+está dentro do gradiente e não numa máscara: a folha tem alguns milhares de
+pixels de altura, e mascarar isso pediria uma camada composta do tamanho da
+ficha inteira a cada rolagem.
+
+A medida acompanha o arranjo, para o comprimento de linha em caracteres ficar
+parecido nos três: **1150px** no apertado, **1360px** no normal, **1420px** no
+espaçoso. O 1360 não é redondo por acaso — abaixo de ~1320px a faixa de três
+painéis deixa o corpo dos Atributos com menos de 380px e o `@container` quebra
+os quatro dados em dois de cada lado.
+
+Abaixo de 760px a folha já ocupa a tela toda: ali o filete sai, porque seriam
+22px roubados do texto para emoldurar uma margem que não existe. Na impressão
+a medida também sai — quem manda na largura é o A4.
+
+### As cinco faixas
+
 A ficha se lê por assunto, não por painel solto. **Cinco faixas**, cada uma
 aberta pela própria régua:
 
@@ -206,7 +234,7 @@ tela**. Muda espaçamento, corpo de texto e quantas colunas abrem. A escolha
 fica gravada por aparelho.
 
 Nenhum componente sabe que isso existe: o botão troca um atributo na raiz, e
-todo o resto lê `--gap`, `--pad-*` e as larguras mínimas de coluna.
+todo o resto lê `--gap`, `--pad-*`, `--medida` e as larguras mínimas de coluna.
 
 ## Direção de arte
 

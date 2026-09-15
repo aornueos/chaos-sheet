@@ -80,6 +80,11 @@
   --col-min:   310px;
   --col-per:   220px;
   --col-item:  330px;   /* largura mínima de coluna de lista dentro do painel */
+  /* Até onde a página cresce, por mais monitor que haja. O número não é
+     redondo por acaso: abaixo de ~1320px a faixa de três painéis deixa o
+     corpo dos Atributos com menos de 380px, e o container query quebra os
+     quatro dados em dois de cada lado. */
+  --medida:    1360px;
 
   --som:       0 2px 0 rgba(0,0,0,.55), 0 10px 26px -12px rgba(0,0,0,.9);
 
@@ -96,10 +101,12 @@
 [data-arranjo="apertado"]{
   --gap: 9px; --pad: 10px; --pad-2: 7px; --fs: 14px; --fs-mini: 12px;
   --col-min: 268px; --col-per: 184px; --col-item: 290px;
+  --medida: 1150px;
 }
 [data-arranjo="espacoso"]{
   --gap: 20px; --pad: 21px; --pad-2: 15px; --fs: 16px; --fs-mini: 12px;
   --col-min: 360px; --col-per: 250px; --col-item: 380px;
+  --medida: 1420px;
 }
 
 *{ box-sizing: border-box; }
@@ -351,9 +358,50 @@ body::before{
 .capa__carimbos{ display: flex; gap: 12px; align-items: center; flex: 0 0 auto; }
 .capa__carimbos .carimbo{ color: var(--casa-clr); border-color: var(--casa-clr); outline-color: var(--casa-clr); mix-blend-mode: normal; }
 
-/* ------------------------------------------------------------ 4. estrutura */
+/* ------------------------------------------------------------ 4. estrutura
 
-.folha{ padding: 0 var(--gap) calc(var(--gap) * 3); }
+   A ficha tem medida. Sem limite, num monitor largo a capa termina com a
+   marca num extremo e os carimbos no outro, e a faixa de perícias vira uma
+   régua de oito colunas que o olho não acompanha de ponta a ponta. A página
+   trava numa largura e se centra no que sobra da gaveta; o resto é mesa.
+
+   O limite é visível, e é o mesmo filete triplo da régua dos tópicos — de pé,
+   nas duas margens. A geometria Déco emoldura por vocação; aqui a moldura
+   ainda ganha função, que é dizer onde o papel acaba.                       */
+
+.pagina{ max-width: var(--medida); margin-inline: auto; }
+
+/* A margem tem de caber o filete (11px) e ainda sobrar ar, senão o filete da
+   página e o da régua do tópico se leem como um bloco só. O termo fixo é o
+   que garante isso no arranjo apertado, onde --gap é pequeno. */
+.folha{ position: relative; padding: 0 calc(var(--gap) * 1.4 + 12px) calc(var(--gap) * 3); }
+
+/* Os dois limites num pseudo-elemento só. Com um em ::before e outro em
+   ::after eles pintariam em ordens diferentes — um atrás do conteúdo, outro
+   na frente — e a fita de um painel passaria por baixo de um filete e por
+   cima do outro.                                                            */
+.folha::before{
+  content: ""; position: absolute; pointer-events: none;
+  inset: 0 0 calc(var(--gap) * 1.4);
+  opacity: .5;
+  /* Fotocópia perde a borda: o filete entra e sai sem começo nem fim. O
+     esmaecido está dentro do próprio gradiente e não numa máscara — a folha
+     tem alguns milhares de pixels de altura, e mascarar isso seria pedir uma
+     camada composta do tamanho da ficha inteira a cada rolagem. */
+  --fio-fino: linear-gradient(180deg, transparent 0, var(--prata-1) 30px,
+                              var(--prata-1) calc(100% - 52px), transparent 100%);
+  --fio-grosso: linear-gradient(180deg, transparent 0, var(--prata-2) 30px,
+                                var(--prata-2) calc(100% - 52px), transparent 100%);
+  /* a porcentagem em calc() já desconta a largura da imagem: por isso o
+     espelho da direita não repete os números da esquerda */
+  background:
+    var(--fio-fino)   0                 0 / 1px 100% no-repeat,
+    var(--fio-grosso) 4px               0 / 3px 100% no-repeat,
+    var(--fio-fino)   10px              0 / 1px 100% no-repeat,
+    var(--fio-fino)   calc(100% - 10px) 0 / 1px 100% no-repeat,
+    var(--fio-grosso) calc(100% - 4px)  0 / 3px 100% no-repeat,
+    var(--fio-fino)   100%              0 / 1px 100% no-repeat;
+}
 
 /* ------------------------------------------------- 4b. tópicos e Art Déco
 
@@ -1024,7 +1072,7 @@ body[data-gaveta="fechada"] .lombada{ display: flex; }
 }
 .lombada:hover{ background: var(--casa-esc); }
 
-.palco{ margin-left: 264px; }
+.palco{ margin-left: 264px; transition: margin-left .18s ease; }
 body[data-gaveta="fechada"] .palco{ margin-left: 54px; }
 
 .ficha-par{ display: flex; gap: 3px; margin-bottom: 4px; }
@@ -1252,6 +1300,8 @@ body[data-gaveta="fechada"] .palco{ margin-left: 54px; }
 
 @media (max-width: 760px){
   .folha{ padding: 0 12px calc(var(--gap) * 3); }
+  /* na telinha a página já ocupa tudo: moldura aqui seria 22px roubados do texto */
+  .folha::before{ display: none; }
   /* dedo não tem ponta: o que é de clicar cresce onde não há cursor */
   .passo{ width: 30px; height: 28px; font-size: 16px; }
   .per__passos .passo{ width: 27px; height: 25px; font-size: 14px; }
@@ -1303,8 +1353,10 @@ body[data-gaveta="fechada"] .palco{ margin-left: 54px; }
   html, body{ background: #fff !important; color: #000 !important; }
   body::before, .painel__folha::before, .capa__trama, .capa__selo,
   .fita, .rasgo, .gaveta, .compendio, .aviso, .naoimprime{ display: none !important; }
-  .palco{ margin-left: 0 !important; }
+  .palco{ margin-left: 0 !important; transition: none; }
+  .pagina{ max-width: none; }
   .folha{ padding: 0; }
+  .folha::before{ display: none; }
 
   .painel, .capa{
     box-shadow: none !important; transform: none !important;
@@ -1448,10 +1500,16 @@ body[data-gaveta="fechada"] .palco{ margin-left: 54px; }
 
 <main class="palco" id="palco">
 
-  <header class="capa" id="capa"></header>
+  <!-- A medida da página. Sem ela a ficha se estica até a borda do monitor,
+       e a capa termina com a marca num extremo e os carimbos no outro. -->
+  <div class="pagina">
 
-  <div class="folha">
-    <div id="topicos"></div>
+    <header class="capa" id="capa"></header>
+
+    <div class="folha">
+      <div id="topicos"></div>
+    </div>
+
   </div>
 
 </main>
