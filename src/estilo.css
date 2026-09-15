@@ -29,7 +29,7 @@
   --papel-3:   #d9d1bf;
   --tinta:     #16130f;
   --tinta-2:   #443d31;
-  --tinta-3:   #5f5849;   /* piso: estado vazio é texto de leitura e mede 5,3:1 */
+  --tinta-3:   #504939;   /* estado vazio é texto de leitura: 5,09:1 no pior papel */
 
   /* prata: a rampa é sempre a mesma, o que muda é onde ela é aplicada */
   --prata-0:   #43474d;
@@ -301,7 +301,6 @@ body::before{
   font: 400 var(--fs-mini)/1.4 var(--mono);
   letter-spacing: .2em; text-transform: uppercase;
   color: var(--casa-clr);
-  overflow-wrap: anywhere;
 }
 
 .capa__id{ flex: 1 1 320px; min-width: 240px; }
@@ -326,12 +325,6 @@ body::before{
 .capa__abaixo b{ color: var(--casa-clr); font-weight: 400; }
 .capa__carimbos{ display: flex; gap: 12px; align-items: center; flex: 0 0 auto; }
 .capa__carimbos .carimbo{ color: var(--casa-clr); border-color: var(--casa-clr); outline-color: var(--casa-clr); mix-blend-mode: normal; }
-
-/* redação: a barra preta que o Olho adora */
-.redigido{
-  background: #000; color: transparent; padding: 0 .35em;
-  user-select: none;
-}
 
 /* ------------------------------------------------------------ 4. estrutura */
 
@@ -361,6 +354,7 @@ body::before{
   position: relative;
   padding: 0 0 12px;
   color: var(--tinta);
+  container-type: inline-size; container-name: caixa;
 }
 .painel__folha{
   position: absolute; inset: 0; z-index: 0;
@@ -405,8 +399,8 @@ body::before{
 
 .painel__topo{
   position: relative;
-  display: flex; align-items: baseline; gap: 10px; flex-wrap: nowrap;
-  padding: 9px var(--pad) 7px;
+  display: flex; align-items: baseline; gap: 3px 12px; flex-wrap: wrap;
+  padding: 9px calc(var(--pad) + 30px) 7px var(--pad);
   background: var(--tinta);
   color: var(--papel);
   clip-path: polygon(0 9%, 14% 0, 41% 7%, 69% 1%, 100% 6%, 100% 600%, 0 600%);
@@ -424,17 +418,15 @@ body::before{
 .painel__nome{
   flex: 0 1 auto; min-width: 0;
   margin: 0;
-  font: 400 clamp(17px, 1.9vw, 23px)/1 var(--titulo);
+  font: 400 clamp(15px, 6.4cqi, 23px)/1.05 var(--titulo);
   letter-spacing: .04em; text-transform: uppercase;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .painel__nota{
-  flex: 0 20 auto; min-width: 0;
+  flex: 1 1 auto; min-width: 0;
   margin-left: auto; text-align: right;
-  font: 400 var(--fs-mini)/1.3 var(--mono);
+  font: 400 var(--fs-mini)/1.35 var(--mono);
   letter-spacing: var(--tr); text-transform: uppercase;
   color: var(--prata-2);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .painel__corpo{ padding: var(--pad-2) var(--pad) 0; }
 
@@ -443,7 +435,8 @@ body::before{
    ficha, não do aparelho, porque um Bastião e um Arquivista desligam
    coisas diferentes. */
 .painel__olho{
-  flex: 0 0 auto; margin-left: auto; width: 26px; height: 22px; padding: 0; border: 0; cursor: pointer;
+  position: absolute; right: 7px; top: 7px;
+  width: 26px; height: 22px; padding: 0; border: 0; cursor: pointer;
   background: rgba(255,255,255,.14); color: var(--papel);
   font: 400 13px/1 var(--mono);
 }
@@ -664,9 +657,14 @@ select.ent{ cursor: pointer; }
   margin: 0 0 var(--pad-2);
 }
 .contador__rot{
-  flex: 1 1 120px; min-width: 0;
+  flex: 1 1 110px; min-width: 0;
   font: 400 var(--fs-mini)/1.3 var(--mono);
   letter-spacing: var(--tr); text-transform: uppercase; color: var(--tinta-2);
+}
+/* os três andam juntos: rótulo pode descer de linha, o controle não se parte */
+.contador__ctrl{
+  flex: 0 0 auto; margin-left: auto;
+  display: flex; align-items: center; gap: 7px;
 }
 .contador__valor{
   min-width: 2.2em; text-align: center;
@@ -799,16 +797,22 @@ select.ent{ cursor: pointer; }
 .slots{ display: grid; gap: var(--pad-2); grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); }
 .slot__rot{
   display: flex; justify-content: space-between; align-items: baseline;
+  gap: 10px;
   font: 400 var(--fs-mini)/1.3 var(--mono); letter-spacing: var(--tr); text-transform: uppercase;
   color: var(--tinta-2); margin-bottom: 3px;
 }
-.slot__rot b{ color: var(--casa-esc); font-weight: 400; }
+.slot__rot > span{ flex: 0 0 auto; }
+/* a nota do slot cede primeiro: o nome do slot é que diz onde a coisa está */
+.slot__rot b{
+  flex: 0 1 auto; min-width: 0; text-align: right;
+  color: var(--casa-esc); font-weight: 400;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 
 /* trilha de ascensão */
-.trilha{ display: flex; gap: 3px; margin-bottom: 8px; }
+.trilha{ display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 8px; }
 .trilha__passo{
-  flex: 1 1 0; min-width: 0; overflow-wrap: anywhere;
-  padding: 5px 3px; text-align: center; border: 0; cursor: pointer;
+  flex: 1 1 78px; padding: 5px 4px; text-align: center; border: 0; cursor: pointer;
   background: rgba(0,0,0,.1); box-shadow: inset 0 0 0 1.5px var(--tinta);
   font: 400 var(--fs-mini)/1.25 var(--mono); letter-spacing: .06em; text-transform: uppercase;
   color: var(--tinta-2);
@@ -821,7 +825,7 @@ select.ent{ cursor: pointer; }
 .grau__casa{
   flex: 1 1 0; min-width: 0; height: 17px;
   background: rgba(0,0,0,.1); box-shadow: inset 0 0 0 1.5px var(--tinta);
-  font: 400 10px/16px var(--mono); text-align: center; color: var(--tinta-3);
+  font: 400 11px/16px var(--mono); text-align: center; color: var(--tinta-3);
 }
 .grau__casa[data-feito="1"]{ background: var(--tinta); color: var(--papel); }
 .grau__casa[data-marca="1"][data-feito="1"]{ background: var(--casa-esc); color: #fff; }
@@ -836,9 +840,6 @@ select.ent{ cursor: pointer; }
   border-right: 2px solid var(--casa-esc);
   box-shadow: 8px 0 30px -12px rgba(0,0,0,.9);
   transition: transform .18s ease;
-}
-.gaveta__puxador{
-  position: absolute; right: -1px; top: 0; bottom: 0; width: 0;
 }
 .gaveta__cabeca{
   display: flex; align-items: center; gap: 8px;
@@ -1093,6 +1094,18 @@ body[data-gaveta="fechada"] .palco{ margin-left: 54px; }
 
 @media (max-width: 760px){
   .folha{ padding: 0 12px calc(var(--gap) * 3); }
+  /* dedo não tem ponta: o que é de clicar cresce onde não há cursor */
+  .passo{ width: 30px; height: 28px; font-size: 16px; }
+  .per__passos .passo{ width: 27px; height: 25px; font-size: 14px; }
+  .contador .passo{ width: 32px; height: 30px; }
+  .acende{ width: 42px; height: 24px; }
+  .acende::after{ width: 16px; height: 16px; }
+  .acende[aria-pressed="true"]::after{ transform: translateX(19px); }
+  .medidor__casa{ height: 38px; }
+  .medidor--papel .medidor__casa{ height: 32px; }
+  .degrau{ height: 36px; }
+  .bt{ padding: 8px 12px; }
+  .bt--fino{ padding: 6px 9px; }
   .marca{ padding-right: 10px; }
   .marca__linha{ letter-spacing: var(--tr); }
   .capa__selo{ width: 150px; opacity: .2; }
@@ -1189,13 +1202,17 @@ body[data-gaveta="fechada"] .palco{ margin-left: 54px; }
   .corr__legenda i[data-tipo="car"]{ background-image: repeating-linear-gradient(-45deg, #000 0 1px, #fff 1px 4px) !important; }
   .corr__legenda i[data-tipo="rec"]{ background: #000 !important; }
   .contador__valor{ font-size: 13px; }
-  .degrau[data-cheio="1"], .grau__casa[data-feito="1"], .trilha__passo[data-atual="1"]{
+  .grau__casa[data-feito="1"], .trilha__passo[data-atual="1"]{
     background: #000 !important; color: #fff !important;
   }
+  .degrau[data-cheio="1"]{
+    background-image: repeating-linear-gradient(45deg, #000 0 3px, #fff 3px 5px) !important;
+    color: #000 !important;
+  }
+  .degrau[data-atual="1"]{ background: #000 !important; color: #fff !important; }
   .trilha__passo[data-feito="1"]{
     background-image: repeating-linear-gradient(45deg, #000 0 2px, #fff 2px 5px) !important;
   }
-  .degrau[data-atual="1"]{ outline: 2px solid #000; outline-offset: -4px; }
   .degrau[data-risco="1"]::after{ background-image: repeating-linear-gradient(45deg, #000 0 2px, transparent 2px 5px); }
   .corr__num, .cap__num{
     color: #000; mix-blend-mode: normal;

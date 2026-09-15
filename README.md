@@ -45,7 +45,7 @@ Mas meio megabyte numa linha só não é manutenção, então as partes moram
 separadas e a montagem é um comando:
 
 ```bash
-node extrai_dados.js devaneio073.txt dados_livro.json && node monta.js
+node extrai_dados.js devaneio073.txt dados_livro.json && node monta.js && node verifica.js
 ```
 
 `extrai_dados.js` lê o texto do livro em ordem de leitura — `pdftotext -enc
@@ -54,6 +54,14 @@ quarenta e quatro Talentos de prateleira, vinte Talentos Gerais, cento e vinte
 Cifras, dez Antecedentes, catorze Traços e seis Bênçãos. Ele só extrai: o que
 não casar com o formato é reportado em voz alta, nunca transformado em
 silêncio. Rodar sem nenhum aviso é o estado normal.
+
+`verifica.js` é a rede de proteção estática, e ela falha com código 1. Confere
+o que revisão manual não pega: ação declarada no markup sem ninguém que a
+atenda, classe escrita que não existe no CSS, dois painéis colidindo na mesma
+chave de recolhimento, `data-campo` gravando em campo que a ficha não tem,
+corpo de texto abaixo do piso de 11px, quebra de palavra no meio, e o
+contraste de cada tinta contra o **pé** do papel de cada casa — que é onde o
+gradiente é mais escuro e onde o texto de estado vazio cai numa ficha cheia.
 
 `monta.js` junta `fontes.css`, `src/estilo.css`, `src/corpo.html`,
 `src/app.js`, `dados_livro.json` e a marca em `index.html`. O texto do livro
@@ -265,9 +273,11 @@ Courier Prime vai embutida no arquivo sob a
 datilografada tenha a mesma aparência em qualquer máquina. A serifa e a
 condensada das manchetes são de sistema, com pilha de substitutas.
 
-Rótulo nenhum desce de **12px**, em qualquer arranjo, e o rastreamento das
-caps miúdas é um número só, `--tr`, parado em **.08em**: passando disso a
-palavra se desmancha em letras soltas e o olho perde o contorno dela. A
+Rótulo é **12px** (`--fs-mini`) em qualquer arranjo, e o piso absoluto, que
+vale para etiqueta e casa numerada, é **11px** — `verifica.js` reprova o que
+descer disso. O rastreamento das caps miúdas é um número só, `--tr`, parado em
+**.08em**: passando disso a palavra se desmancha em letras soltas e o olho
+perde o contorno dela. A
 retícula de meio-tom que cobre o papel fica em **11%** — acima disso ela deixa
 de ser grão de fotocópia, passa a comer os finos da letra e, numa folha
 inteira, acinzenta a página vista de longe.

@@ -159,7 +159,7 @@ const SLOTS = [
   { chave: "maos",    rot: "Mãos",    nota: "ao alcance" },
   { chave: "cintura", rot: "Cintura", nota: "ao alcance" },
   { chave: "bolsos",  rot: "Bolsos",  nota: "ao alcance" },
-  { chave: "costas",  rot: "Costas",  nota: "Ação Padrão para sacar" },
+  { chave: "costas",  rot: "Costas",  nota: "Ação Padrão", longa: "Exige uma Ação Padrão para sacar" },
 ];
 const MARCAS = {
   corpo:  { rot: "Corpo Endurecido", nota: "+1 Ponto de Vitalidade por nível" },
@@ -570,11 +570,13 @@ function medidor(acao, total, tipoDe, extras) {
 
 /* − n + para o que não cabe numa trilha: XP e contadores longos */
 function contador(rot, campo, valor, min, max, nota) {
+  const botao = (d, rotulo) =>
+    `<button class="passo naoimprime" type="button" data-acao="passoNum" data-campo="${campo}"` +
+    ` data-d="${d}" data-min="${min}" data-max="${max}"` +
+    ` aria-label="${d > 0 ? "Subir" : "Baixar"} ${esc(rot)}">${rotulo}</button>`;
   return `<div class="contador">` +
     `<span class="contador__rot">${esc(rot)}</span>` +
-    `<button class="passo naoimprime" type="button" data-acao="passoNum" data-campo="${campo}" data-d="-1" data-min="${min}" data-max="${max}" aria-label="Baixar ${esc(rot)}">−</button>` +
-    `<b class="contador__valor">${valor}</b>` +
-    `<button class="passo naoimprime" type="button" data-acao="passoNum" data-campo="${campo}" data-d="1" data-min="${min}" data-max="${max}" aria-label="Subir ${esc(rot)}">+</button>` +
+    `<span class="contador__ctrl">${botao(-1, "−")}<b class="contador__valor">${valor}</b>${botao(1, "+")}</span>` +
     (nota ? `<span class="contador__nota">${esc(nota)}</span>` : "") +
   `</div>`;
 }
@@ -1072,7 +1074,7 @@ function painelSemblante(f) {
 function painelEquipamento(f) {
   const corpo =
     `<div class="slots">` + SLOTS.map(s =>
-      `<div><div class="slot__rot"><span>${esc(s.rot)}</span><b>${esc(s.nota)}</b></div>` +
+      `<div><div class="slot__rot"><span>${esc(s.rot)}</span><b title="${esc(s.longa || s.nota)}">${esc(s.nota)}</b></div>` +
       `<textarea class="ent" rows="3" data-campo="equip.${s.chave}">${esc(f.equip[s.chave])}</textarea></div>`
     ).join("") + `</div>` +
     `<p class="margem">A distribuição é decidida <b>antes</b> da operação, não durante. O que estiver nas Costas exige uma Ação Padrão para sacar, e uma Ação Padrão em combate é a coisa mais cara que existe.</p>` +
@@ -1515,7 +1517,6 @@ const ACOES = {
     const i = f.recolhidos.indexOf(d.chave);
     if (i >= 0) f.recolhidos.splice(i, 1); else f.recolhidos.push(d.chave);
   },
-  abreTudo(f) { f.recolhidos = []; },
   abreComp(f, d) { abreCompendio(d.aba, d.filtro); },
   abreFicha(f, d) { db.ativa = d.id; },
   duplica(f) {
